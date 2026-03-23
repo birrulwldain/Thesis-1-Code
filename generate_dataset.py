@@ -10,6 +10,21 @@ Fungsi:
 4. Menyimpan output berdimensi masif ke dalam format HDF5 yang efisien.
 """
 
+import os
+
+# =========================================================================
+# MAC OS (APPLE SILICON M1) MULTIPROCESSING DEADLOCK FIX:
+# Matikan paksa inner-threading C-level dari Numpy/Scipy (Accelerate/OpenBLAS).
+# Jika ini tidak diset, numpy Radau solver akan 'hang' berjam-jam ketika 
+# diletakkan di dalam modul multiprocessing Pool 'spawn' di macOS.
+# Set ini harus *SEBELUM* impor numpy!
+# =========================================================================
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 import numpy as np
 import h5py
 import time
@@ -122,44 +137,53 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
     # Resolusi bawaan grid wavelength
     resolution = _CONFIG['instrument']['resolution']
     
-    # Menulis ke HDF5 secara akumulatif (Append) agar tidak terhapus
-    with h5py.File(output_file, 'a') as f:
-        # Cek apakah dataset lama sudah ada
-        if 'parameters' in f and 'spectra' in f:
-            dset_theta = f['parameters']
-            dset_spectra = f['spectra']
-            current_size = dset_theta.shape[0]
-            
-            # Memperpanjang ukuran baris untuk menampung n_samples data baru
-            dset_theta.resize((current_size + n_samples, 4))
-            dset_spectra.resize((current_size + n_samples, resolution))
-            write_idx = current_size
-            print(f"  [Resume] Dataset lama terdeteksi ({current_size} baris). Menambahkan {n_samples} baris baru...")
-            
-        else:
-            # Deklarasi array pertama kali di disk (chunked array agar bisa kompresi GZIP tanpa memenuhi RAM)
-            dset_theta = f.create_dataset("parameters", shape=(n_samples, 4), maxshape=(None, 4), dtype=np.float32)
-            dset_spectra = f.create_dataset("spectra", shape=(n_samples, resolution), maxshape=(None, resolution), dtype=np.float32, 
-                                            compression="gzip", compression_opts=4)
-            
-            dset_theta.attrs['columns'] = ['T_e_core_K', 'T_e_shell_K', 'n_e_core_cm3', 'n_e_shell_cm3']
-            dset_spectra.attrs['description'] = 'Normalized synthetic spectra (Instrumental FWHM 0.5nm, 1% Gaussian noise)'
-            write_idx = 0
-            print(f"  [Baru] Membuat dataset HDF5 kosong untuk {n_samples} baris awal...")
+    # =========================================================================
+    # SOLUSI MULTI-CORE (APPLE M1 / LINUX):
+    # Proses anak (Workers) JANGAN sampai mewarisi file HDF5 yang sedang terbuka.
+    # Maka, Pool diciptakan TERLEBIH DAHULU di RAM, baru file HDF5 dibuka.
+    # =========================================================================
+    with mp.Pool(processes=num_workers, initializer=init_worker, initargs=(elements, 0.5)) as pool:
         
-        t0 = time.time()
-        completed = 0
+        # Eksekusi generator stokastik
+        iterator = pool.imap_unordered(simulate_single_spectrum, tasks)
         
-        # Eksekusi Paralel Pool
-        with mp.Pool(processes=num_workers, initializer=init_worker, initargs=(elements, 0.5)) as pool:
-            for idx, theta, I_sim in pool.imap_unordered(simulate_single_spectrum, tasks):
+        # Menulis ke HDF5 secara akumulatif (Append) oleh MASTER PROCESS SAJA
+        with h5py.File(output_file, 'a') as f:
+            # Cek apakah dataset lama sudah ada
+            if 'parameters' in f and 'spectra' in f:
+                dset_theta = f['parameters']
+                dset_spectra = f['spectra']
+                current_size = dset_theta.shape[0]
+                
+                # Memperpanjang 
+                dset_theta.resize((current_size + n_samples, 4))
+                dset_spectra.resize((current_size + n_samples, resolution))
+                write_idx = current_size
+                print(f"  [Resume] Dataset lama terdeteksi ({current_size} baris). Menambahkan {n_samples} baris baru...")
+                
+            else:
+                dset_theta = f.create_dataset("parameters", shape=(n_samples, 4), maxshape=(None, 4), dtype=np.float32)
+                dset_spectra = f.create_dataset("spectra", shape=(n_samples, resolution), maxshape=(None, resolution), dtype=np.float32, 
+                                                compression="gzip", compression_opts=4)
+                
+                dset_theta.attrs['columns'] = ['T_e_core_K', 'T_e_shell_K', 'n_e_core_cm3', 'n_e_shell_cm3']
+                dset_spectra.attrs['description'] = 'Normalized synthetic spectra (Instrumental FWHM 0.5nm, 1% Gaussian noise)'
+                write_idx = 0
+                print(f"  [Baru] Membuat dataset HDF5 kosong untuk {n_samples} baris awal...")
+            
+            t0 = time.time()
+            completed = 0
+            completed_success = 0
+            
+            # Menyerap hasil kerja dari multi-core dan menuliskannya secara Serial
+            for idx, theta, I_sim in iterator:
                 completed += 1
                 
                 if theta is not None:
-                    # Tulis berurutan ke sub-blok HDF5 membuang celah nol
                     dset_theta[write_idx] = theta
                     dset_spectra[write_idx] = I_sim
                     write_idx += 1
+                    completed_success += 1
                 
                 progress_marker = max(1, n_samples // 10)
                 if completed % progress_marker == 0 or completed == n_samples:
@@ -167,13 +191,13 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
                     rate = completed / elapsed
                     eta = (n_samples - completed) / rate
                     print(f"  [{completed}/{n_samples}] ... {(completed/n_samples)*100:.1f}% | Laju: {rate:.1f} spec/detik | ETA: {eta:.1f} dtk")
-                    
-        # Memotong (resize) jika ada sample yang fail (untuk menjaga array terhindar baris 0)
-        target_max_size = current_size + n_samples if 'current_size' in locals() else n_samples
-        if write_idx < target_max_size:
-            dset_theta.resize((write_idx, 4))
-            dset_spectra.resize((write_idx, resolution))
-            print(f"  [Cleanup] Dataset akhir disusutkan ke resolusi bersih: {write_idx} baris.")
+                        
+            # Memotong (resize) jika ada sample yang fail
+            target_max_size = current_size + completed_success if 'current_size' in locals() else completed_success
+            if write_idx < dset_theta.shape[0]:
+                dset_theta.resize((write_idx, 4))
+                dset_spectra.resize((write_idx, resolution))
+                print(f"  [Cleanup] Dataset disusutkan (membuang baris gagal/kosong) menjadi: {write_idx} baris.")
                     
     fs = os.path.getsize(output_file)/1024/1024
     print(f"\n✅ Selesai! Pabrik data ditutup.")
