@@ -26,13 +26,19 @@ from libs_physics import SIMULATION_CONFIG
 
 def load_and_preprocess_experimental_data(csv_path: str, target_wavelengths: np.ndarray) -> np.ndarray:
     print(f"[Prep] Membaca data eksperimen dari: {csv_path}")
-    df = pd.read_csv(csv_path)
+    # Gunakan separator cerdas untuk melahap .csv (koma), .asc (spasi/tab), atau .txt (titik koma)
+    df = pd.read_csv(csv_path, sep=r'[\s,;]+', engine='python', header=None, skiprows=lambda x: x < 5 if 'asc' in csv_path.lower() else 0)
     
-    # Toleransi untuk beberapa kombinasi penamaan header CSV
-    col_wl = next((col for col in df.columns if 'wave' in col.lower() or 'wl' in col.lower()), df.columns[0])
-    col_int = next((col for col in df.columns if 'int' in col.lower()), df.columns[1])
+    # Jika skrip salah mendeteksi header karena format ASC, paksakan penamaan
+    if not isinstance(df.iloc[0, 0], (int, float, np.float64)): 
+        df = df.iloc[1:].reset_index(drop=True)
     
-    I_raw = df[col_int].values
+    df = df.apply(pd.to_numeric, errors='coerce').dropna()
+    df.columns = [f"Col_{i}" for i in range(df.shape[1])]
+    
+    # Kolom 0 otomatis panjang gelombang, Kolom 1 intensitas (standar ASCII Andor)
+    I_raw = df.iloc[:, 1].values
+    wl_raw = df.iloc[:, 0].values
     
     # 1. Koreksi baseline / latar (pendekatan kuantil terbawah)
     baseline = np.percentile(I_raw, 5) 
@@ -41,7 +47,7 @@ def load_and_preprocess_experimental_data(csv_path: str, target_wavelengths: np.
     
     # 2. Interpolasi ke grid resolusi model komputasi murni
     print(f"[Prep] Interpolasi spektrum ke resolusi termodinamika ({len(target_wavelengths)} piksel)...")
-    I_interp = np.interp(target_wavelengths, df[col_wl].values, I_corr)
+    I_interp = np.interp(target_wavelengths, wl_raw, I_corr)
     
     # 3. Normalisasi L-Infinity (Maksimum intensitas = 1.0)
     m = I_interp.max()
