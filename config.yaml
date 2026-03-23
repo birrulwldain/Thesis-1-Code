@@ -1,8 +1,25 @@
 # =========================================================================
 # Q1 THESIS CONFIGURATION GATEWAY
 # -------------------------------------------------------------------------
-# File pusat untuk mengontrol keempat blok komputasi (Physics, Synthesizer,
-# AI Inversion, dan Experimental Validation).
+# File sentral untuk mengontrol parameter keempat blok komputasi sains Anda.
+# Segala bentuk pengubahan resolusi, suhu, densitas, unsur, hingga matriks ML
+# CUKUP DILAKUKAN DI SINI TANPA HARUS MENULIS ULANG KODE PYTHONNYA.
+#
+# PANDUAN EKSEKUSI TERMINAL (HELP COMMANDS)
+# Jalankan perintah-perintah ini di terminal Mac/HPC Anda:
+#
+# 🟢 BLOK 1  : python libs_physics.py
+#             (Jalankan simulasi 1 spektrum cepat & verifikasi deterministik ODE)
+# 
+# 🟢 BLOK 2  : python generate_dataset.py --samples 100 --cores 2
+#             (Menciptakan "dataset_synthetic.h5" menggunakan Monte-Carlo paralel)
+#             (Parameter akan ditarik dari config 'monte_carlo_synthesizer' ini)
+#
+# 🟢 BLOK 3  : python train_inversion_model.py --dataset dataset_synthetic.h5
+#             (Melatih model kecerdasan buatan SVR dari data HDF5 Blok 2)
+#
+# 🟢 BLOK 4  : python empirical_validation.py --model model_inversi_svr.pkl --csv data_lab.csv
+#             (Menembak data eksperimental mentah ke ML dan menghitung McWhirter limit)
 # =========================================================================
 
 instrument:
