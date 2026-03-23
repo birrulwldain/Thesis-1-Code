@@ -1,0 +1,25 @@
+[
+  {
+    "sample_id": 0,
+    "temperature": 12373.737373737375,
+    "electron_density": 2848035868435805.0,
+    "base_elements": [
+      "Mn",
+      "Sc",
+      "B",
+      "Pd",
+      "Hg",
+      "Te",
+      "Bi",
+      "F",
+      "Ga",
+      "Sn",
+      "Ru",
+      "Co",
+      "N",
+      "Ca",
+      "Si",
+      "Ni"
+    ]
+  }
+]

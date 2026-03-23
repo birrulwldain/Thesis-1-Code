@@ -1,0 +1,268 @@
+\documentclass[10pt,leqno]{amsart}
+\usepackage{graphicx}
+\baselineskip=16pt
+
+\usepackage{indentfirst,csquotes}
+
+\topmargin= .5cm
+\textheight= 20cm
+\textwidth= 32cc
+\baselineskip=16pt
+
+\evensidemargin= .9cm
+\oddsidemargin= .9cm
+
+\usepackage{amssymb,amsthm,amsmath}
+\usepackage{xcolor,paralist,hyperref,titlesec,fancyhdr,etoolbox}
+\newtheorem{theorem}{Theorem}[]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\titleformat{\section}[display]{\normalfont\huge\bfseries\centering}{\centering\chaptertitlename\thechapter}{10pt}{\Large}
+\titlespacing*{\section}{0pt}{0ex}{0ex}
+
+\hypersetup{ colorlinks=true, linkcolor=black, filecolor=black, urlcolor=black }
+\def\proof{\noindent {\it Proof. $\, $}}
+\def\endproof{\hfill $\Box$ \vskip 5 pt }
+
+\begin{document}
+
+\title{Deterministic Two-Zone Modeling of Transient LIBS Plasma: Correcting
+the Local Thermodynamic Equilibrium Illusion via Collisional-Radiative
+Matrices and Statistical Inversion}
+
+\author[Walidain, Idris, Saddami]{Birrul Walidain, Nasrullah Idris, Khairun Saddami}
+\date{\today}
+\address{Department of Physics, Faculty of Mathematics and Natural Sciences,
+Universitas Syiah Kuala, Banda Aceh, Indonesia}
+\email{birrul.walidain@mhs.usk.ac.id}
+\maketitle
+
+\let\thefootnote\relax
+\footnotetext{MSC2020: Primary 82D10 (Plasma and Plasmonics), Secondary 65L04 (Numerical Methods for Stiff ODE), 62J02 (General Nonlinear Regression).}
+
+\begin{abstract}
+The extraction of fundamental thermodynamic parameters, such as electron
+temperature ($T$) and density ($n_e$), in Laser-Induced Breakdown Spectroscopy
+(LIBS) frequently relies on the assumption of Local Thermodynamic Equilibrium
+(LTE) via the Saha equation. However, in rapidly expanding transient plasmas
+operating on nanosecond scales, the LTE criterion collapses, and intense spatial
+gradients induce severe optical self-absorption. This paper presents a
+deterministic computational architecture that replaces the homogeneous plasma
+assumption with a Two-Zone Model (Core and Shell). We strictly reject the Saha
+equilibrium assumption, instead solving the highly stiff Ordinary Differential
+Equations (ODEs) of a Collisional-Radiative (CR) model using an implicit solver
+with an analytical Jacobian matrix to preserve absolute thermodynamic
+conservation. Furthermore, rather than employing computationally expensive
+stochastic blind-search algorithms or black-box deep learning models, we utilize
+a statistical machine learning regression trained on deterministically
+synthesized spectra. This inverse mathematical solver effectively deconvolutes
+the self-absorbed macroscopic spectra to reveal the true microscopic kinetic
+parameters of the core, thereby correcting the McWhirter criterion and
+eliminating the LTE illusion.
+\end{abstract}
+
+\bigskip
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+Laser-Induced Breakdown Spectroscopy (LIBS) has been widely established as a
+robust analytical technique for in-situ material characterization. Despite its
+empirical success, the theoretical extraction of plasma parameters relies heavily
+on the assumption that the plasma adheres to Local Thermodynamic Equilibrium
+(LTE). Under LTE, atomic state populations are assumed to follow the Boltzmann
+distribution, and ionization balances are governed by the Saha equation.
+However, laser-induced plasmas are inherently transient and chaotic, exhibiting
+extreme spatial gradients and rapid expansion velocities on nanosecond and
+femtosecond timescales. In such regimes, collisional rates often fail to
+equilibrate with radiative decay processes, causing a fundamental breakdown of
+the LTE condition.
+
+Furthermore, the sharp temperature gradient between the hot, dense core and the
+cooler, expanding periphery induces profound optical self-absorption. Recent
+literature has attempted to address this self-reversal phenomenon by applying
+homogeneous plasma models or by utilizing global stochastic optimization
+algorithms (such as \texttt{CRS2-LM}) to fit experimental spectra. These
+approaches contain fatal thermodynamic flaws: they either ignore the spatial
+non-uniformity of the transient expansion or forcibly embed the Saha equilibrium
+assumption into mathematically partitioned spatial zones \cite{griem1997,
+fujimoto2004}.
+
+In rejecting black-box deep learning architectures and probabilistic
+curve-fitting that obscure physical realities, this study proposes a strictly
+deterministic computational framework. We implement a physically rigorous
+Two-Zone Model where the atomic population kinetics are governed purely by an
+exact Collisional-Radiative (CR) matrix, eliminating the Saha assumption
+entirely. By mapping the deterministic forward model to a rapid statistical
+machine learning regression for spectral inversion, this methodology provides a
+high-fidelity diagnostic tool capable of exposing the LTE illusion and
+validating the empirical limits of the McWhirter criteria \cite{mcwhirter1965}.
+
+% ============================================================================
+\section{Material and Methods}
+% ============================================================================
+
+The computational architecture is strictly divided into a deterministic forward
+physical model---ensuring absolute conservation of mass and energy---and a
+statistical inverse solver for parameter extraction.
+
+\subsection{The Two-Zone Geometric Architecture}
+
+To capture the spatial heterogeneity of the self-absorption phenomenon without
+triggering the exponential computational cost of full 3D hydrodynamic
+simulations, the plasma is spatially discretized into two distinct regions: the
+emissive Core ($V_1$) and the absorptive Shell ($V_p$). The macroscopic intensity
+observed by the spectrometer ($I_\mathrm{obs}$) is modeled via the 1D integration
+of the Radiative Transfer Equation (RTE):
+\begin{equation}
+    I_\mathrm{obs}(\lambda) = I_\mathrm{core}(\lambda)\,
+    \exp\!\bigl(-\kappa_\mathrm{shell}(\lambda)\, d_\mathrm{shell}\bigr)
+    + I_\mathrm{shell}(\lambda),
+    \label{eq:rte}
+\end{equation}
+where $I_\mathrm{core}$ is the unattenuated emission from the core,
+$\kappa_\mathrm{shell}$ is the wavelength-dependent absorption coefficient of
+the periphery, and $d_\mathrm{shell}$ is the optical thickness of the absorbing
+layer \cite{rybicki1979}.
+
+\subsection{Deterministic Population Kinetics (The Core)}
+
+The fundamental divergence of this methodology from established homogeneous
+models lies in the calculation of the energy state populations ($n_i$). We
+unequivocally reject the Saha equation. The temporal evolution of the fractional
+populations is solved via the Collisional-Radiative (CR) system of differential
+equations:
+\begin{equation}
+    \frac{dn_i}{dt} = \sum_{j \neq i} n_j\, R_{ji} - n_i \sum_{j \neq i} R_{ij},
+    \label{eq:cr}
+\end{equation}
+where the rate matrix $R_{ij}$ encapsulates all fundamental electron-impact
+collisional rates and radiative Einstein transition probabilities ($A_{ij}$,
+$B_{ij}$). Because the kinetic rates of collisional excitation and spontaneous
+emission are separated by multiple orders of magnitude (ranging from $10^{-14}$
+to $10^{-3}$ seconds), the resulting Jacobian matrix is exceptionally stiff.
+
+To prevent numerical divergence and unphysical negative particle
+populations---which routinely occur when using explicit methods such as standard
+Runge-Kutta---the temporal integration is executed using an implicit solver
+(Backward Differentiation Formula, BDF, or Radau). The computational bottleneck
+of inverting the $\mathcal{O}(N^3)$ matrix at each step is mitigated by
+supplying the exact analytical Jacobian:
+\begin{equation}
+    J_{ij} = \frac{\partial f_i}{\partial n_j},
+    \label{eq:jacobian}
+\end{equation}
+which is analytically identical to the CR rate matrix $M$ for the linear ODE
+system $\mathbf{f}(n) = M\,n$. This guarantees that Newton iterations within
+the implicit solver converge quadratically, preserving strict thermodynamic
+conservation at every time step \cite{hairer1996}.
+
+\subsection{Socratic Boundaries and Synthetic Dataset Generation}
+
+The forward model computes the absorption coefficients ($\kappa$) by summing
+Voigt line profiles over all NIST-validated transitions, integrating both Stark
+broadening (pressure broadening, Lorentzian) and Doppler broadening (thermal
+motion, Gaussian):
+\begin{equation}
+    \kappa(\lambda) = \sum_{\text{transitions}} n_i\,\sigma_{ij}(\lambda)\,
+    \left(1 - \frac{n_k\,g_i}{n_i\,g_k}\right),
+    \label{eq:kappa}
+\end{equation}
+where the stimulated emission correction in parentheses ensures detailed balance
+is maintained \cite{griem1997}.
+
+By sweeping the parameter space ($T_e \in [4000, 20000]$\,K and
+$n_e \in [10^{14}, 10^{18}]$\,cm$^{-3}$), we synthesize a comprehensive dataset
+of self-absorbed spectra. We apply Socratic ignorance regarding fundamental
+atomic inputs: transition probabilities $A_{ki}$ and statistical weights $g_i$
+are strictly sourced from the NIST Atomic Spectra Database \cite{nist_asd}.
+Transitions lacking validated empirical cross-sections are not synthetically
+approximated, ensuring the mathematical space does not exceed the boundaries of
+verified physical literature.
+
+\subsection{Inverse Modeling via Statistical Regression}
+
+To solve the inverse problem---extracting the pure core temperature
+($T_\mathrm{core}$) and electron density ($n_{e,\mathrm{core}}$) from a
+convoluted experimental spectrum---we bypass computationally exhaustive and
+often divergent stochastic blind-search algorithms. Instead, intermediate
+statistical machine learning algorithms (e.g., Support Vector Regression or
+Ridge Regression) are trained on the deterministically generated synthetic
+dataset. Here, the algorithm acts purely as a high-speed mathematical inversion
+operator rather than a predictive physical model, translating the distorted line
+profiles back into their foundational thermodynamic parameters.
+
+% ============================================================================
+\section{Expected Results and Discussion}
+% ============================================================================
+
+By applying the trained regression model to experimental LIBS spectra, this
+computational architecture is expected to successfully deconvolute the optical
+self-absorption. Consequently, the extracted parameters ($T$ and $n_e$) will
+reflect the true, unattenuated state of the plasma core.
+
+When these corrected parameters are substituted back into the classical
+McWhirter criterion \cite{mcwhirter1965}:
+\begin{equation}
+    N_e \ge 1.6 \times 10^{12}\, T^{1/2}\, (\Delta E)^3,
+    \label{eq:mcwhirter}
+\end{equation}
+we hypothesize a significant deviation from the values derived via traditional
+homogeneous Boltzmann plot methods. This will quantitatively demonstrate that
+previous assertions of LTE in transient LIBS plasmas are largely mathematical
+illusions caused by the failure to isolate the absorptive shell from the
+emissive core. The stability of the implicit CR solver guarantees that this
+correction is grounded in absolute thermodynamic conservation rather than
+statistical curve-fitting anomalies.
+
+% ============================================================================
+\begin{thebibliography}{99}
+
+\bibitem{fujimoto2004}
+Fujimoto, T. (2004).
+\textit{Plasma Spectroscopy}.
+Clarendon Press, Oxford.
+
+\bibitem{griem1997}
+Griem, H. R. (1997).
+\textit{Principles of Plasma Spectroscopy}.
+Cambridge University Press, Cambridge.
+
+\bibitem{hairer1996}
+Hairer, E., \& Wanner, G. (1996).
+\textit{Solving Ordinary Differential Equations II: Stiff and
+Differential-Algebraic Problems} (2nd ed.).
+Springer, Berlin.
+
+\bibitem{mcwhirter1965}
+McWhirter, R. W. P. (1965).
+Spectral intensities.
+In R. H. Huddlestone \& S. L. Leonard (Eds.),
+\textit{Plasma Diagnostic Techniques} (pp.\ 201--264).
+Academic Press, New York.
+
+\bibitem{nist_asd}
+Kramida, A., Ralchenko, Yu., Reader, J., \& NIST ASD Team (2023).
+\textit{NIST Atomic Spectra Database} (version 5.11).
+National Institute of Standards and Technology, Gaithersburg, MD.
+\url{https://physics.nist.gov/asd}
+
+\bibitem{rybicki1979}
+Rybicki, G. B., \& Lightman, A. P. (1979).
+\textit{Radiative Processes in Astrophysics}.
+Wiley-Interscience, New York.
+
+\bibitem{vanregemorter1962}
+van Regemorter, H. (1962).
+Rate of collisional excitation in stellar atmospheres.
+\textit{The Astrophysical Journal}, \textbf{136}, 906--915.
+
+\end{thebibliography}
+
+\end{document}
