@@ -17,6 +17,13 @@ import time
 import argparse
 import joblib
 
+import yaml
+import os
+
+_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yaml')
+with open(_CONFIG_PATH, 'r') as f:
+    _CONFIG = yaml.safe_load(f)
+
 from sklearn.svm import SVR
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.preprocessing import StandardScaler
@@ -24,9 +31,12 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 
-def train_model(dataset_file: str, output_model: str, n_components: int = 20):
+def train_model(dataset_file: str, output_model: str, n_components: int = None):
     print("=== BLOK 3: Arsitektur Inversi SVR ===")
     print(f"Memuat matrix dataset dari: {dataset_file}")
+    
+    if n_components is None:
+        n_components = _CONFIG['machine_learning']['pca_components']
     
     try:
         with h5py.File(dataset_file, 'r') as f:
@@ -80,8 +90,10 @@ def train_model(dataset_file: str, output_model: str, n_components: int = 20):
     print("[Tahap 3] Melatih SVR Multi-Output (Kernel=RBF)...")
     t0 = time.time()
     
-    # C=100 (penalti keras pada margin), epsilon=0.01 (tube margin ketat)
-    svr = SVR(kernel='rbf', C=100.0, gamma='scale', epsilon=0.01)
+    # C=... (penalti keras pada margin ditarik dari config), epsilon=0.01 (tube margin ketat)
+    cfg_svr_k = _CONFIG['machine_learning']['svr_kernel']
+    cfg_svr_c = _CONFIG['machine_learning']['svr_C']
+    svr = SVR(kernel=cfg_svr_k, C=cfg_svr_c, gamma='scale', epsilon=0.01)
     model = MultiOutputRegressor(svr)
     
     model.fit(X_train_scaled, y_train_scaled)

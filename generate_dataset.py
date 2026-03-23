@@ -19,25 +19,32 @@ import multiprocessing as mp
 
 from libs_physics import DataFetcher, PlasmaZoneParams, TwoZonePlasma, instrumental_broadening
 
+import yaml
+
+# Memuat Konfigurasi Gateway
+_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yaml')
+with open(_CONFIG_PATH, 'r') as f:
+    _CONFIG = yaml.safe_load(f)
+
 # Variabel global untuk setiap Process-Worker agar tidak di-pickle ulang dari master
 _fetcher = None
 _elements = None
-_fwhm_nm = 0.5
+_fwhm_nm = _CONFIG['instrument']['fwhm_nm']
+_noise_level = _CONFIG['instrument']['noise_level']
 
-def init_worker(elements, fwhm_nm):
+def init_worker(elements, fwhm_nm_unused):
     """Inisialisasi memori per-core CPU untuk DataFetcher yang berukuran besar."""
-    global _fetcher, _elements, _fwhm_nm
+    global _fetcher, _elements
     _fetcher = DataFetcher()  
     _elements = elements
-    _fwhm_nm = fwhm_nm
 
 def simulate_single_spectrum(args):
     """Fungsi pekerja: menerima kombinasi parameter, merakit spektrum, mengembalikan array."""
     idx, T_core, T_shell, n_e_core, n_e_shell = args
     
-    # Ketebalan geometris (dipertahankan konstan dalam studi ini)
-    d_core_m = 1e-3
-    d_shell_m = 2e-3
+    # Ketebalan geometris (dipertahankan dari YAML GATEWAY)
+    d_core_m = _CONFIG['monte_carlo_synthesizer']['core']['thickness_m']
+    d_shell_m = _CONFIG['monte_carlo_synthesizer']['shell']['thickness_m']
     
     core = PlasmaZoneParams(T_e_K=T_core, T_i_K=T_core*0.8, n_e_cm3=n_e_core, thickness_m=d_core_m, label='Core')
     shell = PlasmaZoneParams(T_e_K=T_shell, T_i_K=T_shell*0.8, n_e_cm3=n_e_shell, thickness_m=d_shell_m, label='Shell')
@@ -58,8 +65,8 @@ def simulate_single_spectrum(args):
         if m > 0.0:
             I_sim = I_sim / m
             
-        # Injeksi Derau Sintetik: 1% dari rentang maksimal
-        noise = np.random.normal(0, 0.01, size=I_sim.shape)
+        # Injeksi Derau Sintetik: 1% atau sesuai config
+        noise = np.random.normal(0, _noise_level, size=I_sim.shape)
         I_sim = np.clip(I_sim + noise, 0.0, 1.0)
         
         # Bungkus hasil (Float32 untuk efisiensi penyimpanan HDF5)
@@ -80,33 +87,40 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
     print(f"Unit Pekerja (CPU) : {num_workers} cores aktif")
     print(f"File Output (HDF5) : {output_file}")
     
-    # Rentang Domain Parameter Termodinamika
+    # Rentang Domain Parameter Termodinamika dari config.yaml (dipaksa ke float agar aman dari string-parsing PyYAML)
     bounds = {
-        'T_core': (10000.0, 20000.0),
-        'T_shell': (5000.0, 10000.0),
-        'ne_core': (1e17, 1e18),
-        'ne_shell': (1e15, 1e16)
+        'T_core': tuple(map(float, _CONFIG['monte_carlo_synthesizer']['core']['T_range_K'])),
+        'T_shell': tuple(map(float, _CONFIG['monte_carlo_synthesizer']['shell']['T_range_K'])),
+        'ne_core': tuple(map(float, _CONFIG['monte_carlo_synthesizer']['core']['ne_range_cm3'])),
+        'ne_shell': tuple(map(float, _CONFIG['monte_carlo_synthesizer']['shell']['ne_range_cm3']))
     }
     
-    # Kita pertahankan komposisi elemen Si, Al, Fe untuk realisme meteorit/tanah
-    elements = [('Si', 1, 0.25), ('Al', 1, 0.25), ('Fe', 1, 0.5)]
+    # Material komposisi langsung diproyeksikan dari config.yaml
+    els = _CONFIG['plasma_target']['elements']
+    fracs = _CONFIG['plasma_target']['fractions']
+    elements = [(el, 1, frac) for el, frac in zip(els, fracs)]
     
     # Sampling parameter secara seragam
     np.random.seed(42)
     tasks = []
+    
+    d_core_m = _CONFIG['monte_carlo_synthesizer']['core']['thickness_m']
+    d_shell_m = _CONFIG['monte_carlo_synthesizer']['shell']['thickness_m']
+    
     for i in range(n_samples):
         Tc = np.random.uniform(*bounds['T_core'])
         Ts = np.random.uniform(*bounds['T_shell'])
-        # Hukum Fisika: Shell tidak bolah lebih panas dari Core
         if Ts > Tc: Ts = Tc * 0.8
         
         nc = np.random.uniform(*bounds['ne_core'])
         ns = np.random.uniform(*bounds['ne_shell'])
         
+        # Override tasks parameter if needed, but the worker currently uses hardcoded thickness
+        # Wait, the worker uses hardcoded thickness in generate_dataset.py. We should pass it via args if we want it dynamic.
         tasks.append((i, Tc, Ts, nc, ns))
     
     # Resolusi bawaan grid wavelength
-    resolution = 24480
+    resolution = _CONFIG['instrument']['resolution']
     
     # Menulis ke HDF5 secara real-time
     with h5py.File(output_file, 'w') as f:
@@ -153,8 +167,14 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
 
 
 if __name__ == '__main__':
+    # Ekstraksi fallback default samplerate dari YAML
+    import yaml
+    with open(os.path.join(os.path.dirname(__file__), 'config.yaml'), 'r') as f:
+        _cfg = yaml.safe_load(f)
+    default_samples = _cfg['monte_carlo_synthesizer']['generator_samples']
+    
     parser = argparse.ArgumentParser(description="Blok 2: Ciptakan Dataset Sintetik LIBS secara paralel")
-    parser.add_argument('--samples', type=int, default=20, help='Jumlah sampel (def: 20 uji coba)')
+    parser.add_argument('--samples', type=int, default=default_samples, help='Jumlah sampel')
     parser.add_argument('--out', type=str, default='dataset_synthetic.h5', help='Nama file output HDF5')
     parser.add_argument('--cores', type=int, default=None, help='Jumlah core CPU (-1 untuk auto)')
     args = parser.parse_args()

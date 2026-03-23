@@ -16,6 +16,12 @@ import joblib
 import argparse
 import os
 
+import yaml
+
+_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yaml')
+with open(_CONFIG_PATH, 'r') as f:
+    _CONFIG = yaml.safe_load(f)
+
 from libs_physics import SIMULATION_CONFIG
 
 def load_and_preprocess_experimental_data(csv_path: str, target_wavelengths: np.ndarray) -> np.ndarray:
@@ -104,9 +110,8 @@ def run_empirical_validation(model_pkl: str, csv_path: str):
     T_core = results.get('T_e_core_K', 12000.0)
     ne_core = results.get('n_e_core_cm3', 1e17)
     
-    # Asumsi beda energi transisi eksitasi terbesar di plasma LIBS (UV/Visible)
-    # Konservatif: ~5.0 eV (tergantung elemen; jika C/N/O mungkin >10 eV)
-    delta_E_eV = 4.5 
+    # Asumsi beda energi transisi optik ditarik secara dinamis dari Pusat YAML
+    delta_E_eV = _CONFIG['plasma_target']['mcwhirter_delta_E_eV'] 
     
     # McWhirter: N_e >= 1.6e12 * T_e^{1/2} * (dE)^3
     # Dengan T_e dalam K, dan dE dalam eV

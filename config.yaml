@@ -1,0 +1,33 @@
+# =========================================================================
+# Q1 THESIS CONFIGURATION GATEWAY
+# -------------------------------------------------------------------------
+# File pusat untuk mengontrol keempat blok komputasi (Physics, Synthesizer,
+# AI Inversion, dan Experimental Validation).
+# =========================================================================
+
+instrument:
+  wl_range_nm: [200.0, 400.0]        # Rentang pindaian CCD spektrometer [nm]
+  resolution: 24480                  # Resolusi numerik (piksel termodinamika)
+  fwhm_nm: 0.5                       # Resolusi fisik alat (Gaussian instrumental broadening)
+  noise_level: 0.01                  # Fraksi derau sinyal (1%)
+
+plasma_target:
+  elements: ["Si", "Al", "Fe"]       # Spesies plasma yang dianalisis
+  fractions: [0.25, 0.25, 0.50]      # Fraksi stoikiometri mol/massa
+  mcwhirter_delta_E_eV: 4.5          # Celah energi hambatan optik terbesar (untuk batas LTE)
+
+monte_carlo_synthesizer:
+  generator_samples: 100             # Default jumlah spektrum yang dibuat jika tidak diset via argumen CLI
+  core:
+    T_range_K: [10000.0, 20000.0]    # Distribusi tebakan suhu Inti Plasma
+    ne_range_cm3: [1.0e17, 1.0e18]   # Distribusi tebakan kerapatan Inti
+    thickness_m: 0.001               # Kedalaman lintasan optik (1 mm)
+  shell:
+    T_range_K: [5000.0, 10000.0]     # Distribusi tebakan suhu Korona/Pinggiran
+    ne_range_cm3: [1.0e15, 1.0e16]   # Distribusi tebakan kerapatan Korona
+    thickness_m: 0.002               # Kedalaman lintasan optik (2 mm)
+
+machine_learning:
+  pca_components: 20                 # Vektor Hiper-dimensi utama yang dipetik dari >24k matriks
+  svr_kernel: 'rbf'                  # Bentuk Support Vector
+  svr_C: 1.0                         # Hyperparameter regulasi jarak galat

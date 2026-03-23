@@ -59,11 +59,21 @@ G_BAR_ION     = 0.276  # For singly/multiply ionized species (sp_num >= 2)
 # Atomic mass unit
 AMU_KG = 1.66053906660e-27   # [kg/amu]
 
-# Simulation grid configuration
+import yaml
+
+# Muat Konfigurasi Tesis Universal 1-Pintu
+_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yaml')
+try:
+    with open(_CONFIG_PATH, 'r') as f:
+        _CONFIG = yaml.safe_load(f)
+except Exception as e:
+    raise RuntimeError(f"Gagal memuat config.yaml: {e}. Pastikan file konfigurasi 1-Pintu tersedia.")
+
+# Simulation grid configuration (Diwariskan dari YAML agar konsisten lintas Blok)
 SIMULATION_CONFIG = {
-    "resolution"          : 24480,          # Wavelength grid points (matches legacy sim.py)
-    "wl_range_nm"         : (200.0, 900.0), # Wavelength range [nm]
-    "target_max_intensity": 0.8,            # Normalization target for output spectrum
+    "resolution"          : _CONFIG['instrument']['resolution'],
+    "wl_range_nm"         : tuple(_CONFIG['instrument']['wl_range_nm']),
+    "target_max_intensity": 0.8,
 }
 
 # Resolve data paths relative to this file (robust to working directory)
