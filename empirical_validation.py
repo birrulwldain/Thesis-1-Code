@@ -110,6 +110,38 @@ def run_empirical_validation(model_pkl: str, csv_path: str):
     for k, v in results.items():
         print(f"    {k:<16} = {v:.2e}")
         
+    # --- 3.5. Komparasi dengan Ground Truth Konvensional (Saha-Boltzmann) ---
+    import re
+    sample_id = None
+    filename = os.path.basename(csv_path)
+    match = re.search(r'S(\d+)', filename, re.IGNORECASE)
+    if match:
+        sample_id = f"S{match.group(1).upper()}"
+        
+    legacy_pkl = "data/ground_truth_legacy.pkl"
+    if sample_id and os.path.exists(legacy_pkl):
+        try:
+            ground_truth = joblib.load(legacy_pkl)
+            if sample_id in ground_truth:
+                print(f"\n[Benchmarking] Ditemukan Ground Truth historis untuk '{sample_id}'!")
+                saha_Te = ground_truth[sample_id]['T_e_K']
+                saha_ne = ground_truth[sample_id]['n_e_cm3']
+                
+                svr_Te = results.get('T_e_core_K', 0)
+                svr_ne = results.get('n_e_core_cm3', 0)
+                
+                err_Te = abs(svr_Te - saha_Te) / saha_Te * 100 if pd.notna(saha_Te) and saha_Te > 0 else float('nan')
+                err_ne = abs(svr_ne - saha_ne) / saha_ne * 100 if pd.notna(saha_ne) and saha_ne > 0 else float('nan')
+                
+                print("-" * 75)
+                print(f"   === ADU MEKANIK: AI (SVR) vs MANUSIA (Saha-Boltzmann) ===")
+                print(f"   {'Parameter':<12} | {'SVR (Blok 3)':<17} | {'Saha (Konvensional)':<20} | {'Error (%)':<10}")
+                print(f"   {'Suhu (Te)':<12} | {svr_Te:<17.0f} | {saha_Te:<20.0f} | {err_Te:.2f}%")
+                print(f"   {'Densit(ne)':<12} | {svr_ne:<17.2e} | {saha_ne:<20.2e} | {err_ne:.2f}%")
+                print("-" * 75)
+        except Exception as e:
+            print(f"[Warning] Gagal memuat fitur perbandingan: {e}")
+            
     # --- 4. Pembuktian Kriteria McWhirter ---
     print("\n[Fisika] Evaluasi Hukum Termodinamika (Kriteria McWhirter)...")
     
