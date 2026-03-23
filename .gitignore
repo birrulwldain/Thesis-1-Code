@@ -42,6 +42,14 @@ model_inversi_svr.pkl
 data_eksperimen_mock.csv
 *.csv
 
+# Raw outputs and Log files
+*.txt
+!requirements.txt
+raw/
+data/*.h5
+data/*.pkl
+*.log
+
 # OS generated
 .DS_Store
 .DS_Store?
