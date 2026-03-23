@@ -42,28 +42,34 @@ def simulate_single_spectrum(args):
     core = PlasmaZoneParams(T_e_K=T_core, T_i_K=T_core*0.8, n_e_cm3=n_e_core, thickness_m=d_core_m, label='Core')
     shell = PlasmaZoneParams(T_e_K=T_shell, T_i_K=T_shell*0.8, n_e_cm3=n_e_shell, thickness_m=d_shell_m, label='Shell')
     
-    # Eksekusi Blok 1
-    model = TwoZonePlasma(core, shell, _elements, _fetcher)
-    wl, I_raw, meta = model.run()
-    
-    # Broadening Instrumen
-    if _fwhm_nm > 0.0:
-        I_sim = instrumental_broadening(I_raw, wl, _fwhm_nm)
-    else:
-        I_sim = I_raw
+    try:
+        # Eksekusi Blok 1
+        model = TwoZonePlasma(core, shell, _elements, _fetcher)
+        wl, I_raw, meta = model.run()
         
-    # Normalisasi Maksimum ke 1.0
-    m = I_sim.max()
-    if m > 0.0:
-        I_sim = I_sim / m
+        # Broadening Instrumen
+        if _fwhm_nm > 0.0:
+            I_sim = instrumental_broadening(I_raw, wl, _fwhm_nm)
+        else:
+            I_sim = I_raw
+            
+        # Normalisasi Maksimum ke 1.0
+        m = I_sim.max()
+        if m > 0.0:
+            I_sim = I_sim / m
+            
+        # Injeksi Derau Sintetik: 1% dari rentang maksimal
+        noise = np.random.normal(0, 0.01, size=I_sim.shape)
+        I_sim = np.clip(I_sim + noise, 0.0, 1.0)
         
-    # Injeksi Derau Sintetik: 1% dari rentang maksimal untuk merepresentasikan noise sensor CCD
-    noise = np.random.normal(0, 0.01, size=I_sim.shape)
-    I_sim = np.clip(I_sim + noise, 0.0, 1.0)
-    
-    # Bungkus hasil (Float32 untuk efisiensi penyimpanan HDF5)
-    theta = np.array([T_core, T_shell, n_e_core, n_e_shell], dtype=np.float32)
-    return idx, theta, I_sim.astype(np.float32)
+        # Bungkus hasil (Float32 untuk efisiensi penyimpanan HDF5)
+        theta = np.array([T_core, T_shell, n_e_core, n_e_shell], dtype=np.float32)
+        return idx, theta, I_sim.astype(np.float32)
+        
+    except Exception as e:
+        # Mencegah worker mati akibat matriks Jacobian yang infinitely stiff
+        print(f"[Worker] Singularity dihindari pada matriks (idx={idx}, Tc={T_core:.0f}K, nc={n_e_core:.1e}): {str(e)}")
+        return idx, None, None
 
 def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
     if num_workers is None:
@@ -105,8 +111,8 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
     # Menulis ke HDF5 secara real-time
     with h5py.File(output_file, 'w') as f:
         # Deklarasi array di disk (chunked array agar bisa kompresi GZIP tanpa memenuhi RAM)
-        dset_theta = f.create_dataset("parameters", shape=(n_samples, 4), dtype=np.float32)
-        dset_spectra = f.create_dataset("spectra", shape=(n_samples, resolution), dtype=np.float32, 
+        dset_theta = f.create_dataset("parameters", shape=(n_samples, 4), maxshape=(None, 4), dtype=np.float32)
+        dset_spectra = f.create_dataset("spectra", shape=(n_samples, resolution), maxshape=(None, resolution), dtype=np.float32, 
                                         compression="gzip", compression_opts=4)
         
         dset_theta.attrs['columns'] = ['T_e_core_K', 'T_e_shell_K', 'n_e_core_cm3', 'n_e_shell_cm3']
@@ -114,21 +120,31 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
         
         t0 = time.time()
         completed = 0
+        write_idx = 0
         
         # Eksekusi Paralel Pool
         with mp.Pool(processes=num_workers, initializer=init_worker, initargs=(elements, 0.5)) as pool:
             for idx, theta, I_sim in pool.imap_unordered(simulate_single_spectrum, tasks):
-                # Tulis asinkron ke sub-blok HDF5
-                dset_theta[idx] = theta
-                dset_spectra[idx] = I_sim
-                
                 completed += 1
+                
+                if theta is not None:
+                    # Tulis berurutan ke sub-blok HDF5 membuang celah nol
+                    dset_theta[write_idx] = theta
+                    dset_spectra[write_idx] = I_sim
+                    write_idx += 1
+                
                 progress_marker = max(1, n_samples // 10)
                 if completed % progress_marker == 0 or completed == n_samples:
                     elapsed = time.time() - t0
                     rate = completed / elapsed
                     eta = (n_samples - completed) / rate
                     print(f"  [{completed}/{n_samples}] ... {(completed/n_samples)*100:.1f}% | Laju: {rate:.1f} spec/detik | ETA: {eta:.1f} dtk")
+                    
+        # Memotong (resize) array riil dengan data sukses agar terbebas dari artefak baris-nol
+        if write_idx < n_samples:
+            dset_theta.resize((write_idx, 4))
+            dset_spectra.resize((write_idx, resolution))
+            print(f"  [Cleanup] Memotong array ke dataset berukuran sukses: {write_idx} dari target awal {n_samples}")
                     
     fs = os.path.getsize(output_file)/1024/1024
     print(f"\n✅ Selesai! Pabrik data ditutup.")
