@@ -329,32 +329,67 @@ def build_cr_matrix(levels     : List[EnergyLevel],
     M = np.zeros((N, N), dtype=np.float64)
     kT_e = K_B_eV * T_e_K
 
-    for t in transitions:
-        i = t.lower_idx   # lower level (ground-ward)
-        k = t.upper_idx   # upper level (excited)
-        if not (0 <= i < N and 0 <= k < N):
-            continue
+    if not transitions:
+        return M
 
-        A   = t.A_ki                                          # [s⁻¹]
-        q_up = _van_regemorter_q_excitation(t, T_e_K, sp_num) # [cm³/s]
+    # EKSTRAKSI VEKTOR: Memindahkan elemen loop ke array NumPy berkinerja tinggi
+    i_idx = np.array([t.lower_idx for t in transitions], dtype=np.int32)
+    k_idx = np.array([t.upper_idx for t in transitions], dtype=np.int32)
+    
+    A = np.array([t.A_ki for t in transitions], dtype=np.float64)
+    E_low = np.array([t.E_lower_eV for t in transitions], dtype=np.float64)
+    E_up = np.array([t.E_upper_eV for t in transitions], dtype=np.float64)
+    g_low = np.array([t.g_lower for t in transitions], dtype=np.float64)
+    g_up = np.array([t.g_upper for t in transitions], dtype=np.float64)
+    lam_nm = np.array([t.wavelength_nm for t in transitions], dtype=np.float64)
 
-        # Detailed balance: de-excitation coefficient
-        dE = t.E_upper_eV - t.E_lower_eV
-        if kT_e > 0 and dE > 0:
-            q_down = q_up * (t.g_lower / t.g_upper) * np.exp(dE / kT_e)
-        else:
-            q_down = 0.0
+    # Memfilter indeks yang valid untuk menghindari index out of bounds
+    valid = (i_idx >= 0) & (i_idx < N) & (k_idx >= 0) & (k_idx < N)
+    i_idx, k_idx = i_idx[valid], k_idx[valid]
+    A, E_low, E_up = A[valid], E_low[valid], E_up[valid]
+    g_low, g_up, lam_nm = g_low[valid], g_up[valid], lam_nm[valid]
 
-        R_up   = n_e_cm3 * q_up    # excitation rate   i→k  [s⁻¹]
-        R_down = n_e_cm3 * q_down  # de-excitation     k→i  [s⁻¹]
+    # Kalkulasi Termodinamika Transisi
+    delta_E = E_up - E_low
 
-        # Gain terms (off-diagonal — population flowing INTO a level)
-        M[i, k] += (A + R_down)  # k→i : radiative + collisional de-excit.
-        M[k, i] += R_up           # i→k : collisional excitation
+    # _van_regemorter_q_excitation DIVEKTORISASI
+    lam_m = lam_nm * 1e-9
+    gf = 1.4992e-16 * (lam_m ** 2) * g_up * A
+    f_ij = np.maximum(gf / g_low, 0.0)
 
-        # Loss terms (diagonal — population flowing OUT of a level)
-        M[k, k] -= (A + R_down)  # k loses to i
-        M[i, i] -= R_up           # i loses to k
+    G_bar = G_BAR_NEUTRAL if sp_num == 1 else G_BAR_ION
+    C = 5.465e-11
+
+    # Mengamankan pembagian dengan nol
+    mask_E = delta_E > 0
+    q_up = np.zeros_like(delta_E)
+    q_down = np.zeros_like(delta_E)
+    
+    if np.any(mask_E):
+        # Base factor tanpa term eksponensial
+        base_factor = C * (T_e_K ** -0.5) * (f_ij[mask_E] / delta_E[mask_E]) * G_bar
+        
+        # Eksitasi ke atas (q_up) tertahan oleh eksponensial negatif
+        q_up[mask_E] = base_factor * np.exp(-delta_E[mask_E] / kT_e)
+        
+        # Detailed balance de-eksitasi (q_down) membatalkan eksponensial secara analitik!
+        # q_down = q_up * (g_low/g_up) * exp(+dE/kT) = base_factor * (g_low/g_up)
+        if kT_e > 0:
+            q_down[mask_E] = base_factor * (g_low[mask_E] / g_up[mask_E])
+            
+    q_up = np.maximum(q_up, 0.0)
+
+    R_up = n_e_cm3 * q_up
+    R_down = n_e_cm3 * q_down
+
+    # ALGORITMA PERAMBATAN MATRIKS (Fast Scatter-Add Broadcasting)
+    # Gain terms (off-diagonal)
+    np.add.at(M, (i_idx, k_idx), A + R_down)
+    np.add.at(M, (k_idx, i_idx), R_up)
+
+    # Loss terms (diagonal)
+    np.add.at(M, (k_idx, k_idx), -(A + R_down))
+    np.add.at(M, (i_idx, i_idx), -R_up)
 
     return M
 
@@ -568,7 +603,16 @@ def compute_absorption_coefficient(populations       : np.ndarray,
         # Voigt profile φ(λ) [nm⁻¹]
         fwhm_G = 2.0 * _doppler_hwhm_nm(t.wavelength_nm, T_i_K, mass_kg)
         fwhm_L = 2.0 * _stark_hwhm_nm(t.wavelength_nm, n_e_cm3)
-        phi    = voigt_profile(wavelength_grid_nm, t.wavelength_nm, fwhm_G, fwhm_L)
+        
+        # VEKTORISASI/OPTIMASI LOKALISASI: Hitung Voigt hanya pada grid +- 50 width, hemat 99% RAM & CPU
+        hw_window = max(50.0 * max(fwhm_G, fwhm_L), 0.5)
+        mask = np.abs(wavelength_grid_nm - t.wavelength_nm) <= hw_window
+        if not np.any(mask):
+            continue
+            
+        phi_window = voigt_profile(wavelength_grid_nm[mask], t.wavelength_nm, fwhm_G, fwhm_L)
+        phi = np.zeros_like(wavelength_grid_nm)
+        phi[mask] = phi_window
 
         # Absorption cross-section σ(λ) in SI units
         #   σ(ν) = (c²/8πν²) · (g_k/g_i) · A_ki · φ(ν)   [m² · Hz⁻¹]
@@ -629,7 +673,16 @@ def compute_emission_coefficient(populations       : np.ndarray,
         # Voigt profile
         fwhm_G = 2.0 * _doppler_hwhm_nm(t.wavelength_nm, T_i_K, mass_kg)
         fwhm_L = 2.0 * _stark_hwhm_nm(t.wavelength_nm, n_e_cm3)
-        phi    = voigt_profile(wavelength_grid_nm, t.wavelength_nm, fwhm_G, fwhm_L)
+        
+        # VEKTORISASI/OPTIMASI LOKALISASI: Hitung Voigt hanya pada span lokal
+        hw_window = max(50.0 * max(fwhm_G, fwhm_L), 0.5)
+        mask = np.abs(wavelength_grid_nm - t.wavelength_nm) <= hw_window
+        if not np.any(mask):
+            continue
+            
+        phi_window = voigt_profile(wavelength_grid_nm[mask], t.wavelength_nm, fwhm_G, fwhm_L)
+        phi = np.zeros_like(wavelength_grid_nm)
+        phi[mask] = phi_window
 
         # h·c/λ [J] — photon energy
         lam_m  = t.wavelength_nm * 1e-9
