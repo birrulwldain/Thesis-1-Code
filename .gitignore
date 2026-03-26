@@ -37,18 +37,18 @@ ENV/
 # Thesis Data & Models (Do not push massive binaries to repo)
 *.h5
 *.pkl
-dataset_synthetic.h5
-model_inversi_svr.pkl
-data_eksperimen_mock.csv
 *.csv
+data/*.h5
+data/*.pkl
+data/*.csv
+data/*.ipynb
 
 # Raw outputs and Log files
 *.txt
 !requirements.txt
 raw/
-data/*.h5
-data/*.pkl
 *.log
+*.html
 
 # OS generated
 .DS_Store
@@ -67,3 +67,5 @@ Manuskrip/*.fdb_latexmk
 Manuskrip/*.fls
 Manuskrip/*.gz
 Manuskrip/*.toc
+Manuskrip/*.blg
+Manuskrip/*.bbl

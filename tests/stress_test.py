@@ -1,4 +1,4 @@
-import libs_physics as cr
+from src import libs_physics as cr
 import numpy as np
 
 def run_stress_test():

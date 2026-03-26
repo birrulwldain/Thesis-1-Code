@@ -4,7 +4,7 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 from sklearn.base import BaseEstimator, TransformerMixin
 
-_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yaml')
+_CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
 with open(_CONFIG_PATH, 'r') as f:
     _CONFIG = yaml.safe_load(f)
 

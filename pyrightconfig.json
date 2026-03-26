@@ -4,6 +4,7 @@
     "venvPath": "/opt/anaconda3/envs",
     "venv": "main",
     "extraPaths": [
-        "."
+        ".",
+        "src"
     ]
 }

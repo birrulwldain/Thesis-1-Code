@@ -62,7 +62,7 @@ AMU_KG = 1.66053906660e-27   # [kg/amu]
 import yaml
 
 # Muat Konfigurasi Tesis Universal 1-Pintu
-_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yaml')
+_CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
 try:
     with open(_CONFIG_PATH, 'r') as f:
         _CONFIG = yaml.safe_load(f)

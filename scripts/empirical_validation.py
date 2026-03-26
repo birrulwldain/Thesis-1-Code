@@ -18,11 +18,11 @@ import os
 
 import yaml
 
-_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yaml')
+_CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
 with open(_CONFIG_PATH, 'r') as f:
     _CONFIG = yaml.safe_load(f)
 
-from libs_physics import SIMULATION_CONFIG
+from src.libs_physics import SIMULATION_CONFIG
 
 def load_and_preprocess_experimental_data(csv_path: str, target_wavelengths: np.ndarray) -> np.ndarray:
     print(f"[Prep] Membaca data eksperimen dari: {csv_path}")

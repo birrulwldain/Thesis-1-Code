@@ -19,7 +19,7 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
-from libs_physics import (
+from src.libs_physics import (
     DataFetcher, PlasmaZoneParams, TwoZonePlasma, SIMULATION_CONFIG,
     instrumental_broadening
 )

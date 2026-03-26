@@ -32,12 +32,12 @@ import os
 import argparse
 import multiprocessing as mp
 
-from libs_physics import DataFetcher, PlasmaZoneParams, TwoZonePlasma, instrumental_broadening
+from src.libs_physics import DataFetcher, PlasmaZoneParams, TwoZonePlasma, instrumental_broadening
 
 import yaml
 
 # Memuat Konfigurasi Gateway
-_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yaml')
+_CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
 with open(_CONFIG_PATH, 'r') as f:
     _CONFIG = yaml.safe_load(f)
 
@@ -208,7 +208,7 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
 if __name__ == '__main__':
     # Ekstraksi fallback default samplerate dari YAML
     import yaml
-    with open(os.path.join(os.path.dirname(__file__), 'config.yaml'), 'r') as f:
+    with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml'), 'r') as f:
         _cfg = yaml.safe_load(f)
     default_samples = _cfg['monte_carlo_synthesizer']['generator_samples']
     

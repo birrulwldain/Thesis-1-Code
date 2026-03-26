@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
-import sim  # Legacy Model
-import libs_physics as cr  # New Q1 Inversion Engine
+from src import sim  # Legacy Model
+from src import libs_physics as cr  # New Q1 Inversion Engine
 import h5py
 import pandas as pd
 from typing import List, Tuple

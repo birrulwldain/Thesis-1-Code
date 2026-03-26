@@ -27,11 +27,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 
-_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yaml')
+_CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
 with open(_CONFIG_PATH, 'r') as f:
     _CONFIG = yaml.safe_load(f)
 
-from feature_extractor import PhysicsFeatureExtractor
+from src.feature_extractor import PhysicsFeatureExtractor
 
 def train_model(dataset_file: str, output_model: str):
     print("=== BLOK 3: Arsitektur Inversi SVR (Pysics Feature Version) ===")
