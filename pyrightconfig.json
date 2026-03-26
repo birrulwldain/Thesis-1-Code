@@ -1,0 +1,9 @@
+{
+    "pythonVersion": "3.11",
+    "pythonPlatform": "Darwin",
+    "venvPath": "/opt/anaconda3/envs",
+    "venv": "main",
+    "extraPaths": [
+        "."
+    ]
+}
