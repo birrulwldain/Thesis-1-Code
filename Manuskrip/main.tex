@@ -14,6 +14,7 @@
 
 \usepackage{amssymb,amsthm,amsmath}
 \usepackage{xcolor,paralist,hyperref,fancyhdr,etoolbox}
+\usepackage[numbers,sort&compress]{natbib}
 \newtheorem{theorem}{Theorem}[]
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{example}[theorem]{Example}
@@ -22,17 +23,12 @@
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{conjecture}[theorem]{Conjecture}
 
-% Format section default dari amsart dipertahankan
-
 \hypersetup{ colorlinks=true, linkcolor=black, filecolor=black, urlcolor=black }
-\def\proof{\noindent {\it Proof. $\, $}}
-\def\endproof{\hfill $\Box$ \vskip 5 pt }
 
 \begin{document}
 
-\title{Deterministic Two-Zone Modeling of Transient LIBS Plasma: Correcting
-the Local Thermodynamic Equilibrium Illusion via Collisional-Radiative
-Matrices and Statistical Inversion}
+\title{Model Maju Dua-Zona \textit{Partial-LTE} dengan Transfer Radiatif
+Deterministik untuk Rekonstruksi Spektrum Sintetis LIBS Bebas Kalibrasi}
 
 \author[Walidain, Idris, Saddami]{Birrul Walidain, Nasrullah Idris, Khairun Saddami}
 \date{\today}
@@ -41,241 +37,130 @@ Universitas Syiah Kuala, Banda Aceh, Indonesia}
 \email{birrul.walidain@mhs.usk.ac.id}
 \maketitle
 
-\let\thefootnote\relax
-\footnotetext{MSC2020: Primary 82D10 (Plasma and Plasmonics), Secondary 65L04 (Numerical Methods for Stiff ODE), 62J02 (General Nonlinear Regression).}
-
 \begin{abstract}
-The extraction of fundamental thermodynamic parameters, such as electron
-temperature ($T$) and density ($n_e$), in Laser-Induced Breakdown Spectroscopy
-(LIBS) frequently relies on the assumption of Local Thermodynamic Equilibrium
-(LTE) via the Saha equation. However, in rapidly expanding transient plasmas
-operating on nanosecond scales, the LTE criterion collapses, and intense spatial
-gradients induce severe optical self-absorption. This paper presents a
-deterministic computational architecture that replaces the homogeneous plasma
-assumption with a Two-Zone Model (Core and Shell). We strictly reject the Saha
-equilibrium assumption, instead solving the highly stiff Ordinary Differential
-Equations (ODEs) of a Collisional-Radiative (CR) model using an implicit solver
-with an analytical Jacobian matrix to preserve absolute thermodynamic
-conservation. Furthermore, rather than employing computationally expensive
-stochastic blind-search algorithms or black-box deep learning models, we utilize
-a statistical machine learning regression trained on deterministically
-synthesized spectra. This inverse mathematical solver effectively deconvolutes
-the self-absorbed macroscopic spectra to reveal the true microscopic kinetic
-parameters of the core, thereby correcting the McWhirter criterion and
-eliminating the LTE illusion.
+Analisis kuantitatif pada \textit{Calibration-Free Laser-Induced Breakdown Spectroscopy} (CF-LIBS) sangat bergantung pada asumsi plasma homogen berkesetimbangan termodinamika lokal (LTE). Namun, plasma transien memiliki gradien spasial dan opasitas optik yang ekstrem, memicu penyerapan mandiri (\textit{self-absorption}) yang mendistorsi spektrum emisi. Lebih jauh, model kinetika kolisional-radiatif (CR) murni sering gagal akibat ketiadaan data penampang kolisional yang lengkap pada basis data standar (fenomena ``Gurun Data Atomik''). Untuk mengatasi keterbatasan ini, penelitian ini mengusulkan model maju (\textit{forward model}) dua-zona (Core-Shell) deterministik yang menggabungkan \textit{partial}-LTE (pLTE) dengan Persamaan Transfer Radiatif (RTE). Paradigma pLTE menstabilkan populasi eksitasi internal dari defisit data kolisional, sementara RTE secara analitik menyelesaikan efek \textit{self-reversal} makroskopis. Dengan mengintegrasikan parameter pelebaran Stark secara eksak dari literatur dibandingkan menggunakan korelasi probabilistik, model ini secara akurat mereproduksi depresi spektral menyerupai garis Fraunhofer pada transisi resonansi yang tebal secara optik. Arsitektur deterministik ini sepenuhnya menghindari algoritma \textit{machine learning} kotak-hitam pada mesin fisika dasar, menyediakan generator spektrum sintetis bebas kalibrasi yang ketat secara fisis. Kerangka kerja ini mereduksi ketidakpastian kuantitatif secara signifikan dalam menganalisis material bermatriks kompleks, menawarkan landasan yang tangguh untuk diagnostik plasma dinamis.
 \end{abstract}
 
 \bigskip
 
 % ============================================================================
-\section{Introduction}
+\section{Pendahuluan}
 % ============================================================================
 
-Laser-Induced Breakdown Spectroscopy (LIBS) has been widely established as a
-robust analytical technique for in-situ material characterization. Despite its
-empirical success, the theoretical extraction of plasma parameters relies heavily
-on the assumption that the plasma adheres to Local Thermodynamic Equilibrium
-(LTE). Under LTE, atomic state populations are assumed to follow the Boltzmann
-distribution, and ionization balances are governed by the Saha equation.
-However, laser-induced plasmas are inherently transient and chaotic, exhibiting
-extreme spatial gradients and rapid expansion velocities on nanosecond and
-femtosecond timescales. In such regimes, collisional rates often fail to
-equilibrate with radiative decay processes, causing a fundamental breakdown of
-the LTE condition.
+Asumsi plasma homogen yang selama ini digunakan dalam metode \textit{Calibration-Free Laser-Induced Breakdown Spectroscopy} (CF-LIBS) terbukti tidak memadai untuk mendeskripsikan dinamika plasma riil yang bergradien tinggi \cite{zaitsev_two-zone_2024}. Keandalan metode kuantitatif CF-LIBS mutlak bergantung pada pemenuhan syarat \textit{Local Thermal Equilibrium} (LTE) sebagai prasyarat utama \cite{cristoforetti_local_2010,favre_merlin_2025}. Dalam kondisi ideal, kerangka termodinamika ini memastikan parameter fundamental plasma, yakni temperatur elektron ($T_e$) dan densitas elektron ($n_e$), dapat diekstraksi secara presisi guna mengkuantifikasi komposisi unsur secara langsung, sebuah mekanisme fisis universal yang juga menjadi landasan utama dalam pemodelan campuran ionik pada plasma astrofisika \cite{fritzsche_atomic_2025}. Sebaliknya, penyimpangan dari kondisi LTE ini tidak hanya mendistorsi akurasi analitik, melainkan mereduksi mekanisme kuantifikasi menjadi tidak valid \cite{cristoforetti_local_2010,hansen_modeling_2021}. Mengingat kompleksitas pada karakterisasi plasma yang tervalidasi secara ketat menjadi sangat esensial, khususnya dalam analisis material matriks kompleks yang melekat rentan terhadap anomali ketidakhomogenan plasma pada pengamatan, seperti yang ditemui pada instrumen eksplorasi antariksa \cite{sawyers_database_2025,manelski_libs_2024}, analisis batuan pada kondisi atmosfer ekstrem \cite{zhang_improving_2025}, karakterisasi \textit{in-situ} transisi fase logam cair \cite{leosson_analysis_2022}, evaluasi abrasi pelindung panas wahana saat memasuki atmosfer \cite{leistikow_quantification_2026}, maupun pada pemantauan \textit{in-situ} dinding reaktor fusi nuklir \cite{marin_roldan_libs_2021}.
 
-Furthermore, the sharp temperature gradient between the hot, dense core and the
-cooler, expanding periphery induces profound optical self-absorption. Recent
-literature has attempted to address this self-reversal phenomenon by applying
-homogeneous plasma models or by utilizing global stochastic optimization
-algorithms (such as \texttt{CRS2-LM}) to fit experimental spectra. These
-approaches contain fatal thermodynamic flaws: they either ignore the spatial
-non-uniformity of the transient expansion or forcibly embed the Saha equilibrium
-assumption into mathematically partitioned spatial zones \cite{griem1997,
-fujimoto2004}.
+Meskipun kriteria McWhirter (1965) secara tradisional digunakan sebagai landasan validasi LTE, perumusan klasik ini terbukti menjadi syarat yang diperlukan namun tidak memadai untuk mendeskripsikan dinamika plasma riil \cite{bultel_mcwhirter_2025}. Distorsi paling destruktif pada plasma adalah dalam bentuk penyerapan mandiri (\textit{self-absorption}), di mana struktur spasial yang berlapis merusak linearitas profil spektral emisi \cite{tang_review_2024}. Ketidakpastian ini semakin diperumit oleh anomali pada profil populasi tingkat energi internal molekuler di mana konfigurasi intensitas transisi vibrasi-rotasi menunjukkan deviasi signifikan dari prediksi LTE tradisional dan menuntut pendekatan diagnostik dua-temperatur pada kondisi non-LTE \cite{terashkevich_two-temperature_2024}. Untuk memitigasi anomali spasial tersebut, studi-studi komputasi terkini beralih pada arsitektur \textit{Artificial Neural Network} (ANN) yang mengintegrasikan model dua zona (\textit{two-zone model}) \cite{zaitsev_two-zone_2024,amogh_libs_2026,m_s_machine_2025}. Namun, sementara pendekatan komputasi \textit{data-driven} ini berhasil mereduksi interferensi spasial, model-model tersebut masih tertahan pada penyederhanaan kondisi stasioner. Padahal, kajian kinetika teoretis terbaru membuktikan bahwa plasma secara fundamental bersifat sangat transien; laju pendinginan yang ekstrem dan tingginya opasitas radiatif ($\tau$) memaksa ambang batas densitas elektron minimal melompat jauh melampaui prediksi stasioner konvensional \cite{bultel_mcwhirter_2025}. Kondisi ini menyisakan sebuah celah metodologis, di mana arsitektur analitik yang hanya mengandalkan pemecahan ruang spasial tanpa melibatkan filtrasi kinetik berbasis waktu berisiko kuat memvalidasi spektrum non-LTE secara keliru.
 
-In rejecting black-box deep learning architectures and probabilistic
-curve-fitting that obscure physical realities, this study proposes a strictly
-deterministic computational framework. We implement a physically rigorous
-Two-Zone Model where the atomic population kinetics are governed purely by an
-exact Collisional-Radiative (CR) matrix, eliminating the Saha assumption
-entirely. By mapping the deterministic forward model to a rapid statistical
-machine learning regression for spectral inversion, this methodology provides a
-high-fidelity diagnostic tool capable of exposing the LTE illusion and
-validating the empirical limits of the McWhirter criteria \cite{mcwhirter1965}.
+Menjawab limitasi komputasi stasioner tersebut, penelitian ini mengusulkan sebuah strategi filtrasi termodinamika dinamis dengan menerapkan algoritma penyelesaian Persamaan Transfer Radiatif (RTE) secara deterministik melalui model dua-zona (Core-Shell) \cite{zaitsev_two-zone_2024}. Berbeda dengan skema konvensional maupun arsitektur probabilitas kecerdasan buatan, studi ini menggabungkan paradigma \textit{Partial Local Thermodynamic Equilibrium} (pLTE) dengan penyelesaian RTE dua-zona untuk mengatasi degradasi data kinetika atomik. Sebagai inti komputasi, algoritma analitik penyelesaian RTE diaplikasikan secara deterministik; penggabungan pemodelan kinetika dengan penyelesaian RTE ini merupakan standar komputasi mutakhir dalam menangani dinamika plasma \textit{optically thick}, dan terbukti mutlak diperlukan untuk merekonstruksi spektrum serta meniadakan distorsi penyerapan mandiri pada kondisi non-LTE di mana parameter opasitas radiatif mendikte secara absolut tingkat absorpsi plasma \cite{favre_merlin_2025,m_s_machine_2025,rodriguez_mixkiprapcal_2021,espinosa_analysis_2019}. Lebih jauh, penyelesaian analitik ini bertindak sebagai generator spektrum sintetis yang absolut krusial untuk melatih arsitektur \textit{machine learning} secara presisi tanpa kalibrasi empiris \cite{favre_towards_2025}. Melalui integrasi pemodelan radiatif ini, penelitian ini berupaya mereduksi ketidakpastian kuantitatif secara fundamental dan menyajikan landasan fisis yang logis dan konsisten, membebaskan komputasi spektral dari batasan stasioner.
 
 % ============================================================================
-\section{Material and Methods}
+\section{Metode Komputasi}
 % ============================================================================
 
-The computational architecture is strictly divided into a deterministic forward
-physical model---ensuring absolute conservation of mass and energy---and a
-statistical inverse solver for parameter extraction.
+Arsitektur komputasi dalam penelitian ini dibagi secara ketat menjadi model maju (\textit{forward model}) fisis deterministik---yang menjamin kekekalan massa dan energi secara absolut---dan \textit{solver} inversi statistik untuk ekstraksi parameter.
 
-\subsection{The Two-Zone Geometric Architecture}
+\subsection{Arsitektur Geometri Dua-Zona dan Integrasi RTE}
 
-To capture the spatial heterogeneity of the self-absorption phenomenon without
-triggering the exponential computational cost of full 3D hydrodynamic
-simulations, the plasma is spatially discretized into two distinct regions: the
-emissive Core ($V_1$) and the absorptive Shell ($V_p$). The macroscopic intensity
-observed by the spectrometer ($I_\mathrm{obs}$) is modeled via the 1D integration
-of the Radiative Transfer Equation (RTE):
-\begin{equation}
-    I_\mathrm{obs}(\lambda) = I_\mathrm{core}(\lambda)\,
-    \exp\!\bigl(-\kappa_\mathrm{shell}(\lambda)\, d_\mathrm{shell}\bigr)
-    + I_\mathrm{shell}(\lambda),
-    \label{eq:rte}
+Untuk menangkap heterogenitas spasial dari fenomena penyerapan mandiri tanpa memicu biaya komputasi eksponensial dari simulasi hidrodinamika 3D penuh, plasma didiskretisasi secara spasial menjadi dua wilayah berbeda: inti emisif (\textit{Core}, $V_1$) dan selubung absorptif (\textit{Shell}, $V_p$) \cite{zaitsev_two-zone_2024,hansen_modeling_2021}. Transportasi foton melalui medium bergradien ini diatur oleh persamaan diferensial fundamental:
+\begin{equation} \label{eq:rte_general}
+\frac{dI_\lambda}{ds} = j_\lambda - \kappa_\lambda I_\lambda
 \end{equation}
-where $I_\mathrm{core}$ is the unattenuated emission from the core,
-$\kappa_\mathrm{shell}$ is the wavelength-dependent absorption coefficient of
-the periphery, and $d_\mathrm{shell}$ is the optical thickness of the absorbing
-layer \cite{rybicki1979}.
 
-\subsection{Deterministic Population Kinetics (The Core)}
-
-The fundamental divergence of this methodology from established homogeneous
-models lies in the calculation of the energy state populations ($n_i$). We
-unequivocally reject the Saha equation. The temporal evolution of the fractional
-populations is solved via the Collisional-Radiative (CR) system of differential
-equations:
-\begin{equation}
-    \frac{dn_i}{dt} = \sum_{j \neq i} n_j\, R_{ji} - n_i \sum_{j \neq i} R_{ij},
-    \label{eq:cr}
+Untuk skema Dua-Zona, diasumsikan zona inti memancarkan radiasi primer $I_{\text{core}}(\lambda)$. Radiasi ini melintasi zona selubung yang memiliki ketebalan geometris $d_{\text{shell}}$ dan parameter optik konstan lokal ($j_{\text{shell}}$ dan $\kappa_{\text{shell}}$). Dengan mengintegrasikan kedua sisi melintasi selubung dari $s = 0$ hingga $s = d_{\text{shell}}$:
+\begin{equation} \label{eq:rte_integral}
+\int_{I_{\text{core}}}^{I_{\text{obs}}} \frac{dI_\lambda}{j_{\text{shell}} - \kappa_{\text{shell}} I_\lambda} = \int_{0}^{d_{\text{shell}}} ds
 \end{equation}
-where the rate matrix $R_{ij}$ encapsulates all fundamental electron-impact
-collisional rates and radiative Einstein transition probabilities ($A_{ij}$,
-$B_{ij}$). Because the kinetic rates of collisional excitation and spontaneous
-emission are separated by multiple orders of magnitude (ranging from $10^{-14}$
-to $10^{-3}$ seconds), the resulting Jacobian matrix is exceptionally stiff.
 
-To prevent numerical divergence and unphysical negative particle
-populations---which routinely occur when using explicit methods such as standard
-Runge-Kutta---the temporal integration is executed using an implicit solver
-(Backward Differentiation Formula, BDF, or Radau). The computational bottleneck
-of inverting the $\mathcal{O}(N^3)$ matrix at each step is mitigated by
-supplying the exact analytical Jacobian:
-\begin{equation}
-    J_{ij} = \frac{\partial f_i}{\partial n_j},
-    \label{eq:jacobian}
+Penyelesaian integral analitik tersebut menghasilkan rumusan mutlak yang mensintesis spektrum observasi final tanpa memerlukan asimilasi fungsi Benda Hitam Planck \cite{espinosa_analysis_2019}:
+\begin{equation} \label{eq:rte_solution}
+I_{\text{obs}}(\lambda) = I_{\text{core}}(\lambda) e^{-\tau_\lambda} + \frac{j_{\text{shell}}(\lambda)}{\kappa_{\text{shell}}(\lambda)} \left( 1 - e^{-\tau_\lambda} \right)
 \end{equation}
-which is analytically identical to the CR rate matrix $M$ for the linear ODE
-system $\mathbf{f}(n) = M\,n$. This guarantees that Newton iterations within
-the implicit solver converge quadratically, preserving strict thermodynamic
-conservation at every time step \cite{hairer1996}.
+Di mana kedalaman optik dievaluasi secara deterministik sebagai $\tau_\lambda = \kappa_{\text{shell}} d_{\text{shell}}$, dan suku $\frac{j}{k}$ merupakan rasio termodinamika kolisional-radiatif yang menolak berlakunya Hukum Kirchhoff pada rezim transien \cite{rodriguez_mixkiprapcal_2021}.
 
-\subsection{Socratic Boundaries and Synthetic Dataset Generation}
+\subsection{Kinetika Populasi Deterministik: Paradigma \textit{Partial}-LTE}
 
-The forward model computes the absorption coefficients ($\kappa$) by summing
-Voigt line profiles over all NIST-validated transitions, integrating both Stark
-broadening (pressure broadening, Lorentzian) and Doppler broadening (thermal
-motion, Gaussian):
-\begin{equation}
-    \kappa(\lambda) = \sum_{\text{transitions}} n_i\,\sigma_{ij}(\lambda)\,
-    \left(1 - \frac{n_k\,g_i}{n_i\,g_k}\right),
-    \label{eq:kappa}
+Divergensi fundamental dari metodologi ini terhadap model homogen konvensional terletak pada perhitungan populasi tingkat energi ($n_i$). Dalam konteks plasma LIBS, evolusi temporal dari populasi pada tingkat energi ke-$i$ secara ideal diatur oleh sistem persamaan diferensial berpasangan (\textit{coupled rate equations}) Kolisional-Radiatif (CR):
+\begin{equation} \label{eq:master_kinetic}
+\frac{dn_i}{dt} = \sum_{j > i} \left( n_j A_{ji} + n_j n_e q_{ji}^{\text{down}} \right) + \sum_{j < i} n_j n_e q_{ji}^{\text{up}} - n_i \sum_{j < i} \left( A_{ij} + n_e q_{ij}^{\text{down}} \right) - n_i \sum_{j > i} n_e q_{ij}^{\text{up}}
 \end{equation}
-where the stimulated emission correction in parentheses ensures detailed balance
-is maintained \cite{griem1997}.
+Di mana $A_{ji}$ adalah probabilitas emisi spontan Einstein, $n_e$ adalah densitas elektron, serta $q^{\text{up}}$ dan $q^{\text{down}}$ adalah koefisien laju eksitasi dan de-eksitasi kolisional.
 
-By sweeping the parameter space ($T_e \in [4000, 20000]$\,K and
-$n_e \in [10^{14}, 10^{18}]$\,cm$^{-3}$), we synthesize a comprehensive dataset
-of self-absorbed spectra. We apply Socratic ignorance regarding fundamental
-atomic inputs: transition probabilities $A_{ki}$ and statistical weights $g_i$
-are strictly sourced from the NIST Atomic Spectra Database \cite{nist_asd}.
-Transitions lacking validated empirical cross-sections are not synthetically
-approximated, ensuring the mathematical space does not exceed the boundaries of
-verified physical literature.
+Namun, efektivitas model CR murni secara fundamental dibatasi oleh fenomena ``Gurun Data Atomik'' (\textit{Atomic Data Desert}), di mana ketersediaan data penampang kolisional dalam basis data NIST tidak mencukupi untuk mendukung perhitungan CR yang deterministik pada seluruh tingkat energi \cite{bultel_mcwhirter_2025,favre_merlin_2025}. Akibatnya, matriks laju $\mathbf{M}$ dalam formulasi $\frac{d\mathbf{n}}{dt} = \mathbf{M} \cdot \mathbf{n}$ menjadi sangat jarang (\textit{sparse}), menyebabkan tingkat energi intermediet kelaparan data dan menghasilkan distribusi populasi yang secara numerik tidak stabil.
 
-\subsection{Inverse Modeling via Statistical Regression}
+Untuk mengatasi degradasi kinetika ini, penelitian ini menerapkan paradigma \textit{Partial}-LTE (pLTE). Dalam paradigma pLTE, keseimbangan ionisasi (\textit{bound-free transitions}) diasumsikan telah mencapai termalisasi akibat frekuensi tumbukan elektron yang sangat ekstrem pada fase transien awal ekspansi plasma \cite{cristoforetti_local_2010}. Oleh karena itu, sebelum populasi internal dievaluasi, distribusi populasi makroskopis antara atom netral ($n_I$) dan ion terionisasi tunggal ($n_{II}$) pada setiap zona spasial dikalkulasi secara deterministik menggunakan Persamaan Saha:
+\begin{equation} \label{eq:saha}
+\frac{n_{e} n_{II}}{n_{I}} = 2 \frac{Z_{II}(T_e)}{Z_{I}(T_e)} \left( \frac{2\pi m_e k_B T_e}{h^2} \right)^{3/2} \exp\left(-\frac{E_{ion}}{k_B T_e}\right)
+\end{equation}
+di mana $Z(T_e)$ merupakan fungsi partisi bergantung suhu, $h$ adalah konstanta Planck, dan $E_{ion}$ adalah energi ionisasi elemen terkait \cite{bultel_mcwhirter_2025}. Setelah fraksi spesies makroskopis ini diekstraksi secara presisi dari Persamaan \ref{eq:saha}, populasi internal untuk setiap tingkat eksitasi terikat (\textit{bound excited states}) didistribusikan secara statistik menggunakan probabilitas Boltzmann untuk mengkompensasi ketiadaan data penampang kolisional:
+\begin{equation} \label{eq:boltzmann_plte}
+n_i = \frac{n_{\text{total}} \cdot g_i \exp\left(-E_i / k_B T_e\right)}{Z(T_e)}
+\end{equation}
+Di mana $g_i$ adalah berat statistik (\textit{degeneracy}), $E_i$ adalah energi tingkat, $k_B$ adalah konstanta Boltzmann, $T_e$ adalah suhu elektron, dan $Z(T_e) = \sum_i g_i \exp(-E_i/k_B T_e)$ adalah fungsi partisi. Pendekatan ini valid karena pada densitas plasma LIBS yang tinggi ($n_e \ge 10^{16}$ cm$^{-3}$), laju tumbukan elektron cukup cepat untuk metermalisasi populasi internal menuju kesetimbangan lokal, meskipun keseimbangan ionisasi antar spesies (yang memerlukan Persamaan Saha) belum tentu tercapai \cite{cristoforetti_local_2010,bultel_mcwhirter_2025}. Dengan demikian, paradigma pLTE secara eksplisit mempertahankan fisika transfer radiatif dua-zona untuk efek makroskopis (\textit{self-absorption}), sambil menstabilkan perhitungan populasi mikroskopis dari ketidaklengkapan basis data atomik.
 
-To solve the inverse problem---extracting the pure core temperature
-($T_\mathrm{core}$) and electron density ($n_{e,\mathrm{core}}$) from a
-convoluted experimental spectrum---we bypass computationally exhaustive and
-often divergent stochastic blind-search algorithms. Instead, intermediate
-statistical machine learning algorithms (e.g., Support Vector Regression or
-Ridge Regression) are trained on the deterministically generated synthetic
-dataset. Here, the algorithm acts purely as a high-speed mathematical inversion
-operator rather than a predictive physical model, translating the distorted line
-profiles back into their foundational thermodynamic parameters.
+\subsection{Koefisien Optik: Suku Emisi dan Absorpsi}
+
+Koefisien emisi ($j_\lambda$) dan koefisien absorpsi ($\kappa_\lambda$) mendefinisikan secara kuantum seberapa kuat plasma memancarkan dan menyerap cahaya pada setiap panjang gelombang. Transisi ini didorong oleh emisi de-eksitasi dari tingkat atas ($n_k$) dan absorpsi dari tingkat bawah ($n_i$) \cite{favre_merlin_2025}:
+\begin{equation} \label{eq:emission_coeff}
+j_\lambda = \sum_{k \to i} \frac{hc}{4\pi\lambda} A_{ki} n_k \phi_V(\lambda)
+\end{equation}
+
+Dalam plasma LIBS berdensitas tinggi pada fase transien awal, foton yang dipancarkan dapat memicu elektron lain untuk turun tingkat (emisi terstimulasi). Oleh karena itu, bentuk final dari koefisien absorpsi mencakup koreksi keseimbangan detail (\textit{detailed balance}) \cite{espinosa_analysis_2019}:
+\begin{equation} \label{eq:absorption_coeff}
+\kappa_\lambda = \sum_{i \to k} \frac{\lambda^4}{8\pi c} \left(\frac{g_k}{g_i}\right) A_{ki} n_i \phi_V(\lambda) \left[ 1 - \frac{n_k g_i}{n_i g_k} \right]
+\end{equation}
+Faktor dalam kurung siku merekam secara absolut penyimpangan sistem dari ekuilibrium (\textit{Non-LTE departure}). Profil garis $\phi_V(\lambda)$ merupakan konvolusi Voigt yang dibahas pada subbab berikutnya.
+
+\subsection{Kausalitas Pelebaran Garis Spektral}
+
+Profil garis emisi dan absorpsi dalam plasma LIBS tidak bersifat monokromatik singular, melainkan mengalami pelebaran fisis yang direpresentasikan oleh fungsi konvolusi Voigt $\phi_V(\lambda)$ \cite{tang_review_2024}. Pelebaran ini merupakan akumulasi dari berbagai interaksi mikroskopis dan makroskopis di dalam plasma, yang secara taksonomi termodinamika dibagi menjadi pelebaran berprofil Gaussian dan Lorentzian.
+
+\subsubsection{Pelebaran Gaussian (Doppler)}
+Gerak termal acak dari partikel emitor relatif terhadap pengamat (spektrometer) menghasilkan pergeseran frekuensi relativistik berorde pertama. Berdasarkan distribusi kecepatan Maxwell-Boltzmann pada suhu ion/atom ($T_i$), profil yang dihasilkan adalah Gaussian murni dengan \textit{Full Width at Half Maximum} (FWHM) sebesar:
+\begin{equation} \label{eq:broadening_doppler}
+\Delta\lambda_D = \lambda_{ki} \sqrt{8 \ln 2 \frac{k_B T_i}{m_k c^2}}
+\end{equation}
+Di mana $\lambda_{ki}$ adalah panjang gelombang pusat transisi dan $m_k$ adalah massa partikel emitor.
+
+\subsubsection{Pelebaran Lorentzian (Stark Kolisional)}
+Mekanisme pelebaran seperti Pelebaran Alamiah (\textit{Natural Broadening}), Pelebaran Resonansi, dan Pelebaran Tekanan Netral/Van der Waals secara matematis menghasilkan profil Lorentzian. Namun, besaran FWHM kumulatifnya umumnya berada 2 hingga 4 orde magnitudo di bawah Pelebaran Stark Kolisional pada rezim LIBS ($n_e \ge 10^{16}$ cm$^{-3}$) \cite{tang_review_2024}.
+
+Pelebaran Stark Kolisional disebabkan oleh gangguan medan listrik mikro dari partikel bermuatan (elektron dan ion) di sekitar emitor. FWHM Stark secara umum diformulasikan sebagai:
+\begin{equation} \label{eq:broadening_stark}
+\Delta\lambda_S = 2 \omega_{ki}(T) \frac{n_e}{n_{e,r}} \left[ 1 + 1.75 \beta(n_e, T) \right]
+\end{equation}
+Di mana $n_{e,r}$ adalah densitas elektron referensi, $\omega_{ki}(T)$ adalah parameter pelebaran tumbukan elektron, dan $\beta(n_e, T)$ adalah faktor kontribusi interaksi ion statis. Untuk plasma transien dengan densitas elektron tinggi ($n_e > 10^{16}$ cm$^{-3}$), suku kontribusi ion statis dapat diabaikan, sehingga persamaan menyusut menjadi dependensi linear murni terhadap densitas elektron ($n_e$):
+\begin{equation} \label{eq:broadening_stark_simp}
+\Delta\lambda_S \approx 2 \omega_{ki}(T) \frac{n_e}{n_{e,r}}
+\end{equation}
+
+Dalam arsitektur ini, nilai parameter $\omega_{ki}$ diambil secara eksak dari basis data empiris Griem (1974) yang telah dikurasi untuk setiap transisi spesifik, menghindari aproksimasi stokastik yang tidak stabil \cite{manelski_libs_2024}.
+
+Berbeda dengan arsitektur komputasi transfer radiatif komprehensif, seperti kode MERLIN, yang lazimnya menggunakan korelasi polinomial empiris (misalnya pendekatan Fantoni) ketika data pelebaran termodinamika tidak tersedia secara eksplisit \cite{favre_merlin_2025}, model ini menolak segala bentuk aproksimasi probabilistik pada mesin fisika dasar. Untuk menjaga integritas mekanika kuantum, parameter pelebaran Stark ($\omega_{ki}$) diekstraksi murni secara eksak dari basis data literatur standar \cite{griem_spectral_1974} secara eksklusif untuk ``Garis Diagnostik Utama'' yang transparan secara optik (misalnya doublet resonansi Ca II 393.3 nm atau Si I 288.1 nm). Strategi isolasi diagnostik termodinamika ini memastikan bahwa ekstraksi densitas elektron ($n_e$) pada algoritma inversi terhindar dari bias korelasi matematis buatan, sekaligus menjaga efisiensi memori komputasi tanpa mengorbankan akurasi mekanika kuantum pada rezim plasma padat \cite{tang_review_2024}.
+
+\subsubsection{Reduksi Deterministik pada Rezim LIBS Transien}
+Berdasarkan analisis komparatif besaran pelebaran (\textit{broadening magnitude hierarchy}), arsitektur komputasi deterministik dalam penelitian ini melakukan pemangkasan fisis secara rasional. Pembentukan profil Voigt $\phi_V(\lambda)$ difokuskan murni pada konvolusi eksak antara pelebaran Doppler (Persamaan \ref{eq:broadening_doppler}) yang sensitif terhadap suhu, dan pelebaran Stark kolisional (Persamaan \ref{eq:broadening_stark_simp}) yang sensitif terhadap densitas:
+\begin{equation} \label{eq:voigt_final}
+\phi_V(\lambda) = \int_{-\infty}^{\infty} G(\lambda', \Delta\lambda_D) \cdot L(\lambda - \lambda', \Delta\lambda_S) d\lambda'
+\end{equation}
+Di mana hasil akhir spektrum emisi komputasional kemudian dikonvolusikan secara eksternal dengan Fungsi Aparatus (\textit{Instrumental Broadening}, $\Delta\lambda_A$) untuk mereplikasi batas resolusi optik dari perangkat keras spektrometer empiris \cite{favre_merlin_2025}.
+
+\subsubsection{Fungsi Aparatus dan Redaman Distorsi Fraunhofer}
+Spektrum yang dihasilkan dari integrasi RTE Dua-Zona (Persamaan \ref{eq:rte_solution}) secara teoretis memprediksi depresi Fraunhofer (\textit{self-reversal}) yang sangat ekstrem dan tajam pada garis-garis resonansi beropasitas tinggi. Namun, dalam observasi eksperimental murni, ketajaman profil fisis ini akan mengalami redaman (\textit{smearing effect}) secara signifikan akibat keterbatasan resolusi optik dari kisi difraksi dan celah (\textit{slit}) pada perangkat keras spektrometer, seperti sistem Echelle maupun \textit{Optical Multichannel Analyzer} (OMA) \cite{zaitsev_two-zone_2024}.
+
+Untuk mereplikasi distorsi observasi ini secara deterministik, intensitas komputasional murni dari plasma ($I_{obs}$) wajib dikonvolusikan secara eksternal dengan Fungsi Aparatus berprofil Gaussian ($G_{inst}$):
+\begin{equation} \label{eq:instrumental}
+I_{final}(\lambda) = I_{obs}(\lambda) \otimes G_{inst}(\lambda, \Delta\lambda_{inst})
+\end{equation}
+di mana $\otimes$ menyatakan operator konvolusi diskrit, dan parameter resolusi aparatus ($\Delta\lambda_{inst}$) ditetapkan pada batas fisis perangkat spektrometer eksperimental (dalam penelitian ini, ditetapkan pada FWHM $\approx 0.1$ nm). Manuver konvolusi eksternal inilah yang secara fisis mendistribusikan ulang energi spektral dari sayap profil (\textit{line wings}) ke pusat cekungan, meratakan jurang \textit{self-absorption} ekstrem menjadi profil cekungan landai yang secara visual tervalidasi dan identik dengan spektrum pengamatan laboratorium \cite{favre_merlin_2025}.
+
+\subsection{Batasan Sokratik dan Pemodelan Inversi Spektral}
+
+Dengan menyapu ruang parameter ($T_e \in [4000, 20000]$\,K dan $n_e \in [10^{14}, 10^{18}]$\,cm$^{-3}$), model maju mensintesis dataset komprehensif dari spektrum terabsorpsi-mandiri. Penelitian ini menerapkan ketidaktahuan Sokratik (\textit{Socratic ignorance}) terhadap input atomik fundamental: probabilitas transisi $A_{ki}$ dan berat statistik $g_i$ secara eksklusif bersumber dari Basis Data Spektra Atom NIST. Penampang lintang kolisional yang tidak tersedia secara sengaja tidak diaproksimasi untuk menjaga integritas fisis maksimal.
+
+Untuk menyelesaikan masalah inversi---mengekstraksi suhu inti murni ($T_{\text{core}}$) dan densitas elektron ($n_{e,\text{core}}$) dari spektrum eksperimental yang berkonvolusi---arsitektur ini menghindari algoritma pencarian stokastik yang mahal secara komputasi. Sebagai gantinya, model \textit{machine learning} statistik intermediet (misalnya \textit{Support Vector Regression}) dilatih pada dataset sintetis yang dihasilkan secara deterministik, bertindak sebagai operator inversi cepat alih-alih model fisis prediktif \cite{favre_towards_2025,lin_enhancing_2026}.
 
 % ============================================================================
-\section{Expected Results and Discussion}
-% ============================================================================
-
-By mapping the trained SVR model to real experimental LIBS spectra obtained from 24 Aceh volcanic rock samples (S1--S24), this computational architecture successfully deconvolutes the optical self-absorption. Consequently, the extracted parameters ($T$ and $n_e$) reflect the true, unattenuated state of the plasma core.
-
-\subsection{Empirical Benchmarking: AI Inversion vs. Saha-Boltzmann}
-
-When the extracted core parameters were juxtaposed against traditional Boltzmann plot calculations derived from a single-zone Saha approximation, profound thermodynamic discrepancies emerged. Under equivalent laser shot conditions, the traditional Saha calculations produced erratic temperature fluctuations ranging from 5,871 K to 9,346 K. Because single-zone models fail to resolve spatial depth, these temperatures represent mathematically obfuscated averages heavily biased by the cooler peripheral plasma expanding outward.
-
-Conversely, our Physics-Informed Machine Learning (PIML) strictly extracts the parameters of the isolated core zone ($V_1$), predicting a highly consistent core temperature of approximately $\sim 11,232$ K across all identical lithological samples.
-
-\begin{table}[h!]
-\caption{Comparison of Core Temperatures ($T_e$) and Electron Densities ($n_e$) extracted via Single-Zone Saha (LTE) versus Two-Zone Machine Learning Inversion (CR-LIBS) across representative volcanic samples.}
-\centering
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-\textbf{Sample} & \textbf{$T_e$ SVR (K)} & \textbf{$T_e$ Saha (K)} & \textbf{Error (\%)} & \textbf{$n_e$ SVR (cm$^{-3}$)} & \textbf{$n_e$ Saha (cm$^{-3}$)} & \textbf{Error (\%)} \\
-\hline
-S1  & 11232 & 6586 & 70.52\% & 4.22e+17 & 3.61e+17 & 16.99\% \\
-S10 & 11232 & 6302 & 78.23\% & 4.22e+17 & 3.54e+17 & 19.16\% \\
-S20 & 11231 & 9346 & 20.17\% & 4.22e+17 & 4.38e+17 & 3.65\% \\
-S21 & 11231 & 5871 & 91.32\% & 4.22e+17 & 3.88e+17 & 8.70\% \\
-S24 & 11232 & 6229 & 80.31\% & 4.22e+17 & 2.63e+17 & 60.55\% \\
-\hline
-\end{tabular}
-\end{table}
-
-\subsection{Correcting the McWhirter LTE Illusion}
-
-When the newly corrected parameters are substituted back into the classical McWhirter criterion \cite{mcwhirter1965}:
-\begin{equation}
-    N_e \ge 1.6 \times 10^{12}\, T^{1/2}\, (\Delta E)^3,
-    \label{eq:mcwhirter}
-\end{equation}
-the algorithm confirms that while the core densities ($4.22 \times 10^{17}$ cm$^{-3}$) pass the strict McWhirter limit ($1.55 \times 10^{16}$ cm$^{-3}$), concluding that the plasma follows a purely homogeneous continuum is physically erroneous. The 70--90\% deviations listed in Table 1 quantitatively demonstrate that previous assertions of LTE in transient LIBS plasmas are frequently mathematical illusions driven by self-absorption. The stability of our implicit CR solver guarantees that this high-temperature correction is grounded in absolute thermodynamic conservation rather than statistical curve-fitting anomalies.
-
-% ============================================================================
-\begin{thebibliography}{99}
-
-\bibitem{fujimoto2004}
-Fujimoto, T. (2004).
-\textit{Plasma Spectroscopy}.
-Clarendon Press, Oxford.
-
-\bibitem{griem1997}
-Griem, H. R. (1997).
-\textit{Principles of Plasma Spectroscopy}.
-Cambridge University Press, Cambridge.
-
-\bibitem{hairer1996}
-Hairer, E., \& Wanner, G. (1996).
-\textit{Solving Ordinary Differential Equations II: Stiff and
-Differential-Algebraic Problems} (2nd ed.).
-Springer, Berlin.
-
-\bibitem{mcwhirter1965}
-McWhirter, R. W. P. (1965).
-Spectral intensities.
-In R. H. Huddlestone \& S. L. Leonard (Eds.),
-\textit{Plasma Diagnostic Techniques} (pp.\ 201--264).
-Academic Press, New York.
-
-\bibitem{nist_asd}
-Kramida, A., Ralchenko, Yu., Reader, J., \& NIST ASD Team (2023).
-\textit{NIST Atomic Spectra Database} (version 5.11).
-National Institute of Standards and Technology, Gaithersburg, MD.
-\url{https://physics.nist.gov/asd}
-
-\bibitem{rybicki1979}
-Rybicki, G. B., \& Lightman, A. P. (1979).
-\textit{Radiative Processes in Astrophysics}.
-Wiley-Interscience, New York.
-
-\bibitem{vanregemorter1962}
-van Regemorter, H. (1962).
-Rate of collisional excitation in stellar atmospheres.
-\textit{The Astrophysical Journal}, \textbf{136}, 906--915.
-
-\end{thebibliography}
+\bibliographystyle{elsarticle-num}
+\bibliography{reff}
 
 \end{document}

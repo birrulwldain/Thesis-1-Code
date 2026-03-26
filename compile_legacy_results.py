@@ -25,23 +25,33 @@ def compile_legacy_data():
     for sheet_name, df_sheet in df_excel.items():
         sample_id = f"S{sheet_name}"
         
-        # Mencari kolom Element dan Conc % dari Struktur Excel (Toleransi Kolom 10 & 11)
-        elements_dict = {}
+        # Mencari kolom Element dan Conc % dari Struktur Excel
+        cf_dict = {}
+        xrf_dict = {}
         try:
-            # Drop NaN rows yang tidak relevan
-            df_clean = df_sheet.dropna(subset=[10, 11])
-            # Filter hanya baris yang kolom 10 nya string (nama elemen)
-            df_elements = df_clean[df_clean[10].apply(lambda x: isinstance(x, str) and len(x) <= 2)]
-            
-            for _, row in df_elements.iterrows():
-                el = row[10].strip()
-                conc = float(row[11])
-                elements_dict[el] = conc
+            for _, row in df_sheet.iterrows():
+                # XRF Extraction (Col 0/1 and Col 2)
+                try:
+                    xrf_el = str(row[0]).strip() if not pd.isna(row[0]) else str(row[1]).strip()
+                    xrf_val = float(row[2]) if str(row[2]).replace('.','',1).isdigit() else np.nan
+                    if len(xrf_el) <= 2 and xrf_el.isalpha() and not np.isnan(xrf_val):
+                        xrf_dict[xrf_el] = xrf_val
+                except: pass
+                
+                # CF-LIBS Extraction (Col 10 and Col 11)
+                if len(row) > 11:
+                    try:
+                        cf_el = str(row[10]).strip()
+                        cf_val = float(row[11]) if str(row[11]).replace('.','',1).isdigit() else np.nan
+                        if len(cf_el) <= 2 and cf_el.isalpha() and not np.isnan(cf_val):
+                            cf_dict[cf_el] = cf_val
+                    except: pass
         except Exception as e:
             pass
             
         sample_data[sample_id] = {
-            "composition_percent": elements_dict,
+            "composition_percent": cf_dict,
+            "xrf_composition_percent": xrf_dict,
             "T_e_K": np.nan,
             "n_e_cm3": np.nan
         }
@@ -72,14 +82,19 @@ def compile_legacy_data():
             grp.attrs['n_e_cm3'] = s_info['n_e_cm3']
             
             # Konversi dictionary komposisi menjadi array
+            dt = np.dtype([('Element', 'S2'), ('Concentration_Percent', np.float32)])
+            
             if s_info['composition_percent']:
                 elements = list(s_info['composition_percent'].keys())
                 concs = list(s_info['composition_percent'].values())
-                
-                # Numpy structured array
-                dt = np.dtype([('Element', 'S2'), ('Concentration_Percent', np.float32)])
                 comp_array = np.array(list(zip(elements, concs)), dtype=dt)
-                grp.create_dataset('Composition', data=comp_array)
+                grp.create_dataset('Composition_CF_LIBS', data=comp_array)
+                
+            if s_info.get('xrf_composition_percent'):
+                elements_xrf = list(s_info['xrf_composition_percent'].keys())
+                concs_xrf = list(s_info['xrf_composition_percent'].values())
+                xrf_array = np.array(list(zip(elements_xrf, concs_xrf)), dtype=dt)
+                grp.create_dataset('Composition_XRF', data=xrf_array)
 
     print("✅ PENGGABUNGAN SUKSES! Data legacy kini terbungkus rapi, siap dipanggil 1 baris kode saja.")
     

@@ -17,9 +17,9 @@ from IPython.display import display, clear_output
 SIMULATION_CONFIG = {
     "resolution": 24480,
     "wl_range": (200, 900),
-    "sigma": 0.1,
+    "sigma": 0.01,
     "target_max_intensity": 0.8,
-    "convolution_sigma": 0.1,
+    "convolution_sigma": 0.01,
 }
 
 # Konstanta fisika

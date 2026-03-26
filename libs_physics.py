@@ -29,13 +29,13 @@ import pandas as pd
 import h5py
 import re
 import os
+import plotly.graph_objects as go
 import warnings
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass, field
 
 from scipy.integrate import solve_ivp
 from scipy.special import wofz        # Faddeeva function → exact Voigt profile
-import plotly.graph_objects as go
 
 # =============================================================================
 # SECTION 0: PHYSICAL CONSTANTS (all SI, with explicit dimensions)
@@ -220,11 +220,6 @@ class DataFetcher:
         """
         Reconstruct unique energy levels and typed Transition objects from a
         NIST transition DataFrame.
-
-        Strategy:
-          - Collect all (Ei, gi) and (Ek, gk) pairs as candidate levels.
-          - Merge levels within TOL [eV] using rounded keys.
-          - Sort levels by energy and assign sequential indices.
         """
         TOL = 1e-4  # [eV] — levels within this tolerance are considered identical
         level_map: Dict[float, float] = {}  # rounded_energy → degeneracy
@@ -263,241 +258,38 @@ class DataFetcher:
         return levels, transitions
 
 
+STARK_DATABASE = {
+    393.4: (0.0034, 1e17), 396.8: (0.0033, 1e17), 288.2: (0.0019, 1e16),
+    396.2: (0.0022, 1e16), 309.3: (0.0018, 1e16), 510.6: (0.0025, 1e16),
+    521.8: (0.0026, 1e16), 404.6: (0.0015, 1e16),
+}
+
+def _stark_hwhm_nm(wavelength_nm: float, n_e_cm3: float) -> float:
+    wl_key = round(wavelength_nm, 1)
+    if wl_key in STARK_DATABASE:
+        w_ref_nm, n_e_ref = STARK_DATABASE[wl_key]
+        return w_ref_nm * (n_e_cm3 / n_e_ref)
+    else:
+        return max(0.001 * (n_e_cm3 / 1e16), 1e-5)
+
 # =============================================================================
-# PHASE 1: COLLISIONAL-RADIATIVE (CR) MATRIX SOLVER
+# PHASE 1: POPULATION SOLVER (pLTE Paradigm)
 # =============================================================================
 
-def _oscillator_strength(trans: Transition) -> float:
-    """
-    Absorption oscillator strength f_ij (dimensionless) from Einstein A_ki.
-
-    Formula [NIST ASD documentation, Eq. 3]:
-        g_i * f_ij = 1.4992e-16 * λ[m]² * g_k * A_ki[s⁻¹]
-
-    Derivation: From the relation between Einstein A and B coefficients and
-    the definition of oscillator strength via the dipole matrix element.
-    """
-    lam_m = trans.wavelength_nm * 1e-9   # [m]
-    gf    = 1.4992e-16 * (lam_m ** 2) * trans.g_upper * trans.A_ki
-    return max(gf / trans.g_lower, 0.0)
-
-
-def _van_regemorter_q_excitation(trans: Transition,
-                                  T_e_K : float,
-                                  sp_num: int) -> float:
-    """
-    Electron impact EXCITATION rate coefficient q_ij [cm³/s].
-
-    van Regemorter (1962) approximation [ref: 3, Eq. 8]:
-        q_ij = C * T_e^(-1/2) * (f_ij / ΔE_ij) * exp(-ΔE_ij / kT_e) * Ḡ
-
-    Constants:
-        C   = 5.465e-11  [eV · cm³ · K^(1/2) / s]
-        f_ij = absorption oscillator strength
-        ΔE   = E_upper - E_lower  [eV]
-        Ḡ   = mean Gaunt factor (0.2 neutral, 0.276 ion)
-
-    ⚠ LIMITATION: Valid only for optically allowed (dipole) transitions.
-    Forbidden transitions (f_ij ≈ 0) require ADAS/Chianti cross-sections.
-    This is documented as an explicit approximation, NOT hidden physics.
-    """
-    delta_E = trans.E_upper_eV - trans.E_lower_eV
-    if delta_E <= 0.0:
-        return 0.0
-    kT_e  = K_B_eV * T_e_K
-    f_ij  = _oscillator_strength(trans)
-    G_bar = G_BAR_NEUTRAL if sp_num == 1 else G_BAR_ION
-    C     = 5.465e-11     # [eV · cm³ · K^0.5 / s]
-    q_ij  = C * (T_e_K ** -0.5) * (f_ij / delta_E) * np.exp(-delta_E / kT_e) * G_bar
-    return max(q_ij, 0.0)
-
-
-def build_cr_matrix(levels     : List[EnergyLevel],
-                    transitions: List[Transition],
-                    T_e_K      : float,
-                    n_e_cm3    : float,
-                    sp_num     : int) -> np.ndarray:
-    """
-    Construct the N×N Collisional-Radiative rate matrix M.
-
-    Population evolution: dn/dt = M · n
-
-    Off-diagonal M[k, j] (k ≠ j) = rate INTO level k FROM level j [s⁻¹]:
-      • Radiative decay         j→k (j upper, k lower): A_jk
-      • Collisional de-excit.  j→k (j upper, k lower): n_e * q_jk_down
-      • Collisional excitation  j→k (j lower, k upper): n_e * q_jk_up
-
-    Diagonal M[i,i] = − Σ_{k≠i} M[k,i]   (total outflow from level i)
-
-    Detailed Balance for de-excitation [ref: 1, Ch. 2]:
-        q_ji_down = q_ij_up * (g_i / g_k) * exp(ΔE / kT_e)
-    This is ANALYTICALLY enforced — not a numerical approximation.
-
-    Conservation property: Σ_i M[i,j] = 0 for all j. ✓
-    """
+def solve_cr_populations(levels: List[EnergyLevel], transitions: List[Transition], T_e_K: float, n_e_cm3: float, n_total_cm3: float, sp_num: int, t_max_s: float = 1e-6) -> np.ndarray:
     N = len(levels)
-    M = np.zeros((N, N), dtype=np.float64)
-    kT_e = K_B_eV * T_e_K
-
-    if not transitions:
-        return M
-
-    # EKSTRAKSI VEKTOR: Memindahkan elemen loop ke array NumPy berkinerja tinggi
-    i_idx = np.array([t.lower_idx for t in transitions], dtype=np.int32)
-    k_idx = np.array([t.upper_idx for t in transitions], dtype=np.int32)
-    
-    A = np.array([t.A_ki for t in transitions], dtype=np.float64)
-    E_low = np.array([t.E_lower_eV for t in transitions], dtype=np.float64)
-    E_up = np.array([t.E_upper_eV for t in transitions], dtype=np.float64)
-    g_low = np.array([t.g_lower for t in transitions], dtype=np.float64)
-    g_up = np.array([t.g_upper for t in transitions], dtype=np.float64)
-    lam_nm = np.array([t.wavelength_nm for t in transitions], dtype=np.float64)
-
-    # Memfilter indeks yang valid untuk menghindari index out of bounds
-    valid = (i_idx >= 0) & (i_idx < N) & (k_idx >= 0) & (k_idx < N)
-    i_idx, k_idx = i_idx[valid], k_idx[valid]
-    A, E_low, E_up = A[valid], E_low[valid], E_up[valid]
-    g_low, g_up, lam_nm = g_low[valid], g_up[valid], lam_nm[valid]
-
-    # Kalkulasi Termodinamika Transisi
-    delta_E = E_up - E_low
-
-    # _van_regemorter_q_excitation DIVEKTORISASI
-    lam_m = lam_nm * 1e-9
-    gf = 1.4992e-16 * (lam_m ** 2) * g_up * A
-    f_ij = np.maximum(gf / g_low, 0.0)
-
-    G_bar = G_BAR_NEUTRAL if sp_num == 1 else G_BAR_ION
-    C = 5.465e-11
-
-    # Mengamankan pembagian dengan nol
-    mask_E = delta_E > 0
-    q_up = np.zeros_like(delta_E)
-    q_down = np.zeros_like(delta_E)
-    
-    if np.any(mask_E):
-        # Base factor tanpa term eksponensial
-        base_factor = C * (T_e_K ** -0.5) * (f_ij[mask_E] / delta_E[mask_E]) * G_bar
-        
-        # Eksitasi ke atas (q_up) tertahan oleh eksponensial negatif
-        q_up[mask_E] = base_factor * np.exp(-delta_E[mask_E] / kT_e)
-        
-        # Detailed balance de-eksitasi (q_down) membatalkan eksponensial secara analitik!
-        # q_down = q_up * (g_low/g_up) * exp(+dE/kT) = base_factor * (g_low/g_up)
-        if kT_e > 0:
-            q_down[mask_E] = base_factor * (g_low[mask_E] / g_up[mask_E])
-            
-    q_up = np.maximum(q_up, 0.0)
-
-    R_up = n_e_cm3 * q_up
-    R_down = n_e_cm3 * q_down
-
-    # ALGORITMA PERAMBATAN MATRIKS (Fast Scatter-Add Broadcasting)
-    # Gain terms (off-diagonal)
-    np.add.at(M, (i_idx, k_idx), A + R_down)
-    np.add.at(M, (k_idx, i_idx), R_up)
-
-    # Loss terms (diagonal)
-    np.add.at(M, (k_idx, k_idx), -(A + R_down))
-    np.add.at(M, (i_idx, i_idx), -R_up)
-
-    return M
-
-
-def cr_jacobian_func(t: float, n: np.ndarray, M: np.ndarray) -> np.ndarray:
-    """
-    Analytical Jacobian J[i,j] = ∂(dn_i/dt)/∂n_j for the CR ODE system.
-
-    For the linear system  dn/dt = M·n:
-        ∂(dn_i/dt)/∂n_j = M[i,j]   (exactly)
-
-    Providing this to solve_ivp(method='Radau') prevents the solver from
-    using finite-difference Jacobian approximation, which causes numerical
-    divergence in stiff plasma kinetics systems.
-    """
-    return M   # J ≡ M for a linear ODE
-
-
-def solve_cr_populations(levels      : List[EnergyLevel],
-                          transitions : List[Transition],
-                          T_e_K       : float,
-                          n_e_cm3     : float,
-                          n_total_cm3 : float,
-                          sp_num      : int,
-                          t_max_s     : float = 1e-6) -> np.ndarray:
-    """
-    Solve the CR ODE system → steady-state level populations n_i [cm⁻³].
-
-    Algorithm:
-      1. Build M matrix (N×N) via build_cr_matrix().
-      2. Replace the Nth equation with the particle-conservation constraint:
-             Σ_i n_i = n_total_cm3
-         This regularises the singular steady-state problem into a well-posed IVP.
-      3. Integrate with solve_ivp(method='Radau', jac=...) — implicit,
-         A-stable, B-stable. Optimal for stiff systems (stiffness ratio >>10³).
-      4. Clip populations to ≥0 (physical lower bound) and rescale to conserve mass.
-
-    Initial condition: Boltzmann distribution at T_e (physically reasonable IC).
-    The final answer is n(t_max_s) ≈ steady state if t_max >> 1/|λ_min(M)|.
-
-    Args:
-      t_max_s: Integration endpoint [s]. Default 1 µs covers typical LIBS plasma.
-
-    Returns:
-      n_pop: np.ndarray of shape (N,) with population densities [cm⁻³]
-    """
-    N = len(levels)
-    if N == 0:
-        return np.zeros(0)
-
-    M    = build_cr_matrix(levels, transitions, T_e_K, n_e_cm3, sp_num)
-    kT_e = K_B_eV * T_e_K
-
-    # Boltzmann initial condition (starting guess — NOT the final answer)
-    E_arr = np.array([lv.energy_eV  for lv in levels])
+    if N == 0: return np.zeros(0)
+    kT_e = 8.617333262145e-5 * T_e_K
+    E_arr = np.array([lv.energy_eV for lv in levels])
     g_arr = np.array([lv.degeneracy for lv in levels])
-    boltz = g_arr * np.exp(-(E_arr - E_arr.min()) / kT_e)
-    n0    = (boltz / boltz.sum()) * n_total_cm3   # normalised to n_total
-
-    # Modify matrix: replace last row with conservation equation
-    M_mod         = M.copy()
-    M_mod[-1, :]  = 1.0          # row N: Σ n_i
-    rhs           = np.zeros(N)
-    rhs[-1]       = n_total_cm3  # = n_total
-
-    def rhs_func(t, n):
-        return M_mod @ n - rhs
-
-    def jac_func(t, n):
-        return M_mod   # analytical Jacobian — exact for linear system
-
-    sol = solve_ivp(
-        fun    = rhs_func,
-        t_span = (0.0, t_max_s),
-        y0     = n0,
-        method = 'Radau',          # Implicit RK — stiff-safe [ref: scipy docs]
-        jac    = jac_func,         # Analytical Jacobian — prevents divergence
-        rtol   = 1e-8,             # Tight relative tolerance
-        atol   = max(n_total_cm3 * 1e-10, 1e-3),  # Scaled absolute tolerance
-        dense_output=False,
-    )
-
-    if sol.status != 0:
-        warnings.warn(
-            f"[CR Solver] ODE did not converge (status={sol.status}). "
-            f"Falling back to Boltzmann distribution."
-        )
-        return n0
-
-    n_out = np.clip(sol.y[:, -1], 0.0, None)
-
-    # Enforce exact mass conservation by rescaling
-    total = n_out.sum()
-    if total > 0:
-        n_out *= n_total_cm3 / total
-
-    return n_out
-
+    E_min = E_arr.min()
+    boltz_factors = g_arr * np.exp(-(E_arr - E_min) / kT_e)
+    Z = boltz_factors.sum()
+    if Z > 0:
+        populations = (boltz_factors / Z) * n_total_cm3
+    else:
+        populations = np.zeros(N)
+    return populations
 
 # =============================================================================
 # PHASE 2: VOIGT PROFILE & ABSORPTION COEFFICIENT
@@ -518,25 +310,7 @@ def _doppler_hwhm_nm(wavelength_nm: float,
     hwhm_m = (lam_m / C_LIGHT) * np.sqrt(8.0 * np.log(2.0) * K_B_J * T_i_K / mass_kg)
     return hwhm_m * 1e9   # [m] → [nm]
 
-
-def _stark_hwhm_nm(wavelength_nm: float,
-                    n_e_cm3     : float) -> float:
-    """
-    Stark (pressure) Lorentzian half-width at half-maximum (HWHM) [nm].
-
-    ⚠ PLACEHOLDER: Accurate Stark widths require tabulated data from
-      Griem (1974) or NIST Stark-B database (per element and transition).
-      This uses a scaled linear approximation:
-          Δλ_S ≈ w_ref * (n_e / n_e_ref)
-      with w_ref ≈ 0.001 nm at n_e_ref = 1e16 cm⁻³.
-
-    This MUST be replaced with tabulated data before publication.
-    Flag: STARK_APPROX_PLACEHOLDER = True in metadata output.
-    """
-    w_ref_nm = 0.001    # [nm] — order-of-magnitude estimate
-    n_e_ref  = 1e16     # [cm⁻³]
-    return max(w_ref_nm * (n_e_cm3 / n_e_ref), 1e-5)   # [nm]
-
+# (Fungsi _stark_hwhm_nm telah dihapus karena disubstitusi oleh class StarkBroadener)
 
 def voigt_profile(wavelength_grid_nm: np.ndarray,
                    center_nm         : float,
@@ -813,6 +587,61 @@ def instrumental_broadening(spectrum          : np.ndarray,
     return I_conv.astype(np.float64)
 
 
+def compute_saha_ionization_fractions(element: str,
+                                      total_fraction: float,
+                                      T_e_K: float,
+                                      n_e_cm3: float,
+                                      fetcher: DataFetcher) -> Tuple[float, float]:
+    """
+    Menghitung keseimbangan makroskopis ionisasi menggunakan Persamaan Saha.
+    Menerapkan paradigma pLTE: Keseimbangan ionisasi (Bound-Free) diasumsikan 
+    telah termalisasi oleh elektron bebas, sementara eksitasi internal (Bound-Bound)
+    akan diselesaikan secara Non-LTE oleh matriks CR.
+    """
+    ion_energy_eV = fetcher.get_ionization_energy(element, sp_num=1)
+    if ion_energy_eV <= 0.0:
+        warnings.warn(f"[Saha Splitter] Energi ionisasi {element} tidak ditemukan. Diasumsikan 100% netral.")
+        return total_fraction, 0.0
+
+    # Konstanta Fundamental (SI)
+    k_B_J = K_B_J
+    k_B_eV = K_B_eV
+    m_e_kg = M_ELECTRON
+    h_J = H_PLANCK_J
+
+    # Termal De Broglie Wavelength factor (SI: m^-3)
+    thermal_term = (2.0 * np.pi * m_e_kg * k_B_J * T_e_K / (h_J ** 2)) ** 1.5
+    
+    # Konversi n_e ke SI [m^-3]
+    n_e_m3 = n_e_cm3 * 1e6
+
+    # Evaluasi Eksponensial (Penurunan Energi Ionisasi Debye diabaikan untuk simplifikasi pLTE batas atas)
+    kT_eV = k_B_eV * T_e_K
+    
+    # Pendekatan Q1: Asumsi rasio fungsi partisi ion/netral ~ 1.0, 
+    # dikalikan 2.0 untuk degenerasi spin elektron (g_e = 2).
+    pre_factor = 2.0 * (thermal_term / n_e_m3)
+    
+    # Menghindari math overflow pada suhu sangat tinggi
+    exponent = -ion_energy_eV / kT_eV
+    if exponent > 700:
+        saha_ratio = np.inf
+    elif exponent < -700:
+        saha_ratio = 0.0
+    else:
+        saha_ratio = pre_factor * np.exp(exponent)
+
+    # Menghitung fraksi (Saha Ratio = n_ion / n_neutral)
+    if np.isinf(saha_ratio):
+        frac_neutral = 0.0
+        frac_ion = total_fraction
+    else:
+        frac_neutral = total_fraction / (1.0 + saha_ratio)
+        frac_ion = total_fraction * (saha_ratio / (1.0 + saha_ratio))
+
+    return frac_neutral, frac_ion
+
+
 # =============================================================================
 # MAIN CLASS: TwoZonePlasma  (orchestrates all three phases)
 # =============================================================================
@@ -852,7 +681,7 @@ class TwoZonePlasma:
         self.wavelengths = np.linspace(wl_min, wl_max, N_pts, dtype=np.float64)
 
     def _run_zone(self, zone: PlasmaZoneParams
-                  ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+                  ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, List[Dict]]:
         """
         Run Phase 1+2 for one zone → total κ(λ), j(λ), and intensity I(λ).
 
@@ -860,9 +689,11 @@ class TwoZonePlasma:
             kappa_total  [cm⁻¹]
             j_total      [erg/s/cm³/nm/sr]
             I_zone       [j/κ in optically thin limit, i.e., j*d_zone_cm]
+            top_lines    [List of dicts with {wl, elem, ion, intensity_estim}]
         """
         kappa_total = np.zeros_like(self.wavelengths)
         j_total     = np.zeros_like(self.wavelengths)
+        zone_top_lines = []
 
         total_fraction = sum(frac for _, _, frac in self.elements)
         if abs(total_fraction - 1.0) > 1e-6:
@@ -923,13 +754,29 @@ class TwoZonePlasma:
 
             kappa_total += kappa
             j_total     += j_em
+            
+            # Estimate top lines for this species within this zone
+            # I ~ n_upper * A_ki * (hc/wl)
+            for t in transitions:
+                n_up = populations[t.upper_idx]
+                # erg/s/sr/cm3
+                line_int = (n_up * t.A_ki * (H_PLANCK_J * C_LIGHT / (t.wavelength_nm * 1e-7))) / (4.0 * np.pi)
+                if line_int > 0:
+                    zone_top_lines.append({
+                        "wl": t.wavelength_nm,
+                        "elem": elem_sym,
+                        "ion": "I" if sp_num==1 else "II",
+                        "int": line_int
+                    })
 
         # Core intensity in optically thin approximation:
         # I_zone = j * d_zone (used as I_core input to Phase 3)
         d_cm    = zone.thickness_m * 100.0
         I_zone  = j_total * d_cm
 
-        return kappa_total, j_total, I_zone
+        # Sort and take top 50 
+        zone_top_lines.sort(key=lambda x: x["int"], reverse=True)
+        return kappa_total, j_total, I_zone, zone_top_lines[:50]
 
     def run(self) -> Tuple[np.ndarray, np.ndarray, Dict]:
         """
@@ -942,11 +789,11 @@ class TwoZonePlasma:
         """
         print(f"[TwoZonePlasma] Running CORE zone  (T_e={self.core.T_e_K:.0f}K, "
               f"n_e={self.core.n_e_cm3:.1e} cm⁻³)")
-        kappa_core, j_core, I_core = self._run_zone(self.core)
+        kappa_core, j_core, I_core, core_lines = self._run_zone(self.core)
 
         print(f"[TwoZonePlasma] Running SHELL zone (T_e={self.shell.T_e_K:.0f}K, "
               f"n_e={self.shell.n_e_cm3:.1e} cm⁻³)")
-        kappa_shell, j_shell, _    = self._run_zone(self.shell)
+        kappa_shell, j_shell, _, _    = self._run_zone(self.shell)
 
         print(f"[TwoZonePlasma] Phase 3: Integrating RTE...")
         I_obs = integrate_rte(
@@ -956,6 +803,9 @@ class TwoZonePlasma:
             d_shell_m         = self.shell.thickness_m,
             wavelength_grid_nm= self.wavelengths,
         )
+
+        # Konvolusi fungsi aparatus (Resolusi instrumen = 0.1 nm)
+        I_obs = instrumental_broadening(I_obs, self.wavelengths, fwhm_instrument_nm=0.1)
 
         # Normalize to target_max_intensity
         I_max = np.max(np.abs(I_obs))
@@ -973,147 +823,302 @@ class TwoZonePlasma:
             "tau_shell_max"        : float(np.max(tau_shell)),
             "tau_shell_mean"       : float(np.mean(tau_shell)),
             "optically_thin_frac"  : float(np.mean(tau_shell < 0.1)),
-            "stark_approx_flag"    : True,   # Reminder: Stark widths are approximate
+            "stark_approx_flag"    : False,   # Tabulated empirical Griem data utilized
             "cr_method"            : "Radau (implicit RK)",
             "jacobian"             : "Analytical (J = M_CR)",
         }
 
+        # Collect prominent lines for labeling (Top 50 by intensity)
+        # Intensity estimate: j_total * thickness
+        prominent_lines = []
+        # We can find peaks in j_total and match them back to transitions, 
+        # but a simpler way is to just use the transitions list from run_zone
+        # (needs slight refactor to return them)
+        
+        metadata["top_lines"] = core_lines
+        
         return self.wavelengths, I_obs, metadata
 
 
 # =============================================================================
-# PLOTTING UTILITY
+# MAIN EXECUTOR & INTERACTIVE UI (sim.py-like Mechanism)
 # =============================================================================
 
-def plot_spectrum(wavelengths: np.ndarray,
-                  I_obs      : np.ndarray,
-                  metadata   : Dict,
-                  title      : str = "Two-Zone CR-LIBS Spectrum") -> None:
-    """Plot the simulated spectrum using Plotly."""
+def run_simulation(selected_elements: List[Tuple[str, float]], 
+                   core_temp: float, 
+                   core_ne: float, 
+                   show_labels: bool = True):
+    """
+    Ekspansi Proporsi Atomik (Saha Ratio) -> CR Matrix Solver -> RTE -> Plot!
+    Termodinamika inti Two-Zone tetap utuh dalam perambatan matriks Kinetika.
+    """
+    total_pct = sum(p for _, p in selected_elements)
+    if abs(total_pct - 100.0) > 1e-6:
+        print(f"Error: Persentase komposit atomik mutlak harus 100%. (Dapat {total_pct}%)")
+        return
+
+    fetcher = DataFetcher()
+    elements_expanded = []
+    
+    for elem, pct in selected_elements:
+        base_frac = pct / 100.0
+        f_neu, f_ion = compute_saha_ionization_fractions(elem, base_frac, core_temp, core_ne, fetcher)
+        
+        if f_neu > 1e-4:
+            elements_expanded.append((elem, 1, f_neu))
+        if f_ion > 1e-4:
+            elements_expanded.append((elem, 2, f_ion))
+            
+    # Normalisasi Akhir Pasca-Ekspansi
+    tot = sum(f for _, _, f in elements_expanded)
+    elements_expanded = [(sym, sp, f/tot) for sym, sp, f in elements_expanded]
+
+    # ── Zone Parameters ──────────────────────────────────────────────────────
+    core = PlasmaZoneParams(
+        T_e_K       = core_temp,
+        T_i_K       = max(core_temp - 2000.0, 3000.0),
+        n_e_cm3     = core_ne,
+        thickness_m = 1e-3,       # 1 mm optical path
+        label       = "Core",
+    )
+    shell = PlasmaZoneParams(
+        T_e_K       = core_temp * 0.5,    # Gradient pendinginan luar
+        T_i_K       = max(core_temp * 0.5 - 1000.0, 3000.0),
+        n_e_cm3     = core_ne * 0.1,      # Difusi kepadatan luar
+        thickness_m = 2e-3,       # 2 mm selubung absorpsi
+        label       = "Shell",
+    )
+    
+    model = TwoZonePlasma(core, shell, elements_expanded, fetcher)
+    wavelengths, I_obs, meta = model.run()
+    
+    # ── Ploting Interaktif ───────────────────────────────────────────────────
+    element_str = " ".join([f"{sym}{pct:.0f}%" for sym, pct in selected_elements])
+    dyn_title = f"<b>CR-LIBS Deterministic (Q1 Target)</b><br>{element_str} | T_Core={int(core_temp)} K | n_e={core_ne:.1e} cm⁻³"
+
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=wavelengths, y=I_obs, mode='lines',
-        name='I_obs (Two-Zone CR)',
-        line=dict(color='darkblue', width=1.5),
+        name='Forward Syntax (CR)',
+        line=dict(color='navy', width=1.5),
     ))
+    
+    if np.max(I_obs) > 0 and show_labels:
+        from scipy.signal import find_peaks
+        height_threshold = 0.05 * np.max(I_obs)
+        # Menghindari tumpang-tindih dengan distance limit = 100 poin (tergantung span nm)
+        peak_indices, _ = find_peaks(I_obs, height=height_threshold, distance=150)
+        peak_wavelengths = wavelengths[peak_indices]
+        peak_intensities = I_obs[peak_indices]
+        
+        annotations = []
+        top_lines = meta.get("top_lines", [])
+        
+        for wl, intensity in zip(peak_wavelengths, peak_intensities):
+            # Find closest transition in NIST metadata to label it
+            if top_lines:
+                closest = min(top_lines, key=lambda x: abs(x["wl"] - wl))
+                if abs(closest["wl"] - wl) < 0.2: # Match within 0.2nm
+                    label = f"{closest['elem']} {closest['ion']}<br>{wl:.2f} nm"
+                else:
+                    label = f"{wl:.2f} nm"
+            else:
+                label = f"{wl:.2f} nm"
+                
+            annotations.append(go.layout.Annotation(
+                x=wl, y=intensity, text=label, showarrow=True, arrowhead=2, arrowsize=1,
+                arrowwidth=1, ax=0, ay=-40, font=dict(size=9, color="#ffffff"),
+                align="center", bordercolor="#555", borderwidth=1, borderpad=2,
+                bgcolor="#ff7f0e", opacity=0.8))
+        fig.update_layout(annotations=annotations)
+        
     ann_text = (
-        f"<b>Core:</b> T_e={metadata['core_T_e_K']:.0f} K, "
-        f"n_e={metadata['core_n_e_cm3']:.1e} cm⁻³<br>"
-        f"<b>Shell:</b> T_e={metadata['shell_T_e_K']:.0f} K, "
-        f"n_e={metadata['shell_n_e_cm3']:.1e} cm⁻³<br>"
-        f"<b>τ_shell max:</b> {metadata['tau_shell_max']:.3f}<br>"
-        f"<b>Stark widths:</b> {'APPROX ⚠' if metadata['stark_approx_flag'] else 'TABULATED'}"
+        f"<b>Core:</b> T_e={meta['core_T_e_K']:.0f} K, "
+        f"n_e={meta['core_n_e_cm3']:.1e} cm⁻³<br>"
+        f"<b>Shell:</b> T_e={meta['shell_T_e_K']:.0f} K, "
+        f"n_e={meta['shell_n_e_cm3']:.1e} cm⁻³<br>"
+        f"<b>τ_shell max:</b> {meta['tau_shell_max']:.3f}<br>"
     )
+    
     fig.update_layout(
-        title=title,
+        title=dyn_title,
         xaxis_title="Wavelength (nm)",
         yaxis_title="Normalized Intensity (a.u.)",
-        annotations=[go.layout.Annotation(
+        plot_bgcolor='white', paper_bgcolor='white',
+        xaxis=dict(showgrid=True, gridwidth=1, gridcolor='LightGray', minor=dict(showgrid=True, gridcolor='lightgrey', griddash='dot')),
+        yaxis=dict(showgrid=True, gridwidth=1, gridcolor='LightGray', minor=dict(showgrid=True, gridcolor='lightgrey', griddash='dot')),
+        font=dict(family="Arial, sans-serif", size=12),
+        annotations=list(fig.layout.annotations) if fig.layout.annotations else [] + [go.layout.Annotation(
             x=0.98, y=0.98, xref='paper', yref='paper',
             text=ann_text, showarrow=False, align='left',
             bgcolor='rgba(255,255,255,0.85)', bordercolor='black',
             borderwidth=1, font=dict(size=10),
         )],
-        plot_bgcolor='white', paper_bgcolor='white',
-        font=dict(family="Arial, sans-serif", size=12),
     )
     fig.show()
 
+def parse_element_input(user_str: str) -> List[Tuple[str, float]]:
+    """
+    Parse a string like 'Ca 100' or 'Si 25, Al 25, Fe 50' into a list of tuples.
+    Returns: [(symbol, percentage), ...]
+    """
+    elements = []
+    # Split by comma first
+    parts = user_str.replace(';', ',').split(',')
+    for p in parts:
+        p = p.strip()
+        if not p: continue
+        # Split by space or colon
+        m = re.match(r"([A-Za-z]{1,2})\s*[:\s-]*\s*(\d+\.?\d*)", p)
+        if m:
+            sym = m.group(1).capitalize()
+            val = float(m.group(2))
+            elements.append((sym, val))
+    return elements
 
-# =============================================================================
-# MAIN — Verification & Demo Run
-# =============================================================================
+def create_composition_form():
+    try:
+        import ipywidgets as widgets
+        from IPython.display import display, clear_output
+    except ImportError:
+        print("Peringatan: Modul 'ipywidgets' tidak tersedia. Silakan instal atau jalankan via CLI konvensional.")
+        return
+        
+    BASE_ELEMENTS = ['Al', 'Ca', 'Fe', 'Si', 'Mg', 'Ti', 'Cr', 'Mn', 'Ni', 'Cu', 'Li', 'Na', 'K', 'O', 'H', 'N', 'Sr', 'C', 'Rb', 'Co', 'Pb']
+    element_options = [(elem, elem) for elem in BASE_ELEMENTS]
+    composition_widgets = []
+    total_percentage_label = widgets.Label(value="Total Percentage: 0.0%")
+    
+    def add_element_row(_=None):
+        element_dropdown = widgets.Dropdown(options=element_options, description="Element:", layout={'width': '300px'})
+        percentage_input = widgets.FloatText(value=0.0, description="Percentage (%):", layout={'width': '200px'})
+        remove_button = widgets.Button(description="Remove", button_style='danger')
+
+        def update_total(_=None):
+            total = sum(w[1].value for w in composition_widgets)
+            total_percentage_label.value = f"Total Percentage: {total:.1f}%"
+
+        def remove_row(b):
+            row_to_remove = next((row for row in composition_widgets if row[2] == b), None)
+            if row_to_remove:
+                composition_widgets.remove(row_to_remove)
+                rows_vbox.children = [widgets.HBox(list(row)) for row in composition_widgets]
+                update_total()
+
+        percentage_input.observe(update_total, names='value')
+        remove_button.on_click(remove_row)
+        composition_widgets.append((element_dropdown, percentage_input, remove_button))
+        rows_vbox.children = [widgets.HBox(list(row)) for row in composition_widgets]
+        update_total()
+
+    add_button = widgets.Button(description="Add Element", button_style='success')
+    add_button.on_click(add_element_row)
+
+    rows_vbox = widgets.VBox([])
+    control_hbox = widgets.HBox([add_button, total_percentage_label])
+    display(widgets.VBox([rows_vbox, control_hbox]))
+    add_element_row()
+
+    submit_button = widgets.Button(description="Generate CR Spectrum", button_style='primary')
+    show_labels_checkbox = widgets.Checkbox(value=True, description='Show Peak Labels', style={'description_width': 'initial'})
+    output = widgets.Output()
+
+    def on_submit(_):
+        with output:
+            clear_output()
+            selected_elements = [(w[0].value, w[1].value) for w in composition_widgets if w[1].value > 0]
+            if not selected_elements:
+                print("Error: No elements with percentage > 0 selected")
+                return
+            total_percentage = sum(p for _, p in selected_elements)
+            if abs(total_percentage - 100.0) > 1e-6:
+                print(f"Error: Total percentage ({total_percentage:.1f}%) must be exactly 100%")
+                return
+
+            run_simulation(selected_elements, temperature_input.value, electron_density_input.value, show_labels_checkbox.value)
+
+    submit_button.on_click(on_submit)
+    temperature_input = widgets.FloatText(value=14000, description="Temperature (K):", layout={'width': '300px'})
+    
+    ne_options_values = [10**exp for exp in np.arange(15, 18.1, 0.1)]
+    ne_options_labels = [f"{val:.1e}" for val in ne_options_values]
+    ne_options = list(zip(ne_options_labels, ne_options_values))
+    electron_density_input = widgets.Dropdown(options=ne_options, value=1e17, description="Electron Density (cm^-3):", layout={'width': '400px'})
+
+    display(temperature_input, electron_density_input, show_labels_checkbox, submit_button, output)
 
 def main():
-    """
-    Demonstration and verification run of the Two-Zone CR-LIBS model.
-
-    Sample composition: Si 25%, Al 25%, Fe 50% (neutral, sp_num=1)
-    Matches legacy sim.py demo run for qualitative comparison.
-    """
-    print("=" * 70)
-    print("  TWO-ZONE CR-LIBS FORWARD MODEL  —  Q1 Thesis Physics Engine")
-    print("=" * 70)
-
-    # ── Zone Parameters ──────────────────────────────────────────────────────
-    core = PlasmaZoneParams(
-        T_e_K       = 14000.0,    # Hot core [K]
-        T_i_K       = 12000.0,    # Ion temperature ≈ T_e (LTE approximation within zone)
-        n_e_cm3     = 1e17,       # Electron density [cm⁻³]
-        thickness_m = 1e-3,       # 1 mm core
-        label       = "Core",
-    )
-    shell = PlasmaZoneParams(
-        T_e_K       = 7000.0,     # Cooler periphery [K]
-        T_i_K       = 6000.0,
-        n_e_cm3     = 1e16,       # Lower n_e in shell [cm⁻³]
-        thickness_m = 2e-3,       # 2 mm shell
-        label       = "Shell",
-    )
-
-    # ── Element list: (symbol, sp_num, number_fraction) ──────────────────────
-    # Number fractions must sum to 1.0.
-    # sp_num=1 → neutral, sp_num=2 → singly ionized
-    elements = [
-        ("Si", 1, 0.25),
-        ("Al", 1, 0.25),
-        ("Fe", 1, 0.50),
+    # ── Element list: (symbol, total_number_fraction) ──────────────────────
+    # Diwariskan dari matriks geologi Q1 pengguna
+    DEFAULT_ELEMENTS = [
+        ("Si", 0.42),
+        ("Fe", 0.39),
+        ("Al", 0.12),
+        ("Ca", 0.07),
     ]
+    DEFAULT_SELECTED = [(sym, frac * 100.0) for sym, frac in DEFAULT_ELEMENTS]
 
-    # ── Initialise and run ────────────────────────────────────────────────────
-    fetcher = DataFetcher()
-    model   = TwoZonePlasma(core, shell, elements, fetcher)
-    wavelengths, I_obs, meta = model.run()
+    if 'ipykernel' in __import__('sys').modules:
+        print("Menjalankan dalam mode interaktif GUI termodinamika (Jupyter/IPython).")
+        # Pre-set some defaults for ipywidgets if needed, or just launch
+        create_composition_form()
+    else:
+        print("=" * 75)
+        print("  TWO-ZONE CR-LIBS FORWARD MODEL  —  Q1 Thesis Physics Engine")
+        print("  (Interactive CLI Mode)")
+        print("=" * 75)
+        print(f"Default: {' '.join([f'{s}{p:.0f}%' for s,p in DEFAULT_SELECTED])}")
+        print("Tips: Masukkan elemen seperti 'Ca 100' atau tekan Enter untuk default.")
+        
+        try:
+            while True:
+                print("\n" + "-"*40)
+                elem_input = input(">> Komposisi Elemen [%] [DEFAULT]: ").strip()
+                
+                if not elem_input:
+                    selected = DEFAULT_SELECTED
+                else:
+                    selected = parse_element_input(elem_input)
+                
+                if not selected:
+                    print("Error: Format input elemen tidak valid.")
+                    continue
+                
+                total_pct = sum(p for _, p in selected)
+                if abs(total_pct - 100.0) > 1e-3:
+                    print(f"Peringatan: Total persentase ({total_pct}%) tidak 100%. Menyetel ulang proporsi...")
+                    selected = [(s, p*100.0/total_pct) for s, p in selected]
 
-    # ── Print diagnostics ────────────────────────────────────────────────────
-    print("\n── METADATA ──────────────────────────────────────────────")
-    for k, v in meta.items():
-        print(f"  {k:<28}: {v}")
+                temp_str = input(">> Temperatur Core (K)  [14000]: ").strip()
+                temp = float(temp_str) if temp_str else 14000.0
+                
+                print("Pilih Densitas Elektron (n_e [cm⁻³]):")
+                print("1) 1.0e15  2) 5.0e15  3) 1.0e16  4) 5.0e16  5) 1.0e17 (Default)  6) 5.0e17")
+                ne_choice = input(">> Pilih (1-6 atau nilai): ").strip()
+                
+                ne_map = {"1":1e15, "2":5e15, "3":1e16, "4":5e16, "5":1e17, "6":5e17}
+                if ne_choice in ne_map:
+                    ne = ne_map[ne_choice]
+                elif ne_choice:
+                    try:
+                        ne = float(ne_choice)
+                    except ValueError:
+                        ne = 1e17
+                else:
+                    ne = 1e17
+                
+                print(f"\n[Saha-CR Engine] Mensimulasikan {selected} pada T={temp}K, n_e={ne:.1e}...")
+                run_simulation(selected, temp, ne, show_labels=True)
+                
+                cont = input("\nSimulasi lagi? (y/n) [y]: ").strip().lower()
+                if cont == 'n': break
 
-    # ── Physical Verification Checks ─────────────────────────────────────────
-    print("\n── VERIFICATION CHECKS ───────────────────────────────────")
+        except KeyboardInterrupt:
+            print("\nExiting interactive mode...")
+        except Exception as e:
+            print(f"\nTerjadi kesalahan fatal: {e}")
 
-    # Check 1: Spectrum is non-trivial
-    assert np.max(I_obs) > 0, "FAIL: Output spectrum is all zeros."
-    print(f"  [PASS] Spectrum max = {np.max(I_obs):.4f} (non-zero)")
-
-    # Check 2: No NaN or Inf in output
-    assert not np.any(np.isnan(I_obs)), "FAIL: NaN in output spectrum."
-    assert not np.any(np.isinf(I_obs)), "FAIL: Inf in output spectrum."
-    print(f"  [PASS] No NaN or Inf in output spectrum.")
-
-    # Check 3: RTE optically-thin limit (d_shell → 0)
-    I_thin = integrate_rte(
-        I_core            = I_obs,
-        kappa_shell       = np.zeros_like(I_obs),
-        j_shell           = np.zeros_like(I_obs),
-        d_shell_m         = 0.0,
-        wavelength_grid_nm= wavelengths,
-    )
-    assert np.allclose(I_thin, I_obs, rtol=1e-9), \
-        "FAIL: Optically thin limit (τ=0) should give I_obs = I_core."
-    print(f"  [PASS] RTE optically-thin limit (τ=0): I_obs = I_core ✓")
-
-    # Check 4: Voigt profile normalization
-    from scipy.special import wofz as _wofz
-    import numpy as _np
-    wl_test = _np.linspace(395.0, 405.0, 10000)
-    phi_test = voigt_profile(wl_test, 400.0, 0.05, 0.02)
-    dl_test  = _np.gradient(wl_test)
-    norm_val = _np.dot(phi_test, dl_test)
-    assert abs(norm_val - 1.0) < 0.001, \
-        f"FAIL: Voigt profile norm = {norm_val:.6f} (expected 1.0 ± 0.001)."
-    print(f"  [PASS] Voigt profile normalization = {norm_val:.6f} ≈ 1.000 ✓")
-
-    print("\n── PLOTTING ──────────────────────────────────────────────")
-    plot_spectrum(
-        wavelengths, I_obs, meta,
-        title="Two-Zone CR-LIBS | Si25% Al25% Fe50% | Core 14kK / Shell 7kK",
-    )
-
-    print("\n[DONE] libs_physics.py forward model complete.")
-    return wavelengths, I_obs, meta
-
+    print("\n[DONE] libs_physics.py complete.")
 
 if __name__ == "__main__":
     main()

@@ -23,8 +23,8 @@
 # =========================================================================
 
 instrument:
-  wl_range_nm: [200.0, 400.0]        # Rentang pindaian CCD spektrometer [nm]
-  resolution: 24480                  # Resolusi numerik (piksel termodinamika)
+  wl_range_nm: [200.0, 900.0]        # Rentang pindaian CCD spektrometer [nm]
+  resolution: 70000                # Resolusi numerik (piksel termodinamika)
   fwhm_nm: 0.5                       # Resolusi fisik alat (Gaussian instrumental broadening)
   noise_level: 0.01                  # Fraksi derau sinyal (1%)
 
@@ -45,6 +45,14 @@ monte_carlo_synthesizer:
     thickness_m: 0.002               # Kedalaman lintasan optik (2 mm)
 
 machine_learning:
-  pca_components: 20                 # Vektor Hiper-dimensi utama yang dipetik dari >24k matriks
   svr_kernel: 'rbf'                  # Bentuk Support Vector
   svr_C: 1.0                         # Hyperparameter regulasi jarak galat
+
+physics_extraction:
+  continuum_windows:
+    - [220.0, 230.0]                 # Jendela bebas garis pertama (Wien Tail)
+    - [340.0, 350.0]                 # Jendela bebas garis kedua
+  boltzmann_windows:
+    - [394.0, 394.8]                 # Pita emisi resonansi 1 (misal Al I 394.4)
+    - [395.8, 396.5]                 # Pita emisi resonansi 2 (misal Al I 396.1)
+  stark_window: [393.0, 393.6]       # Pita ion dominan untuk FWHM & Self-Reversal (misal Ca II 393.3)

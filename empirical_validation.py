@@ -67,7 +67,11 @@ def run_empirical_validation(model_pkl: str, csv_path: str):
     print(f"[Inversi] Memuat AI pipeline regresi: {model_pkl}")
     pipeline = joblib.load(model_pkl)
     
-    pca = pipeline['pca']
+    physics_extractor = pipeline.get('physics_extractor', None)
+    if not physics_extractor:
+        # Backward compatibility for old pca models
+        physics_extractor = pipeline.get('pca')
+    
     scaler_X = pipeline['scaler_X']
     scaler_y = pipeline['scaler_y']
     model = pipeline['model']
@@ -97,9 +101,9 @@ def run_empirical_validation(model_pkl: str, csv_path: str):
     print("\n[Inversi] Memproses data piksel masif melalui ruang hiperdimensi SVR...")
     X_features = I_exp.reshape(1, -1)
     
-    # Proyeksi PCA & Standarisasi
-    X_pca = pca.transform(X_features)
-    X_scaled = scaler_X.transform(X_pca)
+    # Proyeksi Fitur Termodinamika & Standarisasi
+    X_phys = physics_extractor.transform(X_features)
+    X_scaled = scaler_X.transform(X_phys)
     
     # Prediksi Inverse
     y_pred_scaled = model.predict(X_scaled)
