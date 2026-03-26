@@ -1,0 +1,15 @@
+{
+    "site_package_search_strategy": "pep503",
+    "search_path": [
+        ".",
+        "src",
+        "/opt/anaconda3/envs/main/lib/python3.11/site-packages"
+    ],
+    "source_directories": [
+        ".",
+        "src",
+        "scripts",
+        "tests"
+    ],
+    "python_version": "3.11"
+}

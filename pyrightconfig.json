@@ -5,6 +5,7 @@
     "venv": "main",
     "extraPaths": [
         ".",
-        "src"
+        "src",
+        "/opt/anaconda3/envs/main/lib/python3.11/site-packages"
     ]
 }
