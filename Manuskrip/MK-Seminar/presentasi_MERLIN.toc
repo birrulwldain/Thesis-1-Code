@@ -1,0 +1,5 @@
+\beamer@sectionintoc {1}{Pendahuluan}{3}{0}{1}
+\beamer@sectionintoc {2}{Landasan Teori}{5}{0}{2}
+\beamer@sectionintoc {3}{Validasi Eksperimental}{10}{0}{3}
+\beamer@sectionintoc {4}{Rekonstruksi Spektrum \& Hasil}{15}{0}{4}
+\beamer@sectionintoc {5}{Diskusi \& Kesimpulan}{17}{0}{5}

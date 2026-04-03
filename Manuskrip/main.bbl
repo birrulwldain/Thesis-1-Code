@@ -5,205 +5,106 @@
 \expandafter\ifx\csname href\endcsname\relax
   \def\href#1#2{#2} \def\path#1{#1}\fi
 
-\bibitem{zaitsev_two-zone_2024}
-S.~M. Zaitsev, I.~N. Krylov, A.~M. Popov, T.~A. Labutin,
-  \href{https://link.springer.com/10.1007/s10812-024-01651-w}{Two-{Zone}
-  {Model} of {Laser}-{Induced} {Plasma}}, Journal of Applied Spectroscopy
-  90~(6) (2024) 1183--1189.
-\newblock \href {https://doi.org/10.1007/s10812-024-01651-w}
-  {\path{doi:10.1007/s10812-024-01651-w}}.
-\newline\urlprefix\url{https://link.springer.com/10.1007/s10812-024-01651-w}
+\bibitem{favre_towards_2025}
+A.~Favre, A.~Abad, A.~Poux, L.~Gosse, A.~Berjaoui, V.~Morel, A.~Bultel, \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854724002271}{Towards real-time calibration-free {LIBS} supported by machine learning}, Spectrochimica Acta Part B: Atomic Spectroscopy 224 (2025) 107082.
+\newblock \href {https://doi.org/10.1016/j.sab.2024.107082} {\path{doi:10.1016/j.sab.2024.107082}}.
+\newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0584854724002271}
 
 \bibitem{cristoforetti_local_2010}
-G.~Cristoforetti, A.~De~Giacomo, M.~Dell'Aglio, S.~Legnaioli, E.~Tognoni,
-  V.~Palleschi, N.~Omenetto,
-  \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854709003541}{Local
-  {Thermodynamic} {Equilibrium} in {Laser}-{Induced} {Breakdown}
-  {Spectroscopy}: {Beyond} the {McWhirter} criterion}, Spectrochimica Acta Part
-  B: Atomic Spectroscopy 65~(1) (2010) 86--95.
-\newblock \href {https://doi.org/10.1016/j.sab.2009.11.005}
-  {\path{doi:10.1016/j.sab.2009.11.005}}.
+G.~Cristoforetti, A.~De~Giacomo, M.~Dell'Aglio, S.~Legnaioli, E.~Tognoni, V.~Palleschi, N.~Omenetto, \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854709003541}{Local {Thermodynamic} {Equilibrium} in {Laser}-{Induced} {Breakdown} {Spectroscopy}: {Beyond} the {McWhirter} criterion}, Spectrochimica Acta Part B: Atomic Spectroscopy 65~(1) (2010) 86--95.
+\newblock \href {https://doi.org/10.1016/j.sab.2009.11.005} {\path{doi:10.1016/j.sab.2009.11.005}}.
 \newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0584854709003541}
 
 \bibitem{favre_merlin_2025}
-A.~Favre, A.~Bultel, V.~Morel, M.~Lesage, L.~Gosse,
-  \href{https://linkinghub.elsevier.com/retrieve/pii/S0022407324003297}{{MERLIN},
-  an adaptative {LTE} radiative transfer model for any mixture: {Validation} on
-  {Eurofer97} in argon atmosphere}, Journal of Quantitative Spectroscopy and
-  Radiative Transfer 330 (2025) 109222.
-\newblock \href {https://doi.org/10.1016/j.jqsrt.2024.109222}
-  {\path{doi:10.1016/j.jqsrt.2024.109222}}.
+A.~Favre, A.~Bultel, V.~Morel, M.~Lesage, L.~Gosse, \href{https://linkinghub.elsevier.com/retrieve/pii/S0022407324003297}{{MERLIN}, an adaptative {LTE} radiative transfer model for any mixture: {Validation} on {Eurofer97} in argon atmosphere}, Journal of Quantitative Spectroscopy and Radiative Transfer 330 (2025) 109222.
+\newblock \href {https://doi.org/10.1016/j.jqsrt.2024.109222} {\path{doi:10.1016/j.jqsrt.2024.109222}}.
 \newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0022407324003297}
 
+\bibitem{zaitsev_two-zone_2024}
+S.~M. Zaitsev, I.~N. Krylov, A.~M. Popov, T.~A. Labutin, \href{https://link.springer.com/10.1007/s10812-024-01651-w}{Two-{Zone} {Model} of {Laser}-{Induced} {Plasma}}, Journal of Applied Spectroscopy 90~(6) (2024) 1183--1189.
+\newblock \href {https://doi.org/10.1007/s10812-024-01651-w} {\path{doi:10.1007/s10812-024-01651-w}}.
+\newline\urlprefix\url{https://link.springer.com/10.1007/s10812-024-01651-w}
+
 \bibitem{fritzsche_atomic_2025}
-S.~Fritzsche,
-  \href{https://link.springer.com/10.1140/epja/s10050-025-01535-3}{Atomic input
-  for modeling ionic mixtures in astrophysical plasma}, The European Physical
-  Journal A 61~(3) (2025) 63.
-\newblock \href {https://doi.org/10.1140/epja/s10050-025-01535-3}
-  {\path{doi:10.1140/epja/s10050-025-01535-3}}.
+S.~Fritzsche, \href{https://link.springer.com/10.1140/epja/s10050-025-01535-3}{Atomic input for modeling ionic mixtures in astrophysical plasma}, The European Physical Journal A 61~(3) (2025) 63.
+\newblock \href {https://doi.org/10.1140/epja/s10050-025-01535-3} {\path{doi:10.1140/epja/s10050-025-01535-3}}.
 \newline\urlprefix\url{https://link.springer.com/10.1140/epja/s10050-025-01535-3}
 
 \bibitem{hansen_modeling_2021}
-P.~Hansen, S.~Schröder, S.~Kubitza, K.~Rammelkamp, D.~Vogt, H.-W. Hübers,
-  \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854721000628}{Modeling
-  of time-resolved {LIBS} spectra obtained in {Martian} atmospheric conditions
-  with a stationary plasma approach}, Spectrochimica Acta Part B: Atomic
-  Spectroscopy 178 (2021) 106115.
-\newblock \href {https://doi.org/10.1016/j.sab.2021.106115}
-  {\path{doi:10.1016/j.sab.2021.106115}}.
+P.~Hansen, S.~Schröder, S.~Kubitza, K.~Rammelkamp, D.~Vogt, H.-W. Hübers, \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854721000628}{Modeling of time-resolved {LIBS} spectra obtained in {Martian} atmospheric conditions with a stationary plasma approach}, Spectrochimica Acta Part B: Atomic Spectroscopy 178 (2021) 106115.
+\newblock \href {https://doi.org/10.1016/j.sab.2021.106115} {\path{doi:10.1016/j.sab.2021.106115}}.
 \newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0584854721000628}
 
+\bibitem{zaytsev_accurate_2026}
+S.~M. Zaytsev, V.~A. Terashkevich, \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854725002356}{Accurate simulation of the {CN} emission spectra in laser-induced plasma: a joint impact of robust line list, non-{LTE} conditions and self-absorption effect}, Spectrochimica Acta Part B: Atomic Spectroscopy 235 (2026) 107350.
+\newblock \href {https://doi.org/10.1016/j.sab.2025.107350} {\path{doi:10.1016/j.sab.2025.107350}}.
+\newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0584854725002356}
+
 \bibitem{sawyers_database_2025}
-E.~Sawyers, G.~Lopez-Reyes, A.~Barlow, M.~Veneranda, E.~Lymer, E.~Cloutis,
-  J.~Manrique, B.~Barrios, S.~Julve, J.~Freemantle, M.~Aznar, M.~Daly,
-  E.~Lalla,
-  \href{https://linkinghub.elsevier.com/retrieve/pii/S0019103525002908}{Database
-  development and {LIBS} calibration for the {LIBS}-{Raman} {Sensor} for
-  planetary exploration}, Icarus 442 (2025) 116742.
-\newblock \href {https://doi.org/10.1016/j.icarus.2025.116742}
-  {\path{doi:10.1016/j.icarus.2025.116742}}.
+E.~Sawyers, G.~Lopez-Reyes, A.~Barlow, M.~Veneranda, E.~Lymer, E.~Cloutis, J.~Manrique, B.~Barrios, S.~Julve, J.~Freemantle, M.~Aznar, M.~Daly, E.~Lalla, \href{https://linkinghub.elsevier.com/retrieve/pii/S0019103525002908}{Database development and {LIBS} calibration for the {LIBS}-{Raman} {Sensor} for planetary exploration}, Icarus 442 (2025) 116742.
+\newblock \href {https://doi.org/10.1016/j.icarus.2025.116742} {\path{doi:10.1016/j.icarus.2025.116742}}.
 \newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0019103525002908}
 
 \bibitem{manelski_libs_2024}
-H.~Manelski, R.~Wiens, B.~Bousquet, P.~Hansen, S.~Schröder, S.~Clegg,
-  N.~Martin, A.~Nelson, R.~Martinez, A.~Ollila, A.~Cousin,
-  \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854724002064}{{LIBS}
-  plasma diagnostics with {SuperCam} on {Mars}: {Implications} for
-  quantification of elemental abundances}, Spectrochimica Acta Part B: Atomic
-  Spectroscopy 222 (2024) 107061.
-\newblock \href {https://doi.org/10.1016/j.sab.2024.107061}
-  {\path{doi:10.1016/j.sab.2024.107061}}.
+H.~Manelski, R.~Wiens, B.~Bousquet, P.~Hansen, S.~Schröder, S.~Clegg, N.~Martin, A.~Nelson, R.~Martinez, A.~Ollila, A.~Cousin, \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854724002064}{{LIBS} plasma diagnostics with {SuperCam} on {Mars}: {Implications} for quantification of elemental abundances}, Spectrochimica Acta Part B: Atomic Spectroscopy 222 (2024) 107061.
+\newblock \href {https://doi.org/10.1016/j.sab.2024.107061} {\path{doi:10.1016/j.sab.2024.107061}}.
 \newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0584854724002064}
 
 \bibitem{zhang_improving_2025}
-Y.~Zhang, G.~Yang, B.-X. Wang, X.~Zhang,
-  \href{https://www.tandfonline.com/doi/full/10.1080/10739149.2025.2605334}{Improving
-  the accuracy of laser-induced breakdown spectroscopy using the single-element
-  standard curve calibration}, Instrumentation Science \& Technology (2025)
-  1--20\href {https://doi.org/10.1080/10739149.2025.2605334}
-  {\path{doi:10.1080/10739149.2025.2605334}}.
+Y.~Zhang, G.~Yang, B.-X. Wang, X.~Zhang, \href{https://www.tandfonline.com/doi/full/10.1080/10739149.2025.2605334}{Improving the accuracy of laser-induced breakdown spectroscopy using the single-element standard curve calibration}, Instrumentation Science \& Technology (2025) 1--20\href {https://doi.org/10.1080/10739149.2025.2605334} {\path{doi:10.1080/10739149.2025.2605334}}.
 \newline\urlprefix\url{https://www.tandfonline.com/doi/full/10.1080/10739149.2025.2605334}
 
 \bibitem{leosson_analysis_2022}
-K.~Leosson, S.~K. Padamata, R.~Meirbekova, G.~Saevarsdottir, S.~H. Gudmundsson,
-  \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854722000313}{Analysis
-  of dissolved titanium concentration and phase transformation in molten {Al}
-  {Ti} alloy using laser-induced breakdown spectroscopy}, Spectrochimica Acta
-  Part B: Atomic Spectroscopy 190 (2022) 106387.
-\newblock \href {https://doi.org/10.1016/j.sab.2022.106387}
-  {\path{doi:10.1016/j.sab.2022.106387}}.
+K.~Leosson, S.~K. Padamata, R.~Meirbekova, G.~Saevarsdottir, S.~H. Gudmundsson, \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854722000313}{Analysis of dissolved titanium concentration and phase transformation in molten {Al} {Ti} alloy using laser-induced breakdown spectroscopy}, Spectrochimica Acta Part B: Atomic Spectroscopy 190 (2022) 106387.
+\newblock \href {https://doi.org/10.1016/j.sab.2022.106387} {\path{doi:10.1016/j.sab.2022.106387}}.
 \newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0584854722000313}
 
 \bibitem{leistikow_quantification_2026}
-K.~J. Leistikow, N.~Nawar, J.~I. Borrero-Negrón, M.~Kulakhmetov, P.~Valentini,
-  A.~P. Rao, \href{https://xlink.rsc.org/?DOI=D5JA00374A}{Quantification of
-  spacecraft heatshield contaminants seen in reentry shock layer emissions
-  using calibration-free {LIBS}}, Journal of Analytical Atomic Spectrometry
-  (2026) 10.1039.D5JA00374A\href {https://doi.org/10.1039/D5JA00374A}
-  {\path{doi:10.1039/D5JA00374A}}.
+K.~J. Leistikow, N.~Nawar, J.~I. Borrero-Negrón, M.~Kulakhmetov, P.~Valentini, A.~P. Rao, \href{https://xlink.rsc.org/?DOI=D5JA00374A}{Quantification of spacecraft heatshield contaminants seen in reentry shock layer emissions using calibration-free {LIBS}}, Journal of Analytical Atomic Spectrometry (2026) 10.1039.D5JA00374A\href {https://doi.org/10.1039/D5JA00374A} {\path{doi:10.1039/D5JA00374A}}.
 \newline\urlprefix\url{https://xlink.rsc.org/?DOI=D5JA00374A}
 
 \bibitem{marin_roldan_libs_2021}
-A.~Marín~Roldán, V.~Dwivedi, M.~Pisarčík, M.~Veis, J.~Miškovičová,
-  Y.~Halahovets, P.~Šiffalovic, M.~Držík, P.~Veis,
-  \href{https://linkinghub.elsevier.com/retrieve/pii/S0920379621006748}{{LIBS}
-  investigation of metals suitable for plasma-facing components:
-  {Characteristics} and comparison of picosecond and nanosecond regimes},
-  Fusion Engineering and Design 172 (2021) 112898.
-\newblock \href {https://doi.org/10.1016/j.fusengdes.2021.112898}
-  {\path{doi:10.1016/j.fusengdes.2021.112898}}.
+A.~Marín~Roldán, V.~Dwivedi, M.~Pisarčík, M.~Veis, J.~Miškovičová, Y.~Halahovets, P.~Šiffalovic, M.~Držík, P.~Veis, \href{https://linkinghub.elsevier.com/retrieve/pii/S0920379621006748}{{LIBS} investigation of metals suitable for plasma-facing components: {Characteristics} and comparison of picosecond and nanosecond regimes}, Fusion Engineering and Design 172 (2021) 112898.
+\newblock \href {https://doi.org/10.1016/j.fusengdes.2021.112898} {\path{doi:10.1016/j.fusengdes.2021.112898}}.
 \newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0920379621006748}
 
 \bibitem{bultel_mcwhirter_2025}
-A.~Bultel, V.~Morel, A.~Favre, \href{https://hal.science/hal-05194211}{{THE}
-  {MCWHIRTER} {CRITERION} {REVISITED} {FOR} {LASER}-{INDUCED} {PLASMAS}},
-  publisher: Gilles Cartry Published: ICPIG International Conférence on
-  Phenomena in Ionized Gases (Jul. 2025).
+A.~Bultel, V.~Morel, A.~Favre, \href{https://hal.science/hal-05194211}{{THE} {MCWHIRTER} {CRITERION} {REVISITED} {FOR} {LASER}-{INDUCED} {PLASMAS}}, publisher: Gilles Cartry Published: ICPIG International Conférence on Phenomena in Ionized Gases (Jul. 2025).
 \newline\urlprefix\url{https://hal.science/hal-05194211}
 
 \bibitem{tang_review_2024}
-Y.~Tang, N.~Zhao, \href{https://www.at-spectrosc.com/as/article/pdf/2024041}{A
-  {Review} of {Development} in the {Research} of {Self}-{Absorption} on
-  {Laser}-{Induced} {Breakdown} {Spectroscopy}}, Atomic Spectroscopy 45~(04)
-  (2024) 336--357.
-\newblock \href {https://doi.org/10.46770/AS.2024.041}
-  {\path{doi:10.46770/AS.2024.041}}.
+Y.~Tang, N.~Zhao, \href{https://www.at-spectrosc.com/as/article/pdf/2024041}{A {Review} of {Development} in the {Research} of {Self}-{Absorption} on {Laser}-{Induced} {Breakdown} {Spectroscopy}}, Atomic Spectroscopy 45~(04) (2024) 336--357.
+\newblock \href {https://doi.org/10.46770/AS.2024.041} {\path{doi:10.46770/AS.2024.041}}.
 \newline\urlprefix\url{https://www.at-spectrosc.com/as/article/pdf/2024041}
 
-\bibitem{terashkevich_two-temperature_2024}
-V.~A. Terashkevich, E.~A. Pazyuk,
-  \href{https://link.springer.com/10.1134/S0036024424050285}{Two-{Temperature}
-  {Analysis} of {Intensity} {Distribution} in the {Rovibronic} {Spectra} of the
-  {CN} {Radical}}, Russian Journal of Physical Chemistry A 98~(5) (2024)
-  912--919.
-\newblock \href {https://doi.org/10.1134/S0036024424050285}
-  {\path{doi:10.1134/S0036024424050285}}.
-\newline\urlprefix\url{https://link.springer.com/10.1134/S0036024424050285}
-
 \bibitem{amogh_libs_2026}
-M.~Amogh, S.~S. Xavier, J.~R. Jose, R.~Philip, P.~Biju,
-  \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854726000315}{{LIBS}
-  of {BaSrTiO3} compounds using {ANN} based on a stationary state plasma
-  model}, Spectrochimica Acta Part B: Atomic Spectroscopy 238 (2026) 107480.
-\newblock \href {https://doi.org/10.1016/j.sab.2026.107480}
-  {\path{doi:10.1016/j.sab.2026.107480}}.
+M.~Amogh, S.~S. Xavier, J.~R. Jose, R.~Philip, P.~Biju, \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854726000315}{{LIBS} of {BaSrTiO3} compounds using {ANN} based on a stationary state plasma model}, Spectrochimica Acta Part B: Atomic Spectroscopy 238 (2026) 107480.
+\newblock \href {https://doi.org/10.1016/j.sab.2026.107480} {\path{doi:10.1016/j.sab.2026.107480}}.
 \newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0584854726000315}
 
 \bibitem{m_s_machine_2025}
-A.~M~S, S.~S. Xavier, J.~R. Jose, P.~R. Biju, R.~Philip,
-  \href{https://ieeexplore.ieee.org/document/11110899/}{Machine
-  {Learning}-{Based} {Stoichiometric} {Analysis} of {BaSrTiO}$_{\textrm{3}}$
-  ({BST}) via {Synthetic} {LIBS} {Spectra} {Generated} from a {Two}-{Zone}
-  {Plasma} {Model}}, in: 2025 {Conference} on {Lasers} and {Electro}-{Optics}
-  {Europe} \&amp; {European} {Quantum} {Electronics} {Conference}
-  ({CLEO}/{Europe}-{EQEC}), IEEE, Munich, Germany, 2025, pp. 1--1.
-\newblock \href {https://doi.org/10.1109/CLEO/Europe-EQEC65582.2025.11110899}
-  {\path{doi:10.1109/CLEO/Europe-EQEC65582.2025.11110899}}.
+A.~M~S, S.~S. Xavier, J.~R. Jose, P.~R. Biju, R.~Philip, \href{https://ieeexplore.ieee.org/document/11110899/}{Machine {Learning}-{Based} {Stoichiometric} {Analysis} of {BaSrTiO}$_{\textrm{3}}$ ({BST}) via {Synthetic} {LIBS} {Spectra} {Generated} from a {Two}-{Zone} {Plasma} {Model}}, in: 2025 {Conference} on {Lasers} and {Electro}-{Optics} {Europe} \&amp; {European} {Quantum} {Electronics} {Conference} ({CLEO}/{Europe}-{EQEC}), IEEE, Munich, Germany, 2025, pp. 1--1.
+\newblock \href {https://doi.org/10.1109/CLEO/Europe-EQEC65582.2025.11110899} {\path{doi:10.1109/CLEO/Europe-EQEC65582.2025.11110899}}.
 \newline\urlprefix\url{https://ieeexplore.ieee.org/document/11110899/}
 
-\bibitem{rodriguez_mixkiprapcal_2021}
-R.~Rodríguez, G.~Espinosa, J.~Miguel~Gil,
-  \href{https://global-sci.org/index.php/cicp/article/view/6987}{{MIXKIP}/{RAPCAL}:
-  {A} {Computational} {Package} for {Integrated} {Simulations} of
-  {Large}-{Scale} {Atomic} {Kinetics} and {Radiation} {Transport} in
-  {Non}-{Local} {Thermodynamic} {Equilibrium} {Plasmas}}, Communications in
-  Computational Physics 30~(2) (2021) 602--634.
-\newblock \href {https://doi.org/10.4208/cicp.OA-2020-0264}
-  {\path{doi:10.4208/cicp.OA-2020-0264}}.
-\newline\urlprefix\url{https://global-sci.org/index.php/cicp/article/view/6987}
+\bibitem{wu_novel_2025}
+J.~Wu, S.~Wan, Y.~Yang, Z.~Liu, Y.~Han, H.~Zhang, Z.~Huang, \href{https://www.sciencedirect.com/science/article/pii/S2352012425012688}{A novel multi-constraint {SVR} surrogate model: {Interactive} reliability-based design optimization and case study}, Structures 79 (2025) 109453.
+\newblock \href {https://doi.org/10.1016/j.istruc.2025.109453} {\path{doi:10.1016/j.istruc.2025.109453}}.
+\newline\urlprefix\url{https://www.sciencedirect.com/science/article/pii/S2352012425012688}
 
 \bibitem{espinosa_analysis_2019}
-G.~Espinosa, R.~Rodríguez, J.~M. Gil,
-  \href{https://linkinghub.elsevier.com/retrieve/pii/S0022407319304856}{Analysis
-  of radiative opacities for optically thin and thick astrophysical plasmas},
-  Journal of Quantitative Spectroscopy and Radiative Transfer 237 (2019)
-  106633.
-\newblock \href {https://doi.org/10.1016/j.jqsrt.2019.106633}
-  {\path{doi:10.1016/j.jqsrt.2019.106633}}.
+G.~Espinosa, R.~Rodríguez, J.~M. Gil, \href{https://linkinghub.elsevier.com/retrieve/pii/S0022407319304856}{Analysis of radiative opacities for optically thin and thick astrophysical plasmas}, Journal of Quantitative Spectroscopy and Radiative Transfer 237 (2019) 106633.
+\newblock \href {https://doi.org/10.1016/j.jqsrt.2019.106633} {\path{doi:10.1016/j.jqsrt.2019.106633}}.
 \newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0022407319304856}
 
-\bibitem{favre_towards_2025}
-A.~Favre, A.~Abad, A.~Poux, L.~Gosse, A.~Berjaoui, V.~Morel, A.~Bultel,
-  \href{https://linkinghub.elsevier.com/retrieve/pii/S0584854724002271}{Towards
-  real-time calibration-free {LIBS} supported by machine learning},
-  Spectrochimica Acta Part B: Atomic Spectroscopy 224 (2025) 107082.
-\newblock \href {https://doi.org/10.1016/j.sab.2024.107082}
-  {\path{doi:10.1016/j.sab.2024.107082}}.
-\newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0584854724002271}
-
-\bibitem{griem_spectral_1974}
-H.~R. Griem, Spectral {Line} {Broadening} by {Plasmas}, Academic Press, New
-  York, 1974.
+\bibitem{rodriguez_mixkiprapcal_2021}
+R.~Rodríguez, G.~Espinosa, J.~Miguel~Gil, \href{https://global-sci.org/index.php/cicp/article/view/6987}{{MIXKIP}/{RAPCAL}: {A} {Computational} {Package} for {Integrated} {Simulations} of {Large}-{Scale} {Atomic} {Kinetics} and {Radiation} {Transport} in {Non}-{Local} {Thermodynamic} {Equilibrium} {Plasmas}}, Communications in Computational Physics 30~(2) (2021) 602--634.
+\newblock \href {https://doi.org/10.4208/cicp.OA-2020-0264} {\path{doi:10.4208/cicp.OA-2020-0264}}.
+\newline\urlprefix\url{https://global-sci.org/index.php/cicp/article/view/6987}
 
 \bibitem{lin_enhancing_2026}
-X.~Lin, W.~Liu, P.~Dai, J.~Yang, J.~Lin, Y.~Huang,
-  \href{https://www.tandfonline.com/doi/full/10.1080/00032719.2025.2504563}{Enhancing
-  {Quantitative} {Analysis} by {Laser}-{Induced} {Breakdown} {Spectroscopy}
-  ({LIBS}) with {Machine} {Learning}}, Analytical Letters 59~(4) (2026)
-  672--683.
-\newblock \href {https://doi.org/10.1080/00032719.2025.2504563}
-  {\path{doi:10.1080/00032719.2025.2504563}}.
+X.~Lin, W.~Liu, P.~Dai, J.~Yang, J.~Lin, Y.~Huang, \href{https://www.tandfonline.com/doi/full/10.1080/00032719.2025.2504563}{Enhancing {Quantitative} {Analysis} by {Laser}-{Induced} {Breakdown} {Spectroscopy} ({LIBS}) with {Machine} {Learning}}, Analytical Letters 59~(4) (2026) 672--683.
+\newblock \href {https://doi.org/10.1080/00032719.2025.2504563} {\path{doi:10.1080/00032719.2025.2504563}}.
 \newline\urlprefix\url{https://www.tandfonline.com/doi/full/10.1080/00032719.2025.2504563}
 
 \end{thebibliography}
