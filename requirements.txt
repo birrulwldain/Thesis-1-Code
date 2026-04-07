@@ -9,3 +9,5 @@ pre-commit>=3.5.0
 commitizen>=3.13.0
 tqdm>=4.66.0
 pyyaml>=6.0
+PySide6>=6.7.0
+pyqtgraph>=0.13.7

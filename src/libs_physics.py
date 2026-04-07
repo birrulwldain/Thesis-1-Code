@@ -136,13 +136,19 @@ class DataFetcher:
     Returns EnergyLevel and Transition objects for use in the CR solver.
     """
 
+    REQUIRED_TRANSITION_COLUMNS = [
+        'ritz_wl_air(nm)', 'Aki(s^-1)', 'Ek(eV)', 'Ei(eV)', 'g_i', 'g_k'
+    ]
+
     def __init__(self,
                  nist_path  : str = NIST_HDF_PATH,
                  atomic_path: str = ATOMIC_DATA_PATH):
         self.nist_path   = nist_path
         self.atomic_path = atomic_path
         self._ion_energies: Dict[str, float] = {}
+        self._transition_cache: Dict[Tuple[str, int], pd.DataFrame] = {}
         self._load_ionization_energies()
+        self._load_transition_cache()
 
     def _load_ionization_energies(self) -> None:
         """Load ionization energies [eV] from atomic_data1.h5 into a dict."""
@@ -172,6 +178,48 @@ class DataFetcher:
             warnings.warn(f"[DataFetcher] No ionization energy for '{key}'.")
         return val
 
+    def _load_transition_cache(self) -> None:
+        """
+        Preload and sanitize the full NIST transition table into RAM once.
+        Data are indexed by (element, sp_num) to avoid disk I/O in the main loop.
+        """
+        empty = pd.DataFrame(columns=self.REQUIRED_TRANSITION_COLUMNS)
+        try:
+            with pd.HDFStore(self.nist_path, mode='r') as store:
+                df = store.get('nist_spectroscopy_data')
+
+            if not all(c in df.columns for c in self.REQUIRED_TRANSITION_COLUMNS):
+                warnings.warn("[DataFetcher] NIST table is missing required columns.")
+                return
+
+            df = df.copy()
+            df['element_clean'] = df['element'].astype(str).str.strip()
+            df['sp_num_clean'] = pd.to_numeric(df['sp_num'], errors='coerce').fillna(-1).astype(int)
+            df['ritz_wl_air(nm)'] = pd.to_numeric(df['ritz_wl_air(nm)'], errors='coerce')
+
+            for col in ['Ek(eV)', 'Ei(eV)']:
+                df[col] = df[col].apply(
+                    lambda x: float(re.sub(r'[^\d.-]', '', str(x)))
+                    if re.sub(r'[^\d.-]', '', str(x)) else np.nan
+                )
+
+            for col in ['Aki(s^-1)', 'g_i', 'g_k']:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+
+            df = df.dropna(subset=self.REQUIRED_TRANSITION_COLUMNS)
+
+            grouped = df.groupby(['element_clean', 'sp_num_clean'], sort=False)
+            for (element, sp_num), group in grouped:
+                self._transition_cache[(str(element), int(sp_num))] = (
+                    group[self.REQUIRED_TRANSITION_COLUMNS]
+                    .sort_values('ritz_wl_air(nm)')
+                    .reset_index(drop=True)
+                )
+
+        except Exception as e:
+            warnings.warn(f"[DataFetcher] Error preloading NIST transition cache: {e}")
+            self._transition_cache = {}
+
     def get_transitions(self,
                         element  : str,
                         sp_num   : int,
@@ -183,50 +231,19 @@ class DataFetcher:
         Returns a DataFrame with columns:
           ['ritz_wl_air(nm)', 'Aki(s^-1)', 'Ek(eV)', 'Ei(eV)', 'g_i', 'g_k']
         """
-        REQUIRED = ['ritz_wl_air(nm)', 'Aki(s^-1)', 'Ek(eV)', 'Ei(eV)', 'g_i', 'g_k']
-        empty = pd.DataFrame(columns=REQUIRED)
-        try:
-            with pd.HDFStore(self.nist_path, mode='r') as store:
-                df = store.get('nist_spectroscopy_data')
-                
-                # SANITASI KETAT: Bersihkan string dari spasi/byte tersembunyi dan pastikan tipe data integer
-                df['element_clean'] = df['element'].astype(str).str.strip()
-                df['sp_num_clean']  = pd.to_numeric(df['sp_num'], errors='coerce').fillna(-1).astype(int)
-                
-                target_element = str(element).strip()
-                target_sp_num  = int(sp_num)
-                
-                # Filter menggunakan kolom yang sudah disanitasi
-                sel = df[(df['element_clean'] == target_element) & 
-                         (df['sp_num_clean'] == target_sp_num)].copy()
-                         
-                if sel.empty:
-                    warnings.warn(f"[DataFetcher] FILTER KOSONG: {target_element} {target_sp_num} tidak ditemukan di HDF5.")
-                    return empty
-                if not all(c in df.columns for c in REQUIRED):
-                    return empty
+        empty = pd.DataFrame(columns=self.REQUIRED_TRANSITION_COLUMNS)
+        target_element = str(element).strip()
+        target_sp_num = int(sp_num)
+        key = (target_element, target_sp_num)
 
-                # Parse wavelength
-                sel['ritz_wl_air(nm)'] = pd.to_numeric(sel['ritz_wl_air(nm)'], errors='coerce')
-
-                # Parse energy columns (strip non-numeric chars like brackets/flags)
-                for col in ['Ek(eV)', 'Ei(eV)']:
-                    sel[col] = sel[col].apply(
-                        lambda x: float(re.sub(r'[^\d.-]', '', str(x)))
-                        if re.sub(r'[^\d.-]', '', str(x)) else np.nan
-                    )
-
-                # Parse numeric columns
-                for col in ['Aki(s^-1)', 'g_i', 'g_k']:
-                    sel[col] = pd.to_numeric(sel[col], errors='coerce')
-
-                sel = sel.dropna(subset=REQUIRED)
-                sel = sel[(sel['ritz_wl_air(nm)'] >= wl_range[0]) &
-                          (sel['ritz_wl_air(nm)'] <= wl_range[1])]
-                return sel[REQUIRED].reset_index(drop=True)
-        except Exception as e:
-            warnings.warn(f"[DataFetcher] Error reading NIST for {element}_{sp_num}: {e}")
+        df = self._transition_cache.get(key)
+        if df is None or df.empty:
+            warnings.warn(f"[DataFetcher] FILTER KOSONG: {target_element} {target_sp_num} tidak ditemukan di cache NIST.")
             return empty
+
+        sel = df[(df['ritz_wl_air(nm)'] >= wl_range[0]) &
+                 (df['ritz_wl_air(nm)'] <= wl_range[1])]
+        return sel.reset_index(drop=True).copy()
 
     @staticmethod
     def build_levels_and_transitions(df: pd.DataFrame
@@ -470,7 +487,8 @@ class TwoZonePlasma:
                  shell_params   : PlasmaZoneParams,
                  elements       : List[Tuple[str, int, float]],
                  fetcher        : Optional[DataFetcher] = None,
-                 use_rte        : bool = True):
+                 use_rte        : bool = True,
+                 instrument_fwhm_nm: float = 0.1):
         """
         Args:
             core_params  : PlasmaZoneParams for the Core zone
@@ -486,6 +504,7 @@ class TwoZonePlasma:
         self.elements = elements
         self.fetcher = fetcher or DataFetcher()
         self.use_rte = use_rte
+        self.instrument_fwhm_nm = instrument_fwhm_nm
 
         wl_min, wl_max = SIMULATION_CONFIG["wl_range_nm"]
         N_pts = SIMULATION_CONFIG["resolution"]
@@ -598,7 +617,11 @@ class TwoZonePlasma:
             I_obs = I_core + j_shell * d_shell_cm
 
         # Konvolusi fungsi aparatus (Resolusi instrumen = 0.1 nm)
-        I_obs = PhysicsCalculator.instrumental_broadening(I_obs, self.wavelengths, fwhm_instrument_nm=0.1)
+        I_obs = PhysicsCalculator.instrumental_broadening(
+            I_obs,
+            self.wavelengths,
+            fwhm_instrument_nm=self.instrument_fwhm_nm,
+        )
 
         # KOREKSI 3: Menghapus Normalisasi Skala Buatan (Artificial Normalization)
         # Normalize to target_max_intensity
