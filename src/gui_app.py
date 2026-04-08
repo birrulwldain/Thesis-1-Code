@@ -108,6 +108,20 @@ class SpectrumCanvas(QWidget):
         self._last_show_labels = True
         self.show_placeholder()
 
+    @staticmethod
+    def _format_summary(metadata: dict) -> str:
+        return (
+            f"Basic: Core T_e={metadata['core_T_e_K']:.0f} K, n_e={metadata['core_n_e_cm3']:.1e} cm^-3, "
+            f"RTE={'On' if metadata.get('use_rte', True) else 'Off'}\n"
+            f"Advanced: Core T_i={metadata.get('core_T_i_K', metadata['core_T_e_K']):.0f} K, "
+            f"Shell T_e={metadata['shell_T_e_K']:.0f} K, Shell T_i={metadata.get('shell_T_i_K', metadata['shell_T_e_K']):.0f} K, "
+            f"Shell n_e={metadata['shell_n_e_cm3']:.1e} cm^-3\n"
+            f"Geom/Instr: Core={metadata.get('core_thickness_m', 0.0) * 1e3:.2f} mm, "
+            f"Shell={metadata.get('shell_thickness_m', 0.0) * 1e3:.2f} mm, "
+            f"FWHM={metadata.get('instrument_fwhm_nm', 0.0):.3f} nm, "
+            f"tau_shell_max={metadata['tau_shell_max']:.3f}"
+        )
+
     def show_placeholder(self, message: str = "Click 'Run Simulation' to render the spectrum.") -> None:
         self.plot_container.hide()
         self.message_label.setText(f"CR-LIBS Plot Area\n\n{message}")
@@ -136,12 +150,7 @@ class SpectrumCanvas(QWidget):
                 span = min(100.0, wl_max - wl_min)
                 self.region.setRegion((wl_min, wl_min + span))
 
-        summary = (
-            f"Core T_e={metadata['core_T_e_K']:.0f} K, n_e={metadata['core_n_e_cm3']:.1e} cm^-3\n"
-            f"Shell T_e={metadata['shell_T_e_K']:.0f} K, n_e={metadata['shell_n_e_cm3']:.1e} cm^-3\n"
-            f"tau_shell_max={metadata['tau_shell_max']:.3f}"
-        )
-        self.summary_label.setText(summary)
+        self.summary_label.setText(self._format_summary(metadata))
         self._update_roi_plot()
 
     def _downsample_for_display(self, wavelengths: np.ndarray, intensity: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
@@ -180,22 +189,39 @@ class SpectrumCanvas(QWidget):
         self.plot_roi.setXRange(float(chunk_x[0]), float(chunk_x[-1]), padding=0.02)
         y_min = float(np.min(chunk_y))
         y_max = float(np.max(chunk_y))
+        peak_idx = int(np.argmax(chunk_y))
+        peak_wl = float(chunk_x[peak_idx])
+        peak_int = float(chunk_y[peak_idx])
         if y_max > y_min:
             self.plot_roi.setYRange(y_min, y_max, padding=0.1)
-        self.coord_label.setText(f"ROI: {r0:.2f} - {r1:.2f} nm")
+        coord_text = (
+            f"ROI: {r0:.2f} - {r1:.2f} nm | "
+            f"peak {peak_wl:.2f} nm @ {peak_int:.3e}"
+        )
 
-        if not self._last_metadata or not self._last_show_labels:
+        if not self._last_metadata:
+            self.coord_label.setText(coord_text)
             return
 
-        for line in self._last_metadata.get("top_lines", [])[:20]:
+        lines_in_roi = [
+            line for line in self._last_metadata.get("top_lines", [])
+            if r0 <= float(line["wl"]) <= r1
+        ]
+        if lines_in_roi:
+            dominant = max(lines_in_roi, key=lambda line: float(line["int"]))
+            coord_text += f" | dominant {dominant['elem']} {dominant['ion']} ({dominant.get('zone', 'Zone')})"
+        self.coord_label.setText(coord_text)
+
+        if not self._last_show_labels:
+            return
+
+        for line in lines_in_roi[:20]:
             wl = float(line["wl"])
-            if not (r0 <= wl <= r1):
-                continue
             idx = int(np.argmin(np.abs(chunk_x - wl)))
             y = float(chunk_y[idx])
             marker = pg.ScatterPlotItem([wl], [y], size=7, brush=pg.mkBrush("#f97316"), pen=pg.mkPen(None))
             label = pg.TextItem(
-                text=f"{line['elem']} {line['ion']}\n{wl:.2f} nm",
+                text=f"{line['elem']} {line['ion']} [{line.get('zone', 'Zone')}]\n{wl:.2f} nm",
                 color="#7c2d12",
                 anchor=(0.5, 1.0),
             )

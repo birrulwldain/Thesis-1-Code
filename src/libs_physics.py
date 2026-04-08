@@ -600,7 +600,7 @@ class TwoZonePlasma:
 
         print(f"[TwoZonePlasma] Running SHELL zone (T_e={self.shell.T_e_K:.0f}K, "
               f"n_e={self.shell.n_e_cm3:.1e} cm⁻³)")
-        kappa_shell, j_shell, _, _    = self._run_zone(self.shell)
+        kappa_shell, j_shell, _, shell_lines = self._run_zone(self.shell)
 
         if getattr(self, 'use_rte', True):
             print(f"[TwoZonePlasma] Phase 3: Integrating RTE...")
@@ -632,11 +632,19 @@ class TwoZonePlasma:
         # Optical depth diagnostics
         tau_shell = kappa_shell * (self.shell.thickness_m * 100.0)
 
+        prominent_lines = self._merge_top_lines(core_lines, shell_lines)
+
         metadata = {
             "core_T_e_K"           : self.core.T_e_K,
+            "core_T_i_K"           : self.core.T_i_K,
             "core_n_e_cm3"         : self.core.n_e_cm3,
+            "core_thickness_m"     : self.core.thickness_m,
             "shell_T_e_K"          : self.shell.T_e_K,
+            "shell_T_i_K"          : self.shell.T_i_K,
             "shell_n_e_cm3"        : self.shell.n_e_cm3,
+            "shell_thickness_m"    : self.shell.thickness_m,
+            "instrument_fwhm_nm"   : self.instrument_fwhm_nm,
+            "use_rte"              : bool(self.use_rte),
             "tau_shell_max"        : float(np.max(tau_shell)),
             "tau_shell_mean"       : float(np.mean(tau_shell)),
             "optically_thin_frac"  : float(np.mean(tau_shell < 0.1)),
@@ -645,16 +653,44 @@ class TwoZonePlasma:
             "jacobian"             : "Analytical (J = M_CR)",
         }
 
-        # Collect prominent lines for labeling (Top 50 by intensity)
-        # Intensity estimate: j_total * thickness
-        prominent_lines = []
-        # We can find peaks in j_total and match them back to transitions, 
-        # but a simpler way is to just use the transitions list from run_zone
-        # (needs slight refactor to return them)
-        
-        metadata["top_lines"] = core_lines
+        metadata["top_lines"] = prominent_lines
+        metadata["core_top_lines"] = core_lines
+        metadata["shell_top_lines"] = shell_lines
         
         return self.wavelengths, I_obs, metadata
+
+    @staticmethod
+    def _merge_top_lines(core_lines: List[Dict], shell_lines: List[Dict]) -> List[Dict]:
+        merged: Dict[Tuple[str, str, float], Dict] = {}
+        for zone_name, lines in (("Core", core_lines), ("Shell", shell_lines)):
+            for line in lines:
+                key = (
+                    str(line["elem"]),
+                    str(line["ion"]),
+                    round(float(line["wl"]), 4),
+                )
+                current = merged.get(key)
+                intensity = float(line["int"])
+                if current is None:
+                    merged[key] = {
+                        "wl": float(line["wl"]),
+                        "elem": str(line["elem"]),
+                        "ion": str(line["ion"]),
+                        "int": intensity,
+                        "zone": zone_name,
+                    }
+                    continue
+                current["int"] += intensity
+                if intensity > float(current.get("zone_int", 0.0)):
+                    current["zone"] = zone_name
+                    current["zone_int"] = intensity
+
+        normalized = []
+        for item in merged.values():
+            item.pop("zone_int", None)
+            normalized.append(item)
+        normalized.sort(key=lambda x: x["int"], reverse=True)
+        return normalized[:50]
 
 
 # =============================================================================
