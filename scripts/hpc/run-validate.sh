@@ -12,6 +12,8 @@ BASE_DIR=/home/bwalidain/thesis
 CONDA_SH=/home/bwalidain/miniconda3/etc/profile.d/conda.sh
 ENV_NAME=bw
 
+mkdir -p "$BASE_DIR/logs"
+
 source "$CONDA_SH"
 conda activate "$ENV_NAME"
 
