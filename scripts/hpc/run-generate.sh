@@ -8,8 +8,6 @@
 #SBATCH --output=/home/bwalidain/thesis/logs/generate_%j.out
 #SBATCH --error=/home/bwalidain/thesis/logs/generate_%j.err
 
-set -euo pipefail
-
 BASE_DIR=/home/bwalidain/thesis
 CONDA_SH=/home/bwalidain/miniconda3/etc/profile.d/conda.sh
 ENV_NAME=bw
