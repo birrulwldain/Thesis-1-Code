@@ -1,132 +1,381 @@
 """
-train_inversion_model.py — BLOK 3: Arsitektur Inversi SVR Termodinamika
-==================================================================
-Q1 Thesis: Machine Learning Inversion Engine for CR-LIBS
-
-Fungsi:
-1. Memuat dataset sintetik termodinamika (X_train, y_train) dari HDF5.
-2. Membangun Pipeline scikit-learn: Ekstraksi Fitur Fisika (White-Box) -> StandardScaler -> SVR.
-3. Melatih MultiOutput SVR secara murni sebagai mesin inversi matematis.
-4. Memvalidasi kekuatan prediktif (RMSE, R2 score).
-5. Mengekspor (`joblib.dump`) model final ke disk untuk digunakan di eksperimen nyata.
+train_inversion_model.py — BLOK 3: Hierarchical PI Inversion Training
+=====================================================================
+Q1 Thesis: Phase-1 thermodynamic training pipeline for the PyTorch-based
+physics-informed inverter defined in src.libs_inversion.
 """
 
-import h5py
-import numpy as np
-import time
+from __future__ import annotations
+
 import argparse
+from dataclasses import asdict, dataclass
+import h5py
 import joblib
-import yaml
+import numpy as np
 import os
+import yaml
 
-from scipy.interpolate import UnivariateSpline
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.svm import SVR
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_squared_error
+from src.mrmr import MRMRConfig, compute_mrmr_indices
 
-_CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
-with open(_CONFIG_PATH, 'r') as f:
+from src.libs_inversion import (
+    HierarchicalInversionConfig,
+    HierarchicalPIInverter,
+    ThermoPhaseDataset,
+)
+
+
+_BASE_DIR = os.environ.get(
+    "LIBS_BASE_DIR",
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
+)
+_CONFIG_PATH = os.path.join(_BASE_DIR, "config.yaml")
+with open(_CONFIG_PATH, "r") as f:
     _CONFIG = yaml.safe_load(f)
 
-from src.feature_extractor import PhysicsFeatureExtractor
 
-def train_model(dataset_file: str, output_model: str):
-    print("=== BLOK 3: Arsitektur Inversi SVR (Pysics Feature Version) ===")
-    print(f"Memuat matrix dataset dari: {dataset_file}")
-    
-    try:
-        with h5py.File(dataset_file, 'r') as f:
-            X = f['spectra'][:]
-            y = f['parameters'][:]
-            columns = [c.decode('utf-8') if isinstance(c, bytes) else c for c in f['parameters'].attrs['columns']]
-    except FileNotFoundError:
-        print(f"Error: Dataset {dataset_file} tidak ditemukan. Jalankan BLOK 2 terlebih dahulu.")
-        return
-        
-    print(f"Dataset sukses dimat. Bentuk X (Spektrum): {X.shape}, y (Parameter): {y.shape}")
-    
-    n_samples = X.shape[0]
-    if n_samples < 5:
-        print("Peringatan: Jumlah sampel sangat kecil (kurang dari 5). Evaluasi Train/Test split akan diskip.")
-        X_train, X_test, y_train, y_test = X, X, y, y
-    else:
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        
-    print(f"Skema partisi data: {X_train.shape[0]} LATIH | {X_test.shape[0]} UJI.")
-    
-    # Rekonstruksi grid spektrum untuk Physical Extractor
-    wl_min, wl_max = _CONFIG['instrument']['wl_range_nm']
-    resolution = _CONFIG['instrument']['resolution']
-    wavelengths = np.linspace(wl_min, wl_max, resolution, dtype=np.float64)
-    
-    # TAHAP 1: EKSTRAKSI FITUR FISIKA
-    print(f"\n[Tahap 1] Dekomposisi Spektrum ke Fitur Termodinamika (White-Box)...")
-    physics_extractor = PhysicsFeatureExtractor(wavelengths=wavelengths)
-    
-    X_train_phys = physics_extractor.fit_transform(X_train)
-    X_test_phys = physics_extractor.transform(X_test)
-    
-    # TAHAP 2: Standarisasi Data
-    print("[Tahap 2] Memusatkan & menskalakan data fitur fisik (StandardScaler)...")
-    scaler_X = StandardScaler()
-    scaler_y = StandardScaler()
-    
-    X_train_scaled = scaler_X.fit_transform(X_train_phys)
-    X_test_scaled = scaler_X.transform(X_test_phys)
-    
-    y_train_scaled = scaler_y.fit_transform(y_train)
-    y_test_scaled = scaler_y.transform(y_test)
-    
-    # TAHAP 3: Pelatihan Mesin Inverse SVR
-    print("[Tahap 3] Melatih SVR Multi-Output menggunakan Fitur Fisika Murni...")
-    t0 = time.time()
-    
-    cfg_svr_k = _CONFIG['machine_learning']['svr_kernel']
-    cfg_svr_c = _CONFIG['machine_learning']['svr_C']
-    svr = SVR(kernel=cfg_svr_k, C=cfg_svr_c, gamma='scale', epsilon=0.01)
-    model = MultiOutputRegressor(svr)
-    
-    model.fit(X_train_scaled, y_train_scaled)
-    print(f"Optimalisasi Hyperplane SVR selesai dalam {time.time()-t0:.2f} detik.")
-    
-    # TAHAP 4: Validasi & Uji Empiris Internal
-    print("\n[Validasi] Mengevaluasi model pada himpunan data uji (Test Set) independen...")
-    y_pred_scaled = model.predict(X_test_scaled)
-    y_pred = scaler_y.inverse_transform(y_pred_scaled)
-    
-    print("\nMetrik Validasi Inversi Termodinamika (Berbasis Physics Features):")
-    print("-" * 50)
-    print(f"{'Parameter':<18} | {'R-squared (R²)':<14} | {'RMSE':<12}")
-    print("-" * 50)
-    for i, col in enumerate(columns):
-        if len(y_test) > 1:
-            r2 = r2_score(y_test[:, i], y_pred[:, i])
-            rmse = np.sqrt(mean_squared_error(y_test[:, i], y_pred[:, i]))
-            print(f"{col:<18} | {r2:<14.4f} | {rmse:<12.2e}")
-        else:
-            diff = abs(y_test[0, i] - y_pred[0, i])
-            print(f"{col:<18} | {'N/A (n=1)':<14} | Dev=" + f"{diff:.2e}")
-    print("-" * 50)
-        
-    # TAHAP 5: Persistensi Model
-    print(f"\n[Menyimpan] Mengekspor *pipeline* mesin inversi lengkap ke: {output_model} ...")
-    pipeline = {
-        'physics_extractor': physics_extractor,
-        'scaler_X': scaler_X,
-        'scaler_y': scaler_y,
-        'model': model,
-        'columns': columns
-    }
-    joblib.dump(pipeline, output_model)
-    print("✅ BLOK 3 Selesai! Arsitektur Deterministik sukses menyingkirkan PCA (Black-Box).")
+@dataclass
+class DatasetBundle:
+    spectra: np.ndarray
+    temperatures_K: np.ndarray
+    electron_densities_cm3: np.ndarray
+    parameter_columns: list[str]
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Blok 3: Latih Arsitektur ML Inversi Berbasis Logika Fisika.")
-    parser.add_argument('--dataset', type=str, default='dataset_synthetic.h5', help='File data masuk')
-    parser.add_argument('--out', type=str, default='model_inversi_svr.pkl', help='File model keluar')
+
+@dataclass
+class SplitBundle:
+    train_indices: np.ndarray
+    test_indices: np.ndarray
+    has_holdout: bool
+
+
+class PIInversionTrainer:
+    def __init__(self, config: dict) -> None:
+        self.config = config
+
+    @staticmethod
+    def _decode_columns(raw_columns) -> list[str]:
+        return [c.decode("utf-8") if isinstance(c, bytes) else str(c) for c in raw_columns]
+
+    def load_dataset(self, dataset_file: str) -> DatasetBundle:
+        print(f"Memuat dataset sintetik dari: {dataset_file}")
+        if not os.path.exists(dataset_file):
+            raise FileNotFoundError(
+                f"Dataset {dataset_file} tidak ditemukan. Jalankan BLOK 2 terlebih dahulu."
+            )
+
+        with h5py.File(dataset_file, "r") as f:
+            if "spectra" not in f or "parameters" not in f:
+                raise KeyError("Dataset HDF5 wajib memiliki dataset 'spectra' dan 'parameters'.")
+            spectra = f["spectra"][:]
+            parameters = f["parameters"][:]
+            raw_columns = f["parameters"].attrs.get("columns")
+            if raw_columns is None:
+                raise KeyError("Atribut 'columns' tidak ditemukan pada dataset 'parameters'.")
+
+        columns = self._decode_columns(raw_columns)
+        if spectra.ndim != 2 or parameters.ndim != 2:
+            raise ValueError("Dataset 'spectra' dan 'parameters' harus berupa matriks 2D.")
+        if spectra.shape[0] != parameters.shape[0]:
+            raise ValueError("Jumlah sampel antara 'spectra' dan 'parameters' harus sama.")
+
+        try:
+            temp_idx = columns.index("T_e_core_K")
+            ne_idx = columns.index("n_e_core_cm3")
+        except ValueError as exc:
+            raise KeyError(
+                "Dataset harus memiliki kolom 'T_e_core_K' dan 'n_e_core_cm3' pada atribut columns."
+            ) from exc
+
+        temperatures_K = parameters[:, temp_idx].astype(np.float32)
+        electron_densities_cm3 = parameters[:, ne_idx].astype(np.float32)
+
+        print(
+            f"Dataset sukses dimuat. Spektra={spectra.shape}, "
+            f"parameter termodinamika={(temperatures_K.shape[0], 2)}"
+        )
+        return DatasetBundle(
+            spectra=spectra.astype(np.float32),
+            temperatures_K=temperatures_K,
+            electron_densities_cm3=electron_densities_cm3,
+            parameter_columns=columns,
+        )
+
+    def split_dataset(self, dataset: DatasetBundle) -> SplitBundle:
+        n_samples = dataset.spectra.shape[0]
+        indices = np.arange(n_samples, dtype=int)
+        if n_samples < 5:
+            print("Peringatan: dataset kecil; evaluasi dilakukan pada data latih.")
+            return SplitBundle(
+                train_indices=indices,
+                test_indices=indices,
+                has_holdout=False,
+            )
+
+        rng = np.random.default_rng(42)
+        shuffled = rng.permutation(indices)
+        split_at = max(1, int(round(0.8 * n_samples)))
+        split_at = min(split_at, n_samples - 1)
+        return SplitBundle(
+            train_indices=shuffled[:split_at],
+            test_indices=shuffled[split_at:],
+            has_holdout=True,
+        )
+
+
+    def build_training_config(
+        self,
+        input_dim: int,
+        epochs: int | None,
+        batch_size: int | None,
+        learning_rate: float | None,
+    ) -> HierarchicalInversionConfig:
+        overrides = {}
+        if epochs is not None:
+            overrides["epochs"] = epochs
+        if batch_size is not None:
+            overrides["batch_size"] = batch_size
+        if learning_rate is not None:
+            overrides["learning_rate"] = learning_rate
+        return HierarchicalInversionConfig.from_config(input_dim=input_dim, **overrides)
+
+    def build_phase_dataset(
+        self,
+        dataset: DatasetBundle,
+        indices: np.ndarray,
+        inversion_config: HierarchicalInversionConfig,
+    ) -> ThermoPhaseDataset:
+        return ThermoPhaseDataset(
+            spectra=dataset.spectra[indices],
+            temperatures_K=dataset.temperatures_K[indices],
+            electron_densities_cm3=dataset.electron_densities_cm3[indices],
+            config=inversion_config,
+            tau_values=np.zeros(len(indices), dtype=np.float32),
+        )
+
+    def evaluate_model(
+        self,
+        inverter: HierarchicalPIInverter,
+        dataset: DatasetBundle,
+        split: SplitBundle,
+    ) -> dict[str, float]:
+        indices = split.test_indices
+        preds = inverter.predict_thermo(dataset.spectra[indices])
+        y_true_temp = dataset.temperatures_K[indices]
+        y_true_ne = dataset.electron_densities_cm3[indices]
+        y_pred_temp = preds["T_e_K"].astype(np.float32)
+        y_pred_ne = preds["n_e_cm3"].astype(np.float32)
+
+        rmse_temp = float(np.sqrt(np.mean((y_true_temp - y_pred_temp) ** 2)))
+        rmse_ne = float(np.sqrt(np.mean((y_true_ne - y_pred_ne) ** 2)))
+
+        print("\nMetrik Validasi Inversi Termodinamika (Phase 1):")
+        print("-" * 52)
+        print(f"{'Parameter':<18} | {'RMSE':<14}")
+        print("-" * 52)
+        print(f"{'T_e_core_K':<18} | {rmse_temp:<14.2e}")
+        print(f"{'n_e_core_cm3':<18} | {rmse_ne:<14.2e}")
+        if not split.has_holdout:
+            print("[Validasi] Tidak ada holdout set independen; metrik di atas memakai data latih.")
+        print("-" * 52)
+
+        return {
+            "rmse_T_e_core_K": rmse_temp,
+            "rmse_n_e_core_cm3": rmse_ne,
+        }
+
+    def save_pipeline(
+        self,
+        output_model: str,
+        inverter: HierarchicalPIInverter,
+        inversion_config: HierarchicalInversionConfig,
+        metrics: dict[str, float],
+        selected_indices: np.ndarray | None = None,
+        mrmr_params: dict | None = None,
+    ) -> None:
+        print(f"\n[Menyimpan] Mengekspor model PI inverter ke: {output_model} ...")
+        pipeline = {
+            "model_type": "hierarchical_pi_inverter_phase1",
+            "config": asdict(inversion_config),
+            "state_dict": inverter.model.state_dict(),
+            "metrics": metrics,
+            "targets": ["T_e_core_K", "n_e_core_cm3"],
+        }
+        if selected_indices is not None:
+            pipeline["selected_indices"] = selected_indices.astype(int).tolist()
+        if mrmr_params is not None:
+            pipeline["mrmr"] = mrmr_params
+        joblib.dump(pipeline, output_model)
+        print("✅ BLOK 3 selesai. Model PI inverter berhasil disimpan.")
+
+    def train(
+        self,
+        dataset_file: str,
+        output_model: str,
+        epochs: int | None = None,
+        batch_size: int | None = None,
+        learning_rate: float | None = None,
+        use_mrmr: bool = False,
+        mrmr_features: int | None = None,
+        mrmr_pool: int = 2048,
+        mrmr_sample: int | None = 2000,
+        mrmr_redundancy_weight: float = 1.0,
+        mrmr_random_state: int = 42,
+        mrmr_score_mode: str = "mifs",
+    ) -> None:
+        print("=== BLOK 3: Hierarchical PI Inversion (Phase 1) ===")
+        dataset = self.load_dataset(dataset_file)
+        split = self.split_dataset(dataset)
+        print(
+            f"Skema partisi data: {len(split.train_indices)} LATIH | "
+            f"{len(split.test_indices)} UJI."
+        )
+
+        selected_indices = None
+        if use_mrmr:
+            if mrmr_features is None:
+                mrmr_features = 1024
+            y_targets = np.stack(
+                [dataset.temperatures_K, dataset.electron_densities_cm3], axis=1
+            )
+            X_train = dataset.spectra[split.train_indices]
+            y_train = y_targets[split.train_indices]
+            mrmr_cfg = MRMRConfig(
+                n_features=int(mrmr_features),
+                pool_size=int(mrmr_pool),
+                sample_size=int(mrmr_sample) if mrmr_sample is not None else None,
+                redundancy_weight=float(mrmr_redundancy_weight),
+                random_state=int(mrmr_random_state),
+                score_mode=str(mrmr_score_mode),
+            )
+            selected_indices = compute_mrmr_indices(X_train, y_train, mrmr_cfg)
+            dataset = DatasetBundle(
+                spectra=dataset.spectra[:, selected_indices],
+                temperatures_K=dataset.temperatures_K,
+                electron_densities_cm3=dataset.electron_densities_cm3,
+                parameter_columns=dataset.parameter_columns,
+            )
+            print(f"[mRMR] Dimensi input turun menjadi {dataset.spectra.shape[1]} fitur.")
+
+        inversion_config = self.build_training_config(
+            input_dim=dataset.spectra.shape[1],
+            epochs=epochs,
+            batch_size=batch_size,
+            learning_rate=learning_rate,
+        )
+        train_dataset = self.build_phase_dataset(dataset, split.train_indices, inversion_config)
+        inverter = HierarchicalPIInverter(inversion_config)
+        history = inverter.fit(train_dataset, epochs=inversion_config.epochs)
+        print(f"Loss epoch terakhir: {history.losses[-1]:.4e}")
+
+        metrics = self.evaluate_model(inverter, dataset, split)
+        mrmr_params = None
+        if use_mrmr and selected_indices is not None:
+            mrmr_params = {
+                "n_features": int(mrmr_features),
+                "pool_size": int(mrmr_pool),
+                "sample_size": int(mrmr_sample) if mrmr_sample is not None else None,
+                "redundancy_weight": float(mrmr_redundancy_weight),
+                "random_state": int(mrmr_random_state),
+            }
+        self.save_pipeline(
+            output_model,
+            inverter,
+            inversion_config,
+            metrics,
+            selected_indices=selected_indices,
+            mrmr_params=mrmr_params,
+        )
+
+
+def train_model(
+    dataset_file: str,
+    output_model: str,
+    epochs: int | None = None,
+    batch_size: int | None = None,
+    learning_rate: float | None = None,
+    use_mrmr: bool = False,
+    mrmr_features: int | None = None,
+    mrmr_pool: int = 2048,
+    mrmr_sample: int | None = 2000,
+    mrmr_redundancy_weight: float = 1.0,
+    mrmr_random_state: int = 42,
+    mrmr_score_mode: str = "mifs",
+) -> None:
+    trainer = PIInversionTrainer(_CONFIG)
+    trainer.train(
+        dataset_file=dataset_file,
+        output_model=output_model,
+        epochs=epochs,
+        batch_size=batch_size,
+        learning_rate=learning_rate,
+        use_mrmr=use_mrmr,
+        mrmr_features=mrmr_features,
+        mrmr_pool=mrmr_pool,
+        mrmr_sample=mrmr_sample,
+        mrmr_redundancy_weight=mrmr_redundancy_weight,
+        mrmr_random_state=mrmr_random_state,
+        mrmr_score_mode=mrmr_score_mode,
+    )
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Blok 3: Latih arsitektur Hierarchical PI Inversion Phase 1."
+    )
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default=os.path.join(_BASE_DIR, "data", "dataset_synthetic.h5"),
+        help="File HDF5 sintetik masuk",
+    )
+    parser.add_argument(
+        "--out",
+        type=str,
+        default=os.path.join(_BASE_DIR, "data", "model_inversi_pi.pkl"),
+        help="File model keluar",
+    )
+    parser.add_argument(
+        "--base-dir",
+        type=str,
+        default=_BASE_DIR,
+        help="Base directory project (override LIBS_BASE_DIR)",
+    )
+    parser.add_argument("--epochs", type=int, default=None, help="Override jumlah epoch")
+    parser.add_argument("--batch-size", type=int, default=None, help="Override batch size")
+    parser.add_argument("--learning-rate", type=float, default=None, help="Override learning rate")
+    parser.add_argument("--mrmr", action="store_true", help="Aktifkan seleksi fitur mRMR")
+    parser.add_argument("--mrmr-features", type=int, default=None, help="Jumlah fitur mRMR")
+    parser.add_argument("--mrmr-pool", type=int, default=2048, help="Jumlah kandidat fitur mRMR")
+    parser.add_argument("--mrmr-sample", type=int, default=2000, help="Subsample baris untuk MI")
+    parser.add_argument(
+        "--mrmr-redundancy-weight",
+        type=float,
+        default=1.0,
+        help="Bobot penalti redundansi mRMR",
+    )
+    parser.add_argument(
+        "--mrmr-score-mode",
+        type=str,
+        default="mifs",
+        help="Skor mRMR: 'mifs' (relevance - redundancy) atau 'miq' (relevance / redundancy)",
+    )
+    parser.add_argument("--mrmr-random-state", type=int, default=42, help="Seed mRMR")
     args = parser.parse_args()
-    
-    train_model(args.dataset, args.out)
+
+    if args.base_dir != _BASE_DIR:
+        _BASE_DIR = args.base_dir
+
+    train_model(
+        dataset_file=args.dataset,
+        output_model=args.out,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        learning_rate=args.learning_rate,
+        use_mrmr=args.mrmr,
+        mrmr_features=args.mrmr_features,
+        mrmr_pool=args.mrmr_pool,
+        mrmr_sample=args.mrmr_sample,
+        mrmr_redundancy_weight=args.mrmr_redundancy_weight,
+        mrmr_random_state=args.mrmr_random_state,
+        mrmr_score_mode=args.mrmr_score_mode,
+    )

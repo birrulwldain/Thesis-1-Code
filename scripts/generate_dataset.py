@@ -37,7 +37,11 @@ from src.libs_physics import DataFetcher, PlasmaZoneParams, TwoZonePlasma, instr
 import yaml
 
 # Memuat Konfigurasi Gateway
-_CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml')
+_BASE_DIR = os.environ.get(
+    "LIBS_BASE_DIR",
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
+)
+_CONFIG_PATH = os.path.join(_BASE_DIR, "config.yaml")
 with open(_CONFIG_PATH, 'r') as f:
     _CONFIG = yaml.safe_load(f)
 
@@ -208,14 +212,27 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
 if __name__ == '__main__':
     # Ekstraksi fallback default samplerate dari YAML
     import yaml
-    with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml'), 'r') as f:
+    with open(_CONFIG_PATH, 'r') as f:
         _cfg = yaml.safe_load(f)
     default_samples = _cfg['monte_carlo_synthesizer']['generator_samples']
     
     parser = argparse.ArgumentParser(description="Blok 2: Ciptakan Dataset Sintetik LIBS secara paralel")
     parser.add_argument('--samples', type=int, default=default_samples, help='Jumlah sampel')
-    parser.add_argument('--out', type=str, default='dataset_synthetic.h5', help='Nama file output HDF5')
+    parser.add_argument(
+        '--out',
+        type=str,
+        default=os.path.join(_BASE_DIR, 'data', 'dataset_synthetic.h5'),
+        help='Nama file output HDF5',
+    )
     parser.add_argument('--cores', type=int, default=None, help='Jumlah core CPU (-1 untuk auto)')
+    parser.add_argument(
+        '--base-dir',
+        type=str,
+        default=_BASE_DIR,
+        help='Base directory project (override LIBS_BASE_DIR)',
+    )
     args = parser.parse_args()
     
+    if args.base_dir != _BASE_DIR:
+        _BASE_DIR = args.base_dir
     generate_dataset(n_samples=args.samples, output_file=args.out, num_workers=args.cores)
