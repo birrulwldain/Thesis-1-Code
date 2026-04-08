@@ -32,7 +32,7 @@ import os
 import argparse
 import multiprocessing as mp
 
-from src.libs_physics import DataFetcher, PlasmaZoneParams, TwoZonePlasma, instrumental_broadening
+from src.libs_physics import DataFetcher, PhysicsCalculator, PlasmaZoneParams, TwoZonePlasma
 
 import yaml
 
@@ -75,7 +75,7 @@ def simulate_single_spectrum(args):
         
         # Broadening Instrumen
         if _fwhm_nm > 0.0:
-            I_sim = instrumental_broadening(I_raw, wl, _fwhm_nm)
+            I_sim = PhysicsCalculator.instrumental_broadening(I_raw, wl, _fwhm_nm)
         else:
             I_sim = I_raw
             
