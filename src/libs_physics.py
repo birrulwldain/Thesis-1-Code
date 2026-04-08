@@ -29,7 +29,10 @@ import pandas as pd
 import h5py
 import re
 import os
-import plotly.graph_objects as go
+try:
+    import plotly.graph_objects as go
+except Exception:  # pragma: no cover
+    go = None
 import warnings
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass, field
@@ -703,6 +706,8 @@ class LIBSSimulator:
                        core_ne: float,
                        show_labels: bool = True,
                        use_rte: bool = True):
+        if go is None:
+            raise ImportError("plotly is required for plotting. Install plotly or disable plotting.")
         total_pct = sum(p for _, p in selected_elements)
         if abs(total_pct - 100.0) > 1e-6:
             print(f"Error: Persentase komposit atomik mutlak harus 100%. (Dapat {total_pct}%)")
