@@ -493,8 +493,9 @@ class HierarchicalPIInverter:
     def fit(self, dataset: ThermoPhaseDataset, epochs: Optional[int] = None) -> TrainingHistory:
         loader = DataLoader(dataset, batch_size=self.config.batch_size, shuffle=True)
         n_epochs = int(epochs or self.config.epochs)
-        for _ in range(n_epochs):
+        for epoch_idx in range(n_epochs):
             self.train_epoch(loader)
+            print(f"[Train] Epoch {epoch_idx + 1}/{n_epochs} selesai.")
         return self.history
 
     def predict_thermo(self, spectra: np.ndarray) -> Dict[str, np.ndarray]:

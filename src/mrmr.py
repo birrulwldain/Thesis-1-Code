@@ -115,7 +115,9 @@ def compute_mrmr_indices(
         if best_idx is None:
             break
         selected.append(best_idx)
-        if progress and ((step + 1) % 50 == 0 or (step + 1) == config.n_features):
-            print(f"[mRMR] Progress: {step + 1}/{config.n_features} fitur terpilih")
+        if progress:
+            pct = (step + 1) / float(config.n_features) * 100.0
+            if (step + 1) % 25 == 0 or (step + 1) == config.n_features:
+                print(f"[mRMR] Progress: {step + 1}/{config.n_features} ({pct:.1f}%) fitur terpilih")
 
     return np.asarray(selected, dtype=int)
