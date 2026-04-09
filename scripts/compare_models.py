@@ -69,8 +69,8 @@ def run_comparison():
         if frac_neu > 1e-4: expanded_elements.append((elem, 1, frac_neu))
         if frac_ion > 1e-4: expanded_elements.append((elem, 2, frac_ion))
     
-    core = cr.PlasmaZoneParams(T_e_K=temperature, T_i_K=temperature-2000, n_e_cm3=n_e, thickness_m=1e-3, label="Core")
-    shell = cr.PlasmaZoneParams(T_e_K=temperature*0.5, T_i_K=temperature*0.5-1000, n_e_cm3=n_e*0.1, thickness_m=2e-3, label="Shell")
+    core = cr.PlasmaZoneParams(T_e_K=temperature, T_i_K=temperature-2000, n_e_cm3=n_e, thickness_m=1e-6, label="Core")
+    shell = cr.PlasmaZoneParams(T_e_K=temperature*0.5, T_i_K=temperature*0.5-1000, n_e_cm3=n_e*0.1, thickness_m=1e-6, label="Shell")
     
     model_cr = cr.TwoZonePlasma(core, shell, expanded_elements, fetcher_cr)
     wl_cr, spec_cr, meta = model_cr.run()

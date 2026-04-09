@@ -723,8 +723,8 @@ class LIBSSimulator:
                 elements_expanded.append((elem, 2, f_ion))
         tot = sum(f for _, _, f in elements_expanded)
         elements_expanded = [(sym, sp, f/tot) for sym, sp, f in elements_expanded]
-        core = PlasmaZoneParams(T_e_K=core_temp, T_i_K=max(core_temp - 2000.0, 3000.0), n_e_cm3=core_ne, thickness_m=1e-3, label="Core")
-        shell = PlasmaZoneParams(T_e_K=core_temp * 0.5, T_i_K=max(core_temp * 0.5 - 1000.0, 3000.0), n_e_cm3=core_ne * 0.1, thickness_m=2e-3, label="Shell")
+        core = PlasmaZoneParams(T_e_K=core_temp, T_i_K=max(core_temp - 2000.0, 3000.0), n_e_cm3=core_ne, thickness_m=1e-6, label="Core")
+        shell = PlasmaZoneParams(T_e_K=core_temp * 0.5, T_i_K=max(core_temp * 0.5 - 1000.0, 3000.0), n_e_cm3=core_ne * 0.1, thickness_m=1e-6, label="Shell")
         model = TwoZonePlasma(core, shell, elements_expanded, fetcher, use_rte=use_rte)
         wavelengths, I_obs, meta = model.run()
         element_str = " ".join([f"{sym}{pct:.0f}%" for sym, pct in selected_elements])

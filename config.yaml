@@ -82,11 +82,11 @@ monte_carlo_synthesizer:
   core:
     T_range_K: [8000.0, 18000.0]     # Mengakomodasi spektrum Saha maks di 9346 K, SVR bisa nebak core 2x lebih panas
     ne_range_cm3: [1.0e17, 8.0e17]   # Distribusi tebakan kerapatan Inti (Eksperimen asli 2.6e17 - 4.9e17)
-    thickness_m: 0.001               # Kedalaman lintasan optik (1 mm)
+    thickness_m: 1.0e-6              # Kedalaman lintasan optik (0.001 mm)
   shell:
     T_range_K: [4000.0, 9000.0]      # Suhu pinggiran pendinginan
     ne_range_cm3: [1.0e15, 5.0e16]   # Kerapatan elektron Korona
-    thickness_m: 0.002               # Kedalaman lintasan optik (2 mm)
+    thickness_m: 1.0e-6              # Kedalaman lintasan optik (0.001 mm)
 
 machine_learning:
   svr_kernel: 'rbf'                  # Bentuk Support Vector

@@ -69,8 +69,8 @@ class HierarchicalInversionConfig:
     shell_density_factor: float = 0.1
     core_ion_temp_factor: float = 0.8
     shell_ion_temp_factor: float = 0.8
-    core_thickness_bounds_m: Tuple[float, float] = (5e-4, 3e-3)
-    shell_thickness_bounds_m: Tuple[float, float] = (5e-4, 5e-3)
+    core_thickness_bounds_m: Tuple[float, float] = (1e-6, 1e-5)
+    shell_thickness_bounds_m: Tuple[float, float] = (1e-6, 1e-5)
     geometry_grid_size: int = 8
     temperature_bounds_K: Tuple[float, float] = tuple(
         map(float, _CONFIG["monte_carlo_synthesizer"]["core"]["T_range_K"])
@@ -380,8 +380,8 @@ class ForwardModelWrapper:
 
     def __call__(self, theta: np.ndarray) -> np.ndarray:
         T_core, T_shell, ne_core, ne_shell = theta
-        d_core_m = 1e-3
-        d_shell_m = 2e-3
+        d_core_m = 1e-6
+        d_shell_m = 1e-6
 
         core = PlasmaZoneParams(
             T_e_K=T_core,

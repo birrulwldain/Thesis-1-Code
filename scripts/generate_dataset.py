@@ -33,6 +33,7 @@ import argparse
 import multiprocessing as mp
 from dataclasses import dataclass
 
+import src.libs_physics as libs_physics
 from src.libs_physics import DataFetcher, PhysicsCalculator, PlasmaZoneParams, TwoZonePlasma
 
 import yaml
@@ -51,6 +52,12 @@ _fetcher = None
 _fwhm_nm = _CONFIG['instrument']['fwhm_nm']
 _noise_level = _CONFIG['instrument']['noise_level']
 
+SPECTRAL_TIER_CONFIGS = {
+    "L": {"resolution": 4000, "description": "Low pragmatic resolution"},
+    "M": {"resolution": 8000, "description": "Medium pragmatic resolution"},
+    "H": {"resolution": 16000, "description": "High pragmatic resolution"},
+}
+
 @dataclass
 class DatasetGroupSpec:
     name: str
@@ -58,9 +65,10 @@ class DatasetGroupSpec:
     element_bounds_pct: list[tuple[str, tuple[float, float]]]
 
 
-def init_worker(fwhm_nm_unused):
+def init_worker(resolution: int):
     """Inisialisasi memori per-core CPU untuk DataFetcher yang berukuran besar."""
     global _fetcher
+    libs_physics.SIMULATION_CONFIG["resolution"] = int(resolution)
     _fetcher = DataFetcher()  
 
 
@@ -154,6 +162,7 @@ def generate_dataset(
     n_samples: int,
     output_file: str,
     dataset_group: str,
+    spectral_tier: str,
     num_workers: int = None,
 ):
     if num_workers is None:
@@ -164,6 +173,7 @@ def generate_dataset(
     print(f"Unit Pekerja (CPU) : {num_workers} cores aktif")
     print(f"File Output (HDF5) : {output_file}")
     print(f"Grup Dataset       : {dataset_group}")
+    print(f"Tier Resolusi      : {spectral_tier}")
     
     # Rentang Domain Parameter Termodinamika dari config.yaml (dipaksa ke float agar aman dari string-parsing PyYAML)
     volcanic_profile = _CONFIG["synthetic_dataset_profiles"]["volcanic_soil"]
@@ -204,15 +214,16 @@ def generate_dataset(
         theta = np.asarray([Tc, Ts, nc, ns, *composition_pct.tolist()], dtype=np.float32)
         tasks.append((i, Tc, Ts, nc, ns, elements, theta))
     
-    # Resolusi bawaan grid wavelength
-    resolution = _CONFIG['instrument']['resolution']
+    tier_config = SPECTRAL_TIER_CONFIGS[spectral_tier]
+    resolution = int(tier_config["resolution"])
+    libs_physics.SIMULATION_CONFIG["resolution"] = resolution
     
     # =========================================================================
     # SOLUSI MULTI-CORE (APPLE M1 / LINUX):
     # Proses anak (Workers) JANGAN sampai mewarisi file HDF5 yang sedang terbuka.
     # Maka, Pool diciptakan TERLEBIH DAHULU di RAM, baru file HDF5 dibuka.
     # =========================================================================
-    with mp.Pool(processes=num_workers, initializer=init_worker, initargs=(0.5,)) as pool:
+    with mp.Pool(processes=num_workers, initializer=init_worker, initargs=(resolution,)) as pool:
         
         # Eksekusi generator stokastik
         iterator = pool.imap_unordered(simulate_single_spectrum, tasks)
@@ -229,6 +240,14 @@ def generate_dataset(
                     raise ValueError(
                         "Kolom dataset HDF5 yang ada tidak cocok dengan grup dataset yang diminta."
                     )
+                existing_group = dset_theta.attrs.get('dataset_group', '')
+                existing_tier = dset_theta.attrs.get('spectral_tier', '')
+                if str(existing_group) != group_spec.name:
+                    raise ValueError("Dataset HDF5 yang ada berasal dari group komposisi yang berbeda.")
+                if str(existing_tier) != spectral_tier:
+                    raise ValueError("Dataset HDF5 yang ada berasal dari tier resolusi yang berbeda.")
+                if dset_spectra.shape[1] != resolution:
+                    raise ValueError("Resolusi spektrum HDF5 yang ada tidak cocok dengan tier yang diminta.")
                 
                 # Memperpanjang 
                 dset_theta.resize((current_size + n_samples, len(parameter_columns)))
@@ -249,7 +268,11 @@ def generate_dataset(
                 dset_theta.attrs['columns'] = parameter_columns
                 dset_theta.attrs['dataset_group'] = group_spec.name
                 dset_theta.attrs['description'] = group_spec.description
+                dset_theta.attrs['spectral_tier'] = spectral_tier
+                dset_theta.attrs['spectral_resolution'] = resolution
                 dset_spectra.attrs['description'] = 'Normalized synthetic spectra (Instrumental FWHM 0.5nm, 1% Gaussian noise)'
+                dset_spectra.attrs['spectral_tier'] = spectral_tier
+                dset_spectra.attrs['spectral_resolution'] = resolution
                 write_idx = 0
                 print(f"  [Baru] Membuat dataset HDF5 kosong untuk {n_samples} baris awal...")
             
@@ -304,6 +327,13 @@ if __name__ == '__main__':
         help='Grup dataset: A tanpa trace element, B dengan trace element',
     )
     parser.add_argument(
+        '--spectral-tier',
+        type=str,
+        default='L',
+        choices=['L', 'M', 'H'],
+        help='Tier resolusi spektrum: L=4000, M=8000, H=16000 titik',
+    )
+    parser.add_argument(
         '--out',
         type=str,
         default=None,
@@ -320,10 +350,15 @@ if __name__ == '__main__':
     
     if args.base_dir != _BASE_DIR:
         _BASE_DIR = args.base_dir
-    output_file = args.out or os.path.join(_BASE_DIR, 'data', f'dataset_synthetic_{args.dataset_group}.h5')
+    output_file = args.out or os.path.join(
+        _BASE_DIR,
+        'data',
+        f'dataset_synthetic_{args.dataset_group}_{args.spectral_tier}.h5',
+    )
     generate_dataset(
         n_samples=args.samples,
         output_file=output_file,
         dataset_group=args.dataset_group,
+        spectral_tier=args.spectral_tier,
         num_workers=args.cores,
     )

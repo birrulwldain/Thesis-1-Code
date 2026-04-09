@@ -349,14 +349,14 @@ class LIBSMainWindow(QMainWindow):
         self.shell_density_factor_spin.setSingleStep(0.01)
 
         self.core_thickness_spin = QDoubleSpinBox()
-        self.core_thickness_spin.setRange(0.01, 20.0)
-        self.core_thickness_spin.setValue(1.0)
+        self.core_thickness_spin.setRange(0.001, 20.0)
+        self.core_thickness_spin.setValue(0.001)
         self.core_thickness_spin.setDecimals(3)
         self.core_thickness_spin.setSuffix(" mm")
 
         self.shell_thickness_spin = QDoubleSpinBox()
-        self.shell_thickness_spin.setRange(0.01, 20.0)
-        self.shell_thickness_spin.setValue(2.0)
+        self.shell_thickness_spin.setRange(0.001, 20.0)
+        self.shell_thickness_spin.setValue(0.001)
         self.shell_thickness_spin.setDecimals(3)
         self.shell_thickness_spin.setSuffix(" mm")
 
