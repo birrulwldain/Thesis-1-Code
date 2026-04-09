@@ -176,20 +176,39 @@ class PIInversionTrainer:
 
         rmse_temp = float(np.sqrt(np.mean((y_true_temp - y_pred_temp) ** 2)))
         rmse_ne = float(np.sqrt(np.mean((y_true_ne - y_pred_ne) ** 2)))
+        temp_span = float(np.max(y_true_temp) - np.min(y_true_temp)) if len(y_true_temp) > 1 else 0.0
+        ne_span = float(np.max(y_true_ne) - np.min(y_true_ne)) if len(y_true_ne) > 1 else 0.0
+        rel_rmse_temp = (rmse_temp / temp_span * 100.0) if temp_span > 0.0 else float("nan")
+        rel_rmse_ne = (rmse_ne / ne_span * 100.0) if ne_span > 0.0 else float("nan")
+
+        def verdict(rel_pct: float) -> str:
+            if not np.isfinite(rel_pct):
+                return "tidak tersedia"
+            if rel_pct <= 10.0:
+                return "baik"
+            if rel_pct <= 20.0:
+                return "cukup"
+            return "lemah"
 
         print("\nMetrik Validasi Inversi Termodinamika (Phase 1):")
-        print("-" * 52)
-        print(f"{'Parameter':<18} | {'RMSE':<14}")
-        print("-" * 52)
-        print(f"{'T_e_core_K':<18} | {rmse_temp:<14.2e}")
-        print(f"{'n_e_core_cm3':<18} | {rmse_ne:<14.2e}")
+        print("-" * 92)
+        print(f"{'Parameter':<18} | {'RMSE':<14} | {'Rel. RMSE (%)':<14} | {'Verdict':<10}")
+        print("-" * 92)
+        print(f"{'T_e_core_K':<18} | {rmse_temp:<14.2e} | {rel_rmse_temp:<14.2f} | {verdict(rel_rmse_temp):<10}")
+        print(f"{'n_e_core_cm3':<18} | {rmse_ne:<14.2e} | {rel_rmse_ne:<14.2f} | {verdict(rel_rmse_ne):<10}")
         if not split.has_holdout:
             print("[Validasi] Tidak ada holdout set independen; metrik di atas memakai data latih.")
-        print("-" * 52)
+        print("-" * 92)
+        print(
+            f"[Interpretasi] Span uji: T_e={temp_span:.2e} K, "
+            f"n_e={ne_span:.2e} cm^-3"
+        )
 
         return {
             "rmse_T_e_core_K": rmse_temp,
             "rmse_n_e_core_cm3": rmse_ne,
+            "rel_rmse_T_e_core_K_pct": rel_rmse_temp,
+            "rel_rmse_n_e_core_cm3_pct": rel_rmse_ne,
         }
 
     def save_pipeline(
