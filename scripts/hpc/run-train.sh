@@ -21,8 +21,9 @@ export LIBS_BASE_DIR="$BASE_DIR"
 export MKL_VERBOSE=0
 export OMP_NUM_THREADS=8
 export PYTHONPATH="${PYTHONPATH:-}:$BASE_DIR"
+export PYTHONUNBUFFERED=1
 
-python "$BASE_DIR/scripts/train_inversion_model.py" \
+python -u "$BASE_DIR/scripts/train_inversion_model.py" \
   --mrmr \
   --mrmr-features 1024 \
   --mrmr-pool 4096 \
