@@ -12,6 +12,8 @@ BASE_DIR=/home/bwalidain/thesis
 CONDA_SH=/home/bwalidain/miniconda3/etc/profile.d/conda.sh
 ENV_NAME=bw
 SAMPLES=${SAMPLES:-200}
+SCRATCH_OUT=${SCRATCH_OUT:-/home/bwalidain/_scratch/dataset_synthetic.h5}
+FINAL_OUT=${FINAL_OUT:-$BASE_DIR/data/dataset_synthetic.h5}
 
 mkdir -p "$BASE_DIR/logs"
 
@@ -23,6 +25,7 @@ export MKL_VERBOSE=0
 export OMP_NUM_THREADS=8
 export PYTHONPATH="${PYTHONPATH:-}:$BASE_DIR"
 
-python "$BASE_DIR/scripts/generate_dataset.py" --samples "$SAMPLES"
+python "$BASE_DIR/scripts/generate_dataset.py" --samples "$SAMPLES" --out "$SCRATCH_OUT"
+mv "$SCRATCH_OUT" "$FINAL_OUT"
 
 conda deactivate
