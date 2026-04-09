@@ -39,6 +39,8 @@ class DatasetBundle:
     temperatures_K: np.ndarray
     electron_densities_cm3: np.ndarray
     parameter_columns: list[str]
+    compositions: np.ndarray | None = None
+    composition_columns: list[str] | None = None
 
 
 @dataclass
@@ -88,16 +90,27 @@ class PIInversionTrainer:
 
         temperatures_K = parameters[:, temp_idx].astype(np.float32)
         electron_densities_cm3 = parameters[:, ne_idx].astype(np.float32)
+        composition_columns = [col for col in columns if str(col).startswith("comp_")]
+        compositions = None
+        if composition_columns:
+            comp_indices = [columns.index(col) for col in composition_columns]
+            compositions = parameters[:, comp_indices].astype(np.float32)
+            row_sums = np.clip(compositions.sum(axis=1, keepdims=True), 1e-8, None)
+            compositions = compositions / row_sums
 
         print(
             f"Dataset sukses dimuat. Spektra={spectra.shape}, "
             f"parameter termodinamika={(temperatures_K.shape[0], 2)}"
         )
+        if composition_columns:
+            print(f"Komposisi unsur terdeteksi: {len(composition_columns)} kolom")
         return DatasetBundle(
             spectra=spectra.astype(np.float32),
             temperatures_K=temperatures_K,
             electron_densities_cm3=electron_densities_cm3,
             parameter_columns=columns,
+            compositions=compositions,
+            composition_columns=composition_columns or None,
         )
 
     def split_dataset(self, dataset: DatasetBundle) -> SplitBundle:
@@ -134,6 +147,7 @@ class PIInversionTrainer:
     def build_training_config(
         self,
         input_dim: int,
+        composition_dim: int,
         epochs: int | None,
         batch_size: int | None,
         learning_rate: float | None,
@@ -145,7 +159,12 @@ class PIInversionTrainer:
             overrides["batch_size"] = batch_size
         if learning_rate is not None:
             overrides["learning_rate"] = learning_rate
-        return HierarchicalInversionConfig.from_config(input_dim=input_dim, **overrides)
+        return HierarchicalInversionConfig.from_config(
+            input_dim=input_dim,
+            use_composition_head=composition_dim > 0,
+            composition_dim=composition_dim,
+            **overrides,
+        )
 
     def build_phase_dataset(
         self,
@@ -158,6 +177,7 @@ class PIInversionTrainer:
             temperatures_K=dataset.temperatures_K[indices],
             electron_densities_cm3=dataset.electron_densities_cm3[indices],
             config=inversion_config,
+            compositions=dataset.compositions[indices] if dataset.compositions is not None else None,
             tau_values=np.zeros(len(indices), dtype=np.float32),
         )
 
@@ -204,17 +224,37 @@ class PIInversionTrainer:
             f"n_e={ne_span:.2e} cm^-3"
         )
 
-        return {
+        composition_rmse_mean = None
+        if dataset.compositions is not None and dataset.composition_columns:
+            y_true_comp = dataset.compositions[indices]
+            y_pred_comp = preds.get("composition")
+            if y_pred_comp is not None:
+                comp_rmse = np.sqrt(np.mean((y_true_comp - y_pred_comp) ** 2, axis=0))
+                composition_rmse_mean = float(np.mean(comp_rmse))
+                print("\nMetrik Komposisi Unsur:")
+                print("-" * 92)
+                print(f"{'Komponen':<20} | {'RMSE Fraksi':<14}")
+                print("-" * 92)
+                for col, val in zip(dataset.composition_columns, comp_rmse):
+                    print(f"{col:<20} | {float(val):<14.4e}")
+                print("-" * 92)
+                print(f"[Interpretasi] Rata-rata RMSE komposisi = {composition_rmse_mean:.4e}")
+
+        metrics = {
             "rmse_T_e_core_K": rmse_temp,
             "rmse_n_e_core_cm3": rmse_ne,
             "rel_rmse_T_e_core_K_pct": rel_rmse_temp,
             "rel_rmse_n_e_core_cm3_pct": rel_rmse_ne,
         }
+        if composition_rmse_mean is not None:
+            metrics["rmse_composition_mean"] = composition_rmse_mean
+        return metrics
 
     def save_pipeline(
         self,
         output_model: str,
         inverter: HierarchicalPIInverter,
+        dataset: DatasetBundle,
         inversion_config: HierarchicalInversionConfig,
         metrics: dict[str, float],
         selected_indices: np.ndarray | None = None,
@@ -228,6 +268,8 @@ class PIInversionTrainer:
             "metrics": metrics,
             "targets": ["T_e_core_K", "n_e_core_cm3"],
         }
+        if dataset.composition_columns is not None:
+            pipeline["composition_columns"] = list(dataset.composition_columns)
         if selected_indices is not None:
             pipeline["selected_indices"] = selected_indices.astype(int).tolist()
         if mrmr_params is not None:
@@ -293,8 +335,10 @@ class PIInversionTrainer:
             )
             print(f"[mRMR] Dimensi input turun menjadi {dataset.spectra.shape[1]} fitur.")
 
+        composition_dim = dataset.compositions.shape[1] if dataset.compositions is not None else 0
         inversion_config = self.build_training_config(
             input_dim=dataset.spectra.shape[1],
+            composition_dim=composition_dim,
             epochs=epochs,
             batch_size=batch_size,
             learning_rate=learning_rate,
@@ -318,6 +362,7 @@ class PIInversionTrainer:
         self.save_pipeline(
             output_model,
             inverter,
+            dataset,
             inversion_config,
             metrics,
             selected_indices=selected_indices,

@@ -81,7 +81,7 @@ SIMULATION_CONFIG = {
 
 # Resolve data paths relative to this file (robust to working directory)
 _PROJECT_DIR     = os.path.dirname(os.path.abspath(__file__))
-NIST_HDF_PATH    = os.path.join(_PROJECT_DIR, "..", "data", "nist_data(1).h5")
+NIST_HDF_PATH    = os.path.join(_PROJECT_DIR, "..", "data", "nist_data_hog.h5")
 ATOMIC_DATA_PATH = os.path.join(_PROJECT_DIR, "..", "data", "atomic_data1.h5")
 
 # Atomic masses [amu] for Doppler width calculation. Extend as needed.

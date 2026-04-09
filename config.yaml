@@ -24,7 +24,7 @@
 
 instrument:
   wl_range_nm: [200.0, 900.0]        # Rentang pindaian CCD spektrometer [nm]
-  resolution: 70000                # Resolusi numerik (piksel termodinamika)
+  resolution: 4000                 # Resolusi numerik (piksel termodinamika)
   fwhm_nm: 0.5                       # Resolusi fisik alat (Gaussian instrumental broadening)
   noise_level: 0.01                  # Fraksi derau sinyal (1%)
 
@@ -32,6 +32,50 @@ plasma_target:
   elements: ["Si", "Fe", "Al", "Ca"]       # Spesies plasma yang dominan di Batu/Tanah vulkanik Aceh
   fractions: [0.42, 0.39, 0.12, 0.07]      # Normalisasi fraksi stoikiometri dominan mol/massa
   mcwhirter_delta_E_eV: 4.5          # Celah energi hambatan optik terbesar (untuk batas LTE)
+
+synthetic_dataset_profiles:
+  volcanic_soil:
+    plasma:
+      T_core_range_K: [6000.0, 15000.0]
+      ne_core_range_cm3: [1.0e16, 1.0e17]
+    groups:
+      A:
+        description: "Major elements only (tanpa trace element)"
+        elements:
+          Si: [40.0, 60.0]
+          Al: [10.0, 18.0]
+          Fe: [5.0, 15.0]
+          Ca: [3.0, 10.0]
+          Mg: [2.0, 8.0]
+          Na: [1.0, 5.0]
+          K: [1.0, 5.0]
+          Ti: [0.5, 2.0]
+      B:
+        description: "Major elements + trace elements"
+        elements:
+          Si: [40.0, 60.0]
+          Al: [10.0, 18.0]
+          Fe: [5.0, 15.0]
+          Ca: [3.0, 10.0]
+          Mg: [2.0, 8.0]
+          Na: [1.0, 5.0]
+          K: [1.0, 5.0]
+          Ti: [0.5, 2.0]
+          Mn: [0.05, 0.5]
+          P: [0.05, 0.5]
+          Ba: [0.01, 0.3]
+          Sr: [0.01, 0.2]
+          Zn: [0.005, 0.1]
+          Cu: [0.001, 0.05]
+          Ni: [0.001, 0.05]
+          Cr: [0.001, 0.05]
+          V: [0.001, 0.05]
+          Rb: [0.001, 0.05]
+          Pb: [0.001, 0.02]
+          Co: [0.001, 0.02]
+          Mo: [0.0005, 0.01]
+          Y: [0.0005, 0.01]
+          Zr: [0.001, 0.02]
 
 monte_carlo_synthesizer:
   generator_samples: 100             # Default jumlah spektrum yang dibuat jika tidak diset via argumen CLI

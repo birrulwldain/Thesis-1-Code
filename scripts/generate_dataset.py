@@ -31,6 +31,7 @@ import time
 import os
 import argparse
 import multiprocessing as mp
+from dataclasses import dataclass
 
 from src.libs_physics import DataFetcher, PhysicsCalculator, PlasmaZoneParams, TwoZonePlasma
 
@@ -47,19 +48,72 @@ with open(_CONFIG_PATH, 'r') as f:
 
 # Variabel global untuk setiap Process-Worker agar tidak di-pickle ulang dari master
 _fetcher = None
-_elements = None
 _fwhm_nm = _CONFIG['instrument']['fwhm_nm']
 _noise_level = _CONFIG['instrument']['noise_level']
 
-def init_worker(elements, fwhm_nm_unused):
+@dataclass
+class DatasetGroupSpec:
+    name: str
+    description: str
+    element_bounds_pct: list[tuple[str, tuple[float, float]]]
+
+
+def init_worker(fwhm_nm_unused):
     """Inisialisasi memori per-core CPU untuk DataFetcher yang berukuran besar."""
-    global _fetcher, _elements
+    global _fetcher
     _fetcher = DataFetcher()  
-    _elements = elements
+
+
+def _load_group_spec(group_name: str) -> DatasetGroupSpec:
+    profile = _CONFIG["synthetic_dataset_profiles"]["volcanic_soil"]["groups"][group_name]
+    element_bounds = [
+        (elem, tuple(map(float, bounds)))
+        for elem, bounds in profile["elements"].items()
+    ]
+    return DatasetGroupSpec(
+        name=group_name,
+        description=str(profile.get("description", "")),
+        element_bounds_pct=element_bounds,
+    )
+
+
+def _sample_bounded_simplex_pct(
+    element_bounds_pct: list[tuple[str, tuple[float, float]]],
+    rng: np.random.Generator,
+) -> np.ndarray:
+    lowers = np.asarray([bounds[0] for _, bounds in element_bounds_pct], dtype=np.float64) / 100.0
+    uppers = np.asarray([bounds[1] for _, bounds in element_bounds_pct], dtype=np.float64) / 100.0
+    if lowers.sum() > 1.0 + 1e-9 or uppers.sum() < 1.0 - 1e-9:
+        raise ValueError("Komposisi bounds tidak feasible untuk simplex 100%.")
+
+    order = rng.permutation(len(element_bounds_pct))
+    x = np.zeros(len(element_bounds_pct), dtype=np.float64)
+    remaining = 1.0
+    remaining_lower = lowers.sum()
+    remaining_upper = uppers.sum()
+
+    for pos, idx in enumerate(order[:-1]):
+        remaining_lower -= lowers[idx]
+        remaining_upper -= uppers[idx]
+        lo = max(lowers[idx], remaining - remaining_upper)
+        hi = min(uppers[idx], remaining - remaining_lower)
+        if hi < lo:
+            raise RuntimeError("Gagal sampling komposisi bounded simplex.")
+        value = rng.uniform(lo, hi)
+        x[idx] = value
+        remaining -= value
+
+    last_idx = int(order[-1])
+    x[last_idx] = remaining
+    if x[last_idx] < lowers[last_idx] - 1e-9 or x[last_idx] > uppers[last_idx] + 1e-9:
+        raise RuntimeError("Komposisi terakhir keluar dari bounds.")
+    x = np.clip(x, lowers, uppers)
+    x = x / x.sum()
+    return (x * 100.0).astype(np.float32)
 
 def simulate_single_spectrum(args):
     """Fungsi pekerja: menerima kombinasi parameter, merakit spektrum, mengembalikan array."""
-    idx, T_core, T_shell, n_e_core, n_e_shell = args
+    idx, T_core, T_shell, n_e_core, n_e_shell, elements, theta = args
     
     # Ketebalan geometris (dipertahankan dari YAML GATEWAY)
     d_core_m = _CONFIG['monte_carlo_synthesizer']['core']['thickness_m']
@@ -70,7 +124,7 @@ def simulate_single_spectrum(args):
     
     try:
         # Eksekusi Blok 1
-        model = TwoZonePlasma(core, shell, _elements, _fetcher)
+        model = TwoZonePlasma(core, shell, elements, _fetcher)
         wl, I_raw, meta = model.run()
         
         # Broadening Instrumen
@@ -89,7 +143,6 @@ def simulate_single_spectrum(args):
         I_sim = np.clip(I_sim + noise, 0.0, 1.0)
         
         # Bungkus hasil (Float32 untuk efisiensi penyimpanan HDF5)
-        theta = np.array([T_core, T_shell, n_e_core, n_e_shell], dtype=np.float32)
         return idx, theta, I_sim.astype(np.float32)
         
     except Exception as e:
@@ -97,7 +150,12 @@ def simulate_single_spectrum(args):
         print(f"[Worker] Singularity dihindari pada matriks (idx={idx}, Tc={T_core:.0f}K, nc={n_e_core:.1e}): {str(e)}")
         return idx, None, None
 
-def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
+def generate_dataset(
+    n_samples: int,
+    output_file: str,
+    dataset_group: str,
+    num_workers: int = None,
+):
     if num_workers is None:
         num_workers = max(1, mp.cpu_count() - 1)
         
@@ -105,38 +163,46 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
     print(f"Target Sampel      : {n_samples} spektrum sintetik")
     print(f"Unit Pekerja (CPU) : {num_workers} cores aktif")
     print(f"File Output (HDF5) : {output_file}")
+    print(f"Grup Dataset       : {dataset_group}")
     
     # Rentang Domain Parameter Termodinamika dari config.yaml (dipaksa ke float agar aman dari string-parsing PyYAML)
+    volcanic_profile = _CONFIG["synthetic_dataset_profiles"]["volcanic_soil"]
+    group_spec = _load_group_spec(dataset_group)
     bounds = {
-        'T_core': tuple(map(float, _CONFIG['monte_carlo_synthesizer']['core']['T_range_K'])),
+        'T_core': tuple(map(float, volcanic_profile['plasma']['T_core_range_K'])),
         'T_shell': tuple(map(float, _CONFIG['monte_carlo_synthesizer']['shell']['T_range_K'])),
-        'ne_core': tuple(map(float, _CONFIG['monte_carlo_synthesizer']['core']['ne_range_cm3'])),
+        'ne_core': tuple(map(float, volcanic_profile['plasma']['ne_core_range_cm3'])),
         'ne_shell': tuple(map(float, _CONFIG['monte_carlo_synthesizer']['shell']['ne_range_cm3']))
     }
-    
-    # Material komposisi langsung diproyeksikan dari config.yaml
-    els = _CONFIG['plasma_target']['elements']
-    fracs = _CONFIG['plasma_target']['fractions']
-    elements = [(el, 1, frac) for el, frac in zip(els, fracs)]
+
+    composition_columns = [f"comp_{elem}_pct" for elem, _ in group_spec.element_bounds_pct]
+    parameter_columns = [
+        "T_e_core_K",
+        "T_e_shell_K",
+        "n_e_core_cm3",
+        "n_e_shell_cm3",
+        *composition_columns,
+    ]
     
     # Sampling parameter secara seragam
-    np.random.seed(42)
+    rng = np.random.default_rng(42)
     tasks = []
-    
-    d_core_m = _CONFIG['monte_carlo_synthesizer']['core']['thickness_m']
-    d_shell_m = _CONFIG['monte_carlo_synthesizer']['shell']['thickness_m']
-    
+
     for i in range(n_samples):
-        Tc = np.random.uniform(*bounds['T_core'])
-        Ts = np.random.uniform(*bounds['T_shell'])
-        if Ts > Tc: Ts = Tc * 0.8
-        
-        nc = np.random.uniform(*bounds['ne_core'])
-        ns = np.random.uniform(*bounds['ne_shell'])
-        
-        # Override tasks parameter if needed, but the worker currently uses hardcoded thickness
-        # Wait, the worker uses hardcoded thickness in generate_dataset.py. We should pass it via args if we want it dynamic.
-        tasks.append((i, Tc, Ts, nc, ns))
+        Tc = rng.uniform(*bounds['T_core'])
+        Ts = rng.uniform(*bounds['T_shell'])
+        if Ts > Tc:
+            Ts = Tc * 0.8
+
+        nc = rng.uniform(*bounds['ne_core'])
+        ns = rng.uniform(*bounds['ne_shell'])
+        composition_pct = _sample_bounded_simplex_pct(group_spec.element_bounds_pct, rng)
+        elements = [
+            (elem, 1, float(frac_pct) / 100.0)
+            for (elem, _), frac_pct in zip(group_spec.element_bounds_pct, composition_pct)
+        ]
+        theta = np.asarray([Tc, Ts, nc, ns, *composition_pct.tolist()], dtype=np.float32)
+        tasks.append((i, Tc, Ts, nc, ns, elements, theta))
     
     # Resolusi bawaan grid wavelength
     resolution = _CONFIG['instrument']['resolution']
@@ -146,7 +212,7 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
     # Proses anak (Workers) JANGAN sampai mewarisi file HDF5 yang sedang terbuka.
     # Maka, Pool diciptakan TERLEBIH DAHULU di RAM, baru file HDF5 dibuka.
     # =========================================================================
-    with mp.Pool(processes=num_workers, initializer=init_worker, initargs=(elements, 0.5)) as pool:
+    with mp.Pool(processes=num_workers, initializer=init_worker, initargs=(0.5,)) as pool:
         
         # Eksekusi generator stokastik
         iterator = pool.imap_unordered(simulate_single_spectrum, tasks)
@@ -158,19 +224,31 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
                 dset_theta = f['parameters']
                 dset_spectra = f['spectra']
                 current_size = dset_theta.shape[0]
+                existing_columns = list(dset_theta.attrs.get('columns', []))
+                if existing_columns != parameter_columns:
+                    raise ValueError(
+                        "Kolom dataset HDF5 yang ada tidak cocok dengan grup dataset yang diminta."
+                    )
                 
                 # Memperpanjang 
-                dset_theta.resize((current_size + n_samples, 4))
+                dset_theta.resize((current_size + n_samples, len(parameter_columns)))
                 dset_spectra.resize((current_size + n_samples, resolution))
                 write_idx = current_size
                 print(f"  [Resume] Dataset lama terdeteksi ({current_size} baris). Menambahkan {n_samples} baris baru...")
                 
             else:
-                dset_theta = f.create_dataset("parameters", shape=(n_samples, 4), maxshape=(None, 4), dtype=np.float32)
+                dset_theta = f.create_dataset(
+                    "parameters",
+                    shape=(n_samples, len(parameter_columns)),
+                    maxshape=(None, len(parameter_columns)),
+                    dtype=np.float32,
+                )
                 dset_spectra = f.create_dataset("spectra", shape=(n_samples, resolution), maxshape=(None, resolution), dtype=np.float32, 
                                                 compression="gzip", compression_opts=4)
                 
-                dset_theta.attrs['columns'] = ['T_e_core_K', 'T_e_shell_K', 'n_e_core_cm3', 'n_e_shell_cm3']
+                dset_theta.attrs['columns'] = parameter_columns
+                dset_theta.attrs['dataset_group'] = group_spec.name
+                dset_theta.attrs['description'] = group_spec.description
                 dset_spectra.attrs['description'] = 'Normalized synthetic spectra (Instrumental FWHM 0.5nm, 1% Gaussian noise)'
                 write_idx = 0
                 print(f"  [Baru] Membuat dataset HDF5 kosong untuk {n_samples} baris awal...")
@@ -199,7 +277,7 @@ def generate_dataset(n_samples: int, output_file: str, num_workers: int = None):
             # Memotong (resize) jika ada sample yang fail
             target_max_size = current_size + completed_success if 'current_size' in locals() else completed_success
             if write_idx < dset_theta.shape[0]:
-                dset_theta.resize((write_idx, 4))
+                dset_theta.resize((write_idx, len(parameter_columns)))
                 dset_spectra.resize((write_idx, resolution))
                 print(f"  [Cleanup] Dataset disusutkan (membuang baris gagal/kosong) menjadi: {write_idx} baris.")
                     
@@ -219,9 +297,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Blok 2: Ciptakan Dataset Sintetik LIBS secara paralel")
     parser.add_argument('--samples', type=int, default=default_samples, help='Jumlah sampel')
     parser.add_argument(
+        '--dataset-group',
+        type=str,
+        default='A',
+        choices=['A', 'B'],
+        help='Grup dataset: A tanpa trace element, B dengan trace element',
+    )
+    parser.add_argument(
         '--out',
         type=str,
-        default=os.path.join(_BASE_DIR, 'data', 'dataset_synthetic.h5'),
+        default=None,
         help='Nama file output HDF5',
     )
     parser.add_argument('--cores', type=int, default=None, help='Jumlah core CPU (-1 untuk auto)')
@@ -235,4 +320,10 @@ if __name__ == '__main__':
     
     if args.base_dir != _BASE_DIR:
         _BASE_DIR = args.base_dir
-    generate_dataset(n_samples=args.samples, output_file=args.out, num_workers=args.cores)
+    output_file = args.out or os.path.join(_BASE_DIR, 'data', f'dataset_synthetic_{args.dataset_group}.h5')
+    generate_dataset(
+        n_samples=args.samples,
+        output_file=output_file,
+        dataset_group=args.dataset_group,
+        num_workers=args.cores,
+    )

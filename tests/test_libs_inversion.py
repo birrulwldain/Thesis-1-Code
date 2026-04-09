@@ -140,6 +140,21 @@ def test_predict_thermo_returns_physical_ranges():
     assert np.all(preds["n_e_cm3"] <= config.electron_density_bounds_cm3[1])
 
 
+def test_predict_with_composition_head_returns_simplex_outputs():
+    config, dataset, spectra, _, _ = make_synthetic_dataset(
+        use_composition_head=True,
+        composition_dim=2,
+    )
+    inverter = HierarchicalPIInverter(config)
+    inverter.fit(dataset, epochs=2)
+    preds = inverter.predict_thermo(spectra[:3])
+
+    assert "composition" in preds
+    assert preds["composition"].shape == (3, 2)
+    assert np.all(preds["composition"] >= 0.0)
+    assert np.allclose(preds["composition"].sum(axis=1), np.ones(3), atol=1e-5)
+
+
 def test_phase2_geometry_solver_returns_physical_ranges():
     config, dataset, spectra, _, _ = make_synthetic_dataset()
     inverter = HierarchicalPIInverter(config)

@@ -379,7 +379,7 @@ def create_composition_form():
 def run_simulation(selected_elements, temperature, electron_density, show_labels=True):
     data_dir = "data"
     # Perbaikan nama file agar konsisten
-    nist_path = "data/nist_data(1).h5"
+    nist_path = "data/nist_data_hog.h5"
     atomic_data_path = "data/atomic_data1.h5"
 
     if not os.path.exists(nist_path) or not os.path.exists(atomic_data_path):

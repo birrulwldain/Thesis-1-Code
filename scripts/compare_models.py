@@ -11,7 +11,7 @@ def get_legacy_spectrum(selected_elements: List[Tuple[str, float]],
                         electron_density: float):
     """Mengeksekusi simulasi menggunakan sim.py (Legacy LTE)"""
     # 1. Setup Data
-    nist_path = "data/nist_data(1).h5"
+    nist_path = "data/nist_data_hog.h5"
     atomic_data_path = "data/atomic_data1.h5"
     
     # 2. Get Ionization Energies
