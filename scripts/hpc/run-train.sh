@@ -25,9 +25,10 @@ export PYTHONUNBUFFERED=1
 
 python -u "$BASE_DIR/scripts/train_inversion_model.py" \
   --mrmr \
-  --mrmr-features 1024 \
-  --mrmr-pool 4096 \
-  --mrmr-sample 2000 \
-  --mrmr-score-mode miq
+  --mrmr-features 256 \
+  --mrmr-pool 1024 \
+  --mrmr-sample 500 \
+  --mrmr-score-mode miq \
+  --epochs 3
 
 conda deactivate

@@ -11,7 +11,7 @@
 BASE_DIR=/home/bwalidain/thesis
 CONDA_SH=/home/bwalidain/miniconda3/etc/profile.d/conda.sh
 ENV_NAME=bw
-SAMPLES=${SAMPLES:-1000}
+SAMPLES=${SAMPLES:-200}
 
 mkdir -p "$BASE_DIR/logs"
 
