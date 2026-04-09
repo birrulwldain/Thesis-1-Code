@@ -212,10 +212,10 @@ class PIInversionTrainer:
 
         print("\nMetrik Validasi Inversi Termodinamika (Phase 1):")
         print("-" * 92)
-        print(f"{'Parameter':<18} | {'RMSE':<14} | {'Rel. RMSE (%)':<14} | {'Verdict':<10}")
+        print(f"{'Parameter':<18} | {'RMSE (%)':<14} | {'Verdict':<10}")
         print("-" * 92)
-        print(f"{'T_e_core_K':<18} | {rmse_temp:<14.2e} | {rel_rmse_temp:<14.2f} | {verdict(rel_rmse_temp):<10}")
-        print(f"{'n_e_core_cm3':<18} | {rmse_ne:<14.2e} | {rel_rmse_ne:<14.2f} | {verdict(rel_rmse_ne):<10}")
+        print(f"{'T_e_core_K':<18} | {rel_rmse_temp:<14.2f} | {verdict(rel_rmse_temp):<10}")
+        print(f"{'n_e_core_cm3':<18} | {rel_rmse_ne:<14.2f} | {verdict(rel_rmse_ne):<10}")
         if not split.has_holdout:
             print("[Validasi] Tidak ada holdout set independen; metrik di atas memakai data latih.")
         print("-" * 92)
@@ -230,15 +230,17 @@ class PIInversionTrainer:
             y_pred_comp = preds.get("composition")
             if y_pred_comp is not None:
                 comp_rmse = np.sqrt(np.mean((y_true_comp - y_pred_comp) ** 2, axis=0))
+                comp_rmse_pct = comp_rmse * 100.0
                 composition_rmse_mean = float(np.mean(comp_rmse))
+                composition_rmse_mean_pct = float(np.mean(comp_rmse_pct))
                 print("\nMetrik Komposisi Unsur:")
                 print("-" * 92)
-                print(f"{'Komponen':<20} | {'RMSE Fraksi':<14}")
+                print(f"{'Komponen':<20} | {'RMSE (%)':<14}")
                 print("-" * 92)
-                for col, val in zip(dataset.composition_columns, comp_rmse):
-                    print(f"{col:<20} | {float(val):<14.4e}")
+                for col, val_pct in zip(dataset.composition_columns, comp_rmse_pct):
+                    print(f"{col:<20} | {float(val_pct):<14.2f}")
                 print("-" * 92)
-                print(f"[Interpretasi] Rata-rata RMSE komposisi = {composition_rmse_mean:.4e}")
+                print(f"[Interpretasi] Rata-rata RMSE komposisi = {composition_rmse_mean_pct:.2f}%")
 
         metrics = {
             "rmse_T_e_core_K": rmse_temp,
@@ -248,6 +250,7 @@ class PIInversionTrainer:
         }
         if composition_rmse_mean is not None:
             metrics["rmse_composition_mean"] = composition_rmse_mean
+            metrics["rmse_composition_mean_pct"] = composition_rmse_mean_pct
         return metrics
 
     def save_pipeline(
