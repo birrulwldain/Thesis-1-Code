@@ -28,6 +28,7 @@ python -u "$BASE_DIR/scripts/train_inversion_model.py" \
   --mrmr-features 256 \
   --mrmr-pool 1024 \
   --mrmr-sample 500 \
+  --mrmr-prefilter-stride 32 \
   --mrmr-score-mode miq \
   --epochs 3
 

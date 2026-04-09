@@ -121,6 +121,15 @@ class PIInversionTrainer:
             has_holdout=True,
         )
 
+    @staticmethod
+    def build_prefilter_indices(input_dim: int, stride: int) -> np.ndarray:
+        if stride <= 1:
+            return np.arange(input_dim, dtype=int)
+        indices = np.arange(0, input_dim, stride, dtype=int)
+        if indices[-1] != input_dim - 1:
+            indices = np.concatenate([indices, np.asarray([input_dim - 1], dtype=int)])
+        return indices
+
 
     def build_training_config(
         self,
@@ -221,6 +230,7 @@ class PIInversionTrainer:
         mrmr_redundancy_weight: float = 1.0,
         mrmr_random_state: int = 42,
         mrmr_score_mode: str = "mifs",
+        mrmr_prefilter_stride: int = 1,
     ) -> None:
         print("=== BLOK 3: Hierarchical PI Inversion (Phase 1) ===")
         dataset = self.load_dataset(dataset_file)
@@ -237,8 +247,15 @@ class PIInversionTrainer:
             y_targets = np.stack(
                 [dataset.temperatures_K, dataset.electron_densities_cm3], axis=1
             )
-            X_train = dataset.spectra[split.train_indices]
+            prefilter_indices = self.build_prefilter_indices(
+                dataset.spectra.shape[1], int(mrmr_prefilter_stride)
+            )
+            X_train = dataset.spectra[split.train_indices][:, prefilter_indices]
             y_train = y_targets[split.train_indices]
+            print(
+                f"[mRMR] Prefilter stride={int(mrmr_prefilter_stride)} "
+                f"menurunkan kandidat awal dari {dataset.spectra.shape[1]} ke {len(prefilter_indices)} fitur."
+            )
             mrmr_cfg = MRMRConfig(
                 n_features=int(mrmr_features),
                 pool_size=int(mrmr_pool),
@@ -247,7 +264,8 @@ class PIInversionTrainer:
                 random_state=int(mrmr_random_state),
                 score_mode=str(mrmr_score_mode),
             )
-            selected_indices = compute_mrmr_indices(X_train, y_train, mrmr_cfg)
+            selected_local = compute_mrmr_indices(X_train, y_train, mrmr_cfg)
+            selected_indices = prefilter_indices[selected_local]
             dataset = DatasetBundle(
                 spectra=dataset.spectra[:, selected_indices],
                 temperatures_K=dataset.temperatures_K,
@@ -276,6 +294,7 @@ class PIInversionTrainer:
                 "sample_size": int(mrmr_sample) if mrmr_sample is not None else None,
                 "redundancy_weight": float(mrmr_redundancy_weight),
                 "random_state": int(mrmr_random_state),
+                "prefilter_stride": int(mrmr_prefilter_stride),
             }
         self.save_pipeline(
             output_model,
@@ -300,6 +319,7 @@ def train_model(
     mrmr_redundancy_weight: float = 1.0,
     mrmr_random_state: int = 42,
     mrmr_score_mode: str = "mifs",
+    mrmr_prefilter_stride: int = 1,
 ) -> None:
     trainer = PIInversionTrainer(_CONFIG)
     trainer.train(
@@ -315,6 +335,7 @@ def train_model(
         mrmr_redundancy_weight=mrmr_redundancy_weight,
         mrmr_random_state=mrmr_random_state,
         mrmr_score_mode=mrmr_score_mode,
+        mrmr_prefilter_stride=mrmr_prefilter_stride,
     )
 
 
@@ -359,6 +380,12 @@ if __name__ == "__main__":
         default="mifs",
         help="Skor mRMR: 'mifs' (relevance - redundancy) atau 'miq' (relevance / redundancy)",
     )
+    parser.add_argument(
+        "--mrmr-prefilter-stride",
+        type=int,
+        default=1,
+        help="Ambil setiap k titik sebelum mRMR untuk menurunkan biaya komputasi",
+    )
     parser.add_argument("--mrmr-random-state", type=int, default=42, help="Seed mRMR")
     args = parser.parse_args()
 
@@ -378,4 +405,5 @@ if __name__ == "__main__":
         mrmr_redundancy_weight=args.mrmr_redundancy_weight,
         mrmr_random_state=args.mrmr_random_state,
         mrmr_score_mode=args.mrmr_score_mode,
+        mrmr_prefilter_stride=args.mrmr_prefilter_stride,
     )
