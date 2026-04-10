@@ -1,0 +1,154 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[indonesian]{babel}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{xcolor}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue!60!black,
+  pdftitle={Review Literatur MERLIN},
+  pdfauthor={birrulwldain}
+}
+
+\setstretch{1.15}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\setlist[enumerate]{leftmargin=1.2cm}
+
+\newcommand{\templateitem}[2]{\textbf{#1} #2\par}
+
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Tugas Review Literatur}}\\[4pt]
+  {\large Review Artikel MERLIN}\\[8pt]
+  \textbf{Birrul Walidain}\\
+  \textbf{250820201100015}\\[6pt]
+  % \textit{Disusun berdasarkan template review literatur dan artikel utama MERLIN}
+\end{center}
+
+\section*{A. Identitas Artikel}
+\templateitem{Judul:}{\textit{MERLIN, an adaptative LTE radiative transfer model for any mixture: Validation on Eurofer97 in argon atmosphere}}
+\templateitem{Penulis:}{Aur\'elien Favre, Arnaud Bultel, Vincent Morel, Morgan Lesage, dan L\'eo Gosse}
+\templateitem{Jurnal \& Tahun:}{\textit{Journal of Quantitative Spectroscopy and Radiative Transfer}, Volume 330, tahun 2025, artikel 109222}
+\templateitem{Q-Ranking:}{Berdasarkan basis data Scopus 2024, jurnal \textit{Journal of Quantitative Spectroscopy and Radiative Transfer} memiliki CiteScore 5.5 dan berada pada kuartil Q1 pada kategori Radiation.}
+\templateitem{DOI:}{\href{https://doi.org/10.1016/j.jqsrt.2024.109222}{10.1016/j.jqsrt.2024.109222}}
+\templateitem{Bidang/Sub-bidang:}{Spektroskopi plasma, transfer radiasi, dan \textit{calibration-free laser-induced breakdown spectroscopy} (CF-LIBS).}
+
+\section*{B. Latar Belakang dan Masalah}
+\begin{enumerate}
+  \item \textbf{Apa masalah yang ingin diselesaikan?}\\
+  Artikel ini bertujuan untuk mengatasi keterbatasan pendekatan \textit{calibrated LIBS} yang bergantung pada sampel referensi. Pada sampel kompleks atau komposisi yang tidak diketahui, pendekatan \textit{calibration-free LIBS} (CF-LIBS) memerlukan model fisika plasma yang mampu merekonstruksi spektrum emisi secara langsung dari kondisi termodinamika plasma.
+
+  \item \textbf{Mengapa masalah tersebut penting?}\\
+  Pada LIBS, pendekatan \textit{calibrated LIBS} cocok bila komposisi sampel sudah diketahui atau tersedia standar referensi. Namun, untuk sampel kompleks seperti paduan dengan banyak unsur, komposisi tidak seragam, atau konsentrasi yang tidak diketahui, pendekatan tersebut tidak memadai. Karena itu, CF-LIBS menjadi penting agar komposisi dapat ditentukan dari model fisika plasma dan spektrum emisi secara langsung.
+
+  \item \textbf{Apa \textit{state-of-the-art} yang disebutkan penulis?}\\
+  Penulis menunjukkan bahwa sebagian besar penelitian LIBS memanfaatkan analisis garis spektral individual untuk estimasi temperatur plasma dan densitas elektron. Namun, pendekatan tersebut sering mengabaikan efek transfer radiasi dan \textit{self-absorption} yang dapat mempengaruhi intensitas garis spektral secara signifikan.
+\end{enumerate}
+
+\section*{C. Tujuan dan Kontribusi}
+\begin{enumerate}
+  \item \textbf{Apa tujuan penelitian?}\\
+  Tujuan penelitian ini adalah mengembangkan dan memvalidasi kode MERLIN (\textit{MultiElemental Radiative equiLibrIum emissioN}), yaitu kode transfer radiasi berbasis LTE yang dapat mensimulasikan spektrum plasma LIBS untuk campuran unsur apa pun, kemudian mengujinya pada baja Eurofer97 dalam atmosfer argon.
+
+  \item \textbf{Apa kebaruan (\textit{novelty})?}\\
+  Kebaruan penelitian ini terletak pada kombinasi beberapa aspek: pembangkitan adaptif sistem komposisi LTE untuk campuran kompleks, integrasi kueri ke basis data spektral daring, pemodelan emisi kontinu dan diskret dalam satu kerangka, penggunaan profil pseudo-Voigt untuk efisiensi tinggi, serta validasi spektral tanpa variabel penyesuaian bebas.
+
+  \item \textbf{Apa klaim utama artikel?}\\
+  Klaim utama artikel adalah bahwa MERLIN mampu merekonstruksi spektrum eksperimen plasma LIBS Eurofer97 pada kondisi LTE dengan kesesuaian yang baik, dan seluruh parameter input penting seperti temperatur, densitas elektron, serta ukuran plasma diperoleh dari pengukuran independen, bukan dari \textit{fitting} bebas.
+\end{enumerate}
+
+\section*{D. Metodologi}
+\begin{enumerate}
+  \item \textbf{Jenis penelitian: eksperimen / teori / komputasi?}\\
+  Penelitian ini bersifat gabungan: teori, komputasi, dan eksperimen. Aspek teorinya berupa formulasi LTE dan persamaan transfer radiasi; aspek komputasinya berupa implementasi MERLIN; sedangkan aspek eksperimennya berupa validasi menggunakan data plasma LIBS pada platform PLEIADES.
+
+  \item \textbf{Metode utama yang digunakan?}\\
+  Metode utamanya meliputi:
+  \begin{enumerate}
+    \item perhitungan komposisi LTE dengan sistem ODE fiktif yang dibangkitkan secara adaptif,
+    \item koreksi penurunan potensial ionisasi menggunakan pendekatan Griem,
+    \item penyelesaian persamaan transfer radiasi satu dimensi,
+    \item pemodelan emisi kontinu (\textit{free-bound} dan \textit{free-free}) serta emisi diskret,
+    \item pemodelan pelebaran Stark dan penggunaan profil pseudo-Voigt,
+    \item pengukuran densitas elektron dari pelebaran/pergeseran Stark,
+    \item pengukuran temperatur dengan plot Saha-Boltzmann,
+    \item rekonstruksi spektrum eksperimen pada rentang UV dan VIS.
+  \end{enumerate}
+
+  \item \textbf{Apakah metode tersebut tepat dan valid?}\\
+  Metode yang digunakan sesuai dengan tujuan penelitian karena pendekatan CF-LIBS memerlukan model radiatif yang konsisten dengan kondisi plasma dan parameter termodinamika yang terukur secara eksperimental. Validitas pendekatan diperkuat oleh beberapa aspek berikut: benchmark komposisi LTE terhadap literatur, verifikasi LTE melalui kriteria McWhirter, penggunaan data eksperimen yang terukur, dan pembandingan langsung antara spektrum simulasi dan spektrum eksperimen pada beberapa waktu tunda.
+
+  \item \textbf{Apakah ada kelemahan metodologis?}\\
+  Penulis juga mengidentifikasi beberapa keterbatasan metodologis dalam pendekatan yang digunakan. Model masih mengasumsikan LTE, beberapa parameter kontinu seperti faktor Bibermann dan penampang tumbukan elektron-netral diambil dari argon atau nilai pendekatan, koreksi Virial/Debye-H\"uckel belum dimasukkan, data Stark tidak selalu lengkap, dan struktur dua lapis plasma pada kasus tertentu belum seluruhnya ditentukan secara eksperimen.
+\end{enumerate}
+
+\section*{E. Hasil dan Analisis}
+\begin{enumerate}
+  \item \textbf{Hasil utama apa?}\\
+  Hasil utama penelitian ini meliputi:
+  \begin{enumerate}
+    \item MERLIN berhasil menghasilkan komposisi LTE yang sejalan dengan referensi literatur untuk campuran udara sebagai \textit{benchmark}.
+    \item Evolusi ketebalan plasma, densitas elektron, dan temperatur berhasil ditentukan dari eksperimen LIBS Eurofer97.
+    \item Spektrum eksperimen pada beberapa rentang panjang gelombang, termasuk sekitar 274.5 nm serta 702--711 nm, dapat direkonstruksi dengan baik oleh model MERLIN.
+    \item Pada waktu panjang, korelasi Pearson antara simulasi dan eksperimen dilaporkan melebihi 99.15\% untuk salah satu rentang spektral yang dibahas.
+  \end{enumerate}
+
+  \item \textbf{Apakah data mendukung kesimpulan?}\\
+  Ya. Data eksperimen mendukung kesimpulan bahwa model MERLIN mampu merepresentasikan spektrum plasma LIBS dengan baik dalam kondisi kesetimbangan termodinamika lokal (LTE). Dukungan ini berasal dari konsistensi antara diagnostik plasma, benchmark termokimia, dan kecocokan bentuk serta amplitudo spektrum simulasi terhadap spektrum terukur.
+
+  \item \textbf{Apakah ada interpretasi berlebihan?}\\
+  Secara umum interpretasi penulis masih cukup hati-hati. Penulis tidak menyatakan bahwa model sudah sempurna, melainkan menekankan bahwa perbedaan dengan eksperimen masih banyak dipengaruhi oleh keterbatasan data spektral dan data pelebaran Stark. Namun, klaim ``untuk campuran apa pun'' tetap perlu dibaca sebagai kapasitas kerangka model, bukan jaminan akurasi penuh untuk semua campuran tanpa dukungan basis data yang memadai.
+
+  \item \textbf{Apakah hasil dapat direproduksi?}\\
+  Hasilnya cukup dapat direproduksi secara metodologis karena persamaan, alur rekonstruksi, sumber data, dan kondisi eksperimen dijelaskan rinci. Meski demikian, reproduksibilitas penuh masih terbatas karena kode MERLIN dan basis data SQL internal yang sedang dikembangkan tidak disediakan secara langsung pada artikel, serta beberapa data spektral bergantung pada ketersediaan dan kualitas basis data eksternal.
+\end{enumerate}
+
+\section*{F. Kelebihan dan Keterbatasan}
+\templateitem{Kelebihan:}{MERLIN bersifat adaptif untuk campuran unsur kompleks, memanfaatkan kueri basis data daring, efisien secara komputasi melalui pseudo-Voigt dan paralelisasi, serta divalidasi tanpa memakai parameter penyesuaian bebas. Selain itu, artikel menyajikan validasi yang kuat karena parameter plasma diambil dari pengukuran independen.}
+
+\templateitem{Keterbatasan:}{Model masih bergantung pada asumsi LTE, kualitas rekonstruksi sangat bergantung pada kelengkapan data atomik dan Stark, emisi kontinu masih memakai pendekatan tertentu, efek nonideal plasma belum dimodelkan penuh, dan beberapa kasus membutuhkan pendekatan dua lapis dengan parameter lapisan dingin yang belum seluruhnya diukur langsung.}
+
+\section*{G. Identifikasi \textit{Research Gap}}
+\begin{enumerate}
+  \item \textbf{Apa yang belum dijawab?}\\
+  Artikel belum menjawab secara menyeluruh bagaimana performa MERLIN pada kondisi plasma non-LTE, pada plasma dengan gradien spasial yang lebih kompleks, atau pada sistem yang melibatkan molekul secara dominan. Artikel juga belum menunjukkan pelepasan kode secara terbuka untuk validasi lintas peneliti.
+
+  \item \textbf{Parameter apa yang belum dieksplorasi?}\\
+  Parameter yang masih belum dieksplorasi secara luas antara lain pengaruh tekanan dan atmosfer latar selain argon, variasi energi laser, campuran unsur yang lebih beragam, kontribusi lapisan dingin plasma, sensitivitas terhadap ketidakpastian data Stark, serta pengaruh parameter kontinu untuk unsur selain argon.
+
+  \item \textbf{Bagaimana artikel ini bisa dikembangkan?}\\
+  Pengembangan lanjutan dapat diarahkan pada perluasan model ke sistem molekuler, integrasi basis data SQL internal yang lebih lengkap, penerapan model non-LTE atau model multi-lapis yang lebih realistis, kuantifikasi ketidakpastian secara sistematis, serta pengujian pada material lain agar kemampuan generalisasi model lebih kuat.
+\end{enumerate}
+
+\section*{H. Relevansi dengan Calon Tesis}
+\begin{enumerate}
+  \item \textbf{Apakah topik ini bisa dikembangkan menjadi tesis?}\\
+  Ya, sangat bisa. Topik ini relevan untuk tesis yang berfokus pada diagnostik plasma LIBS, pemodelan transfer radiasi, pengembangan CF-LIBS untuk material kompleks, atau integrasi eksperimen dan komputasi dalam spektroskopi plasma.
+
+  \item \textbf{Ide pengembangan lanjutan?}\\
+  Beberapa ide pengembangan penelitian lanjutan yang relevan antara lain:
+  \begin{enumerate}
+    \item menggunakan model fisika seperti MERLIN secara tersimplifikasi untuk menghasilkan dataset spektrum sintetis yang kemudian digunakan sebagai data pelatihan bagi model \textit{machine learning},
+    \item mengembangkan analisis sensitivitas terhadap parameter plasma seperti temperatur dan densitas elektron terhadap bentuk spektrum,
+    \item membangun workflow otomatis untuk identifikasi komposisi sampel dari spektrum LIBS menggunakan model \textit{machine learning},
+    \item membandingkan performa pendekatan berbasis model fisika dengan pendekatan \textit{machine learning} yang dilatih menggunakan spektrum simulasi.
+  \end{enumerate}
+\end{enumerate}
+
+\vfill
+% \begin{center}
+%   \textcolor{gray}{Disusun dari: \textit{TEMPLETE REVIEW LITERATUR.pdf}, \textit{presentasi\_MERLIN.pdf}, dan \textit{MERLIN.pdf}}
+% \end{center}
+
+\end{document}

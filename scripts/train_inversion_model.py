@@ -253,6 +253,126 @@ class PIInversionTrainer:
             metrics["rmse_composition_mean_pct"] = composition_rmse_mean_pct
         return metrics
 
+    @staticmethod
+    def _infer_experiment_metadata(
+        dataset_file: str,
+        output_model: str,
+        use_mrmr: bool,
+        mrmr_score_mode: str,
+    ) -> dict[str, str]:
+        dataset_base = os.path.splitext(os.path.basename(dataset_file))[0]
+        model_base = os.path.splitext(os.path.basename(output_model))[0]
+        dataset_code = dataset_base.replace("dataset_synthetic_", "", 1) if dataset_base.startswith("dataset_synthetic_") else dataset_base
+        return {
+            "dataset_code": dataset_code,
+            "dataset_name": dataset_base,
+            "model_name": model_base,
+            "pipeline": f"mRMR({mrmr_score_mode.upper()}) + PI" if use_mrmr else "PI",
+            "feature_mode": "mrmr" if use_mrmr else "plain",
+        }
+
+    def write_report(
+        self,
+        report_file: str,
+        dataset_file: str,
+        output_model: str,
+        dataset: DatasetBundle,
+        split: SplitBundle,
+        inversion_config: HierarchicalInversionConfig,
+        metrics: dict[str, float],
+        use_mrmr: bool,
+        selected_indices: np.ndarray | None,
+        mrmr_params: dict | None,
+        mrmr_score_mode: str,
+    ) -> None:
+        meta = self._infer_experiment_metadata(dataset_file, output_model, use_mrmr, mrmr_score_mode)
+        report_dir = os.path.dirname(report_file)
+        if report_dir:
+            os.makedirs(report_dir, exist_ok=True)
+
+        def verdict(rel_pct: float) -> str:
+            if not np.isfinite(rel_pct):
+                return "tidak tersedia"
+            if rel_pct <= 10.0:
+                return "baik"
+            if rel_pct <= 20.0:
+                return "cukup"
+            return "lemah"
+
+        lines = [
+            "LAPORAN ILMIAH TRAINING PHASE 1",
+            "=" * 72,
+            "",
+            "Metadata Eksperimen",
+            "-" * 72,
+            f"Dataset code             : {meta['dataset_code']}",
+            f"Dataset file             : {dataset_file}",
+            f"Model output             : {output_model}",
+            f"Pipeline                 : {meta['pipeline']}",
+            f"Feature mode             : {meta['feature_mode']}",
+            "",
+            "Konfigurasi Data",
+            "-" * 72,
+            f"Jumlah sampel            : {dataset.spectra.shape[0]}",
+            f"Dimensi spektrum input   : {dataset.spectra.shape[1]}",
+            f"Jumlah target termo      : 2",
+            f"Jumlah target komposisi  : {0 if dataset.composition_columns is None else len(dataset.composition_columns)}",
+            f"Split train/test         : {len(split.train_indices)}/{len(split.test_indices)}",
+            "",
+            "Konfigurasi Model",
+            "-" * 72,
+            f"Epochs                   : {inversion_config.epochs}",
+            f"Batch size               : {inversion_config.batch_size}",
+            f"Learning rate            : {inversion_config.learning_rate}",
+            f"Physics-informed         : ya",
+        ]
+        if use_mrmr:
+            lines.extend([
+                f"mRMR score mode          : {mrmr_score_mode}",
+                f"Fitur terpilih           : {0 if selected_indices is None else len(selected_indices)}",
+            ])
+            if mrmr_params is not None:
+                lines.extend([
+                    f"mRMR pool size           : {mrmr_params.get('pool_size')}",
+                    f"mRMR sample size         : {mrmr_params.get('sample_size')}",
+                    f"mRMR prefilter stride    : {mrmr_params.get('prefilter_stride')}",
+                ])
+        else:
+            lines.append("mRMR                     : tidak digunakan")
+
+        lines.extend([
+            "",
+            "Metrik Validasi",
+            "-" * 72,
+            f"RMSE T_e_core (%)        : {metrics.get('rel_rmse_T_e_core_K_pct', float('nan')):.2f}",
+            f"RMSE n_e_core (%)        : {metrics.get('rel_rmse_n_e_core_cm3_pct', float('nan')):.2f}",
+        ])
+        if "rmse_composition_mean_pct" in metrics:
+            lines.append(f"RMSE komposisi rata2 (%) : {metrics['rmse_composition_mean_pct']:.2f}")
+
+        lines.extend([
+            "",
+            "Interpretasi",
+            "-" * 72,
+            f"Verdict T_e              : {verdict(metrics.get('rel_rmse_T_e_core_K_pct', float('nan')))}",
+            f"Verdict n_e              : {verdict(metrics.get('rel_rmse_n_e_core_cm3_pct', float('nan')))}",
+        ])
+        if "rmse_composition_mean_pct" in metrics:
+            lines.append(f"Verdict komposisi        : {verdict(metrics.get('rmse_composition_mean_pct', float('nan')))}")
+
+        if dataset.composition_columns:
+            lines.extend([
+                "",
+                "Komponen Komposisi",
+                "-" * 72,
+                ", ".join(dataset.composition_columns),
+            ])
+
+        lines.append("")
+        with open(report_file, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+        print(f"[Report] Laporan ilmiah disimpan ke: {report_file}")
+
     def save_pipeline(
         self,
         output_model: str,
@@ -284,6 +404,7 @@ class PIInversionTrainer:
         self,
         dataset_file: str,
         output_model: str,
+        report_file: str | None = None,
         epochs: int | None = None,
         batch_size: int | None = None,
         learning_rate: float | None = None,
@@ -335,6 +456,8 @@ class PIInversionTrainer:
                 temperatures_K=dataset.temperatures_K,
                 electron_densities_cm3=dataset.electron_densities_cm3,
                 parameter_columns=dataset.parameter_columns,
+                compositions=dataset.compositions,
+                composition_columns=dataset.composition_columns,
             )
             print(f"[mRMR] Dimensi input turun menjadi {dataset.spectra.shape[1]} fitur.")
 
@@ -371,11 +494,27 @@ class PIInversionTrainer:
             selected_indices=selected_indices,
             mrmr_params=mrmr_params,
         )
+        if report_file is None:
+            report_file = os.path.splitext(output_model)[0] + "_report.txt"
+        self.write_report(
+            report_file=report_file,
+            dataset_file=dataset_file,
+            output_model=output_model,
+            dataset=dataset,
+            split=split,
+            inversion_config=inversion_config,
+            metrics=metrics,
+            use_mrmr=use_mrmr,
+            selected_indices=selected_indices,
+            mrmr_params=mrmr_params,
+            mrmr_score_mode=mrmr_score_mode,
+        )
 
 
 def train_model(
     dataset_file: str,
     output_model: str,
+    report_file: str | None = None,
     epochs: int | None = None,
     batch_size: int | None = None,
     learning_rate: float | None = None,
@@ -392,6 +531,7 @@ def train_model(
     trainer.train(
         dataset_file=dataset_file,
         output_model=output_model,
+        report_file=report_file,
         epochs=epochs,
         batch_size=batch_size,
         learning_rate=learning_rate,
@@ -421,6 +561,12 @@ if __name__ == "__main__":
         type=str,
         default=os.path.join(_BASE_DIR, "data", "model_inversi_pi.pkl"),
         help="File model keluar",
+    )
+    parser.add_argument(
+        "--report-out",
+        type=str,
+        default=None,
+        help="File laporan ilmiah .txt; default mengikuti nama model",
     )
     parser.add_argument(
         "--base-dir",
@@ -462,6 +608,7 @@ if __name__ == "__main__":
     train_model(
         dataset_file=args.dataset,
         output_model=args.out,
+        report_file=args.report_out,
         epochs=args.epochs,
         batch_size=args.batch_size,
         learning_rate=args.learning_rate,

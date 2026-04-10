@@ -15,9 +15,20 @@ DATASET_GROUP=${DATASET_GROUP:-A}
 SPECTRAL_TIER=${SPECTRAL_TIER:-L}
 DATASET_TAG="${DATASET_GROUP}_${SPECTRAL_TIER}"
 DATASET_PATH=${DATASET_PATH:-$BASE_DIR/data/dataset_synthetic_${DATASET_TAG}.h5}
-MODEL_OUT=${MODEL_OUT:-$BASE_DIR/data/model_inversi_pi_${DATASET_TAG}.pkl}
+FEATURE_MODE=${FEATURE_MODE:-plain}
+MRMR_SCORE_MODE=${MRMR_SCORE_MODE:-miq}
 EPOCHS=${EPOCHS:-10}
-USE_MRMR=${USE_MRMR:-1}
+
+if [ "$FEATURE_MODE" = "plain" ]; then
+  PIPELINE_TAG="plain_pi"
+elif [ "$FEATURE_MODE" = "mrmr" ]; then
+  PIPELINE_TAG="mrmr_${MRMR_SCORE_MODE}_pi"
+else
+  echo "[Train] FEATURE_MODE harus 'plain' atau 'mrmr', sekarang: $FEATURE_MODE"
+  exit 2
+fi
+
+MODEL_OUT=${MODEL_OUT:-$BASE_DIR/data/model_inversi_${PIPELINE_TAG}_${DATASET_TAG}.pkl}
 
 mkdir -p "$BASE_DIR/logs"
 mkdir -p "$BASE_DIR/data"
@@ -32,6 +43,7 @@ export PYTHONPATH="${PYTHONPATH:-}:$BASE_DIR"
 export PYTHONUNBUFFERED=1
 
 echo "[Train] Group=$DATASET_GROUP Tier=$SPECTRAL_TIER"
+echo "[Train] FeatureMode=$FEATURE_MODE"
 echo "[Train] Dataset=$DATASET_PATH"
 echo "[Train] Model=$MODEL_OUT"
 
@@ -42,14 +54,14 @@ TRAIN_ARGS=(
   --epochs "$EPOCHS"
 )
 
-if [ "$USE_MRMR" = "1" ]; then
+if [ "$FEATURE_MODE" = "mrmr" ]; then
   TRAIN_ARGS+=(
     --mrmr
     --mrmr-features 256
     --mrmr-pool 1024
     --mrmr-sample 500
     --mrmr-prefilter-stride 32
-    --mrmr-score-mode miq
+    --mrmr-score-mode "$MRMR_SCORE_MODE"
   )
 fi
 

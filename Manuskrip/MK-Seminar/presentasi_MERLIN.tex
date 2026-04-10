@@ -140,6 +140,29 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}{Kontribusi Utama Artikel}
+  \begin{block}{Kontribusi Penelitian}
+    Artikel ini memperkenalkan kode simulasi plasma spektroskopi
+    bernama \textbf{MERLIN} yang digunakan untuk rekonstruksi spektrum
+    pada teknik \textit{Calibration-Free Laser-Induced Breakdown
+    Spectroscopy (CF-LIBS)}.
+  \end{block}
+
+  \begin{itemize}
+    \item Pengembangan \textbf{radiative transfer code} berbasis LTE
+    \item Generasi adaptif spesies plasma untuk campuran unsur kompleks
+    \item Integrasi otomatis dengan \textbf{database spektral online}
+    \item Validasi model menggunakan eksperimen LIBS pada
+          paduan \textbf{Eurofer97}
+  \end{itemize}
+
+  \vspace{6pt}
+  \begin{alertblock}{Tujuan}
+    Merekonstruksi spektrum plasma LIBS tanpa parameter penyesuaian
+    bebas (\textit{no adjustable parameters}).
+  \end{alertblock}
+\end{frame}
+
 \begin{frame}{Solusi: Kode MERLIN}
   \begin{block}{\textbf{MERLIN} --- \textit{MultiElemental Radiative equiLibrIum emissioN}}
     \begin{itemize}
@@ -171,6 +194,35 @@
       \end{exampleblock}
     \end{column}
   \end{columns}
+\end{frame}
+
+\begin{frame}{Arsitektur Model MERLIN}
+  \begin{center}
+    \begin{tikzpicture}[
+      node distance=1.8cm,
+      block/.style={draw, rounded corners, fill=blue!10, minimum width=3cm, minimum height=0.8cm},
+      arrow/.style={->, thick}
+    ]
+      \node[block] (input) {Input: Elemen + Fraksi Mol};
+      \node[block, below of=input] (species) {Generasi Spesies Plasma};
+      \node[block, below of=species] (lte) {Perhitungan Komposisi LTE};
+      \node[block, below of=lte] (rte) {Radiative Transfer Equation};
+      \node[block, below of=rte] (spectra) {Spektrum Simulasi};
+
+      \draw[arrow] (input) -- (species);
+      \draw[arrow] (species) -- (lte);
+      \draw[arrow] (lte) -- (rte);
+      \draw[arrow] (rte) -- (spectra);
+    \end{tikzpicture}
+  \end{center}
+
+  \vspace{6pt}
+
+  \begin{block}{Ide Utama}
+    MERLIN menggabungkan perhitungan komposisi plasma pada kondisi LTE
+    dengan persamaan transfer radiasi untuk menghasilkan spektrum
+    emisi plasma secara fisik konsisten.
+  \end{block}
 \end{frame}
 
 % ──────────────────────────────────────────────────────────
@@ -690,9 +742,48 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}{Hasil Utama Penelitian}
+  \begin{block}{Validasi Model}
+    \begin{itemize}
+      \item Komposisi LTE berhasil divalidasi menggunakan benchmark
+            campuran udara.
+      \item Parameter plasma seperti temperatur dan densitas elektron
+            diperoleh dari pengukuran eksperimen.
+      \item Spektrum simulasi menunjukkan kesesuaian yang baik dengan
+            spektrum eksperimen LIBS.
+    \end{itemize}
+  \end{block}
+
+  \begin{exampleblock}{Kinerja Model}
+    \begin{itemize}
+      \item Rekonstruksi spektrum pada rentang UV dan VIS
+      \item Korelasi simulasi--eksperimen mencapai
+            \textbf{> 99\%} pada beberapa rentang spektral
+    \end{itemize}
+  \end{exampleblock}
+\end{frame}
+
 % ──────────────────────────────────────────────────────────
 \section{Diskusi \& Kesimpulan}
 % ──────────────────────────────────────────────────────────
+
+\begin{frame}{Keterbatasan Pendekatan}
+  \begin{alertblock}{Batasan Model}
+    \begin{itemize}
+      \item Model mengasumsikan kondisi
+            \textbf{Local Thermodynamic Equilibrium (LTE)}
+      \item Beberapa parameter kontinu menggunakan nilai pendekatan
+      \item Data pelebaran Stark tidak selalu tersedia untuk semua garis
+      \item Model dua lapis plasma masih memerlukan parameter tambahan
+    \end{itemize}
+  \end{alertblock}
+
+  \begin{block}{Implikasi}
+    Keterbatasan ini menunjukkan peluang pengembangan lebih lanjut,
+    misalnya integrasi model \textit{non-LTE} atau peningkatan basis
+    data atomik untuk simulasi spektrum.
+  \end{block}
+\end{frame}
 
 \begin{frame}{Diskusi: Kelebihan dan Keterbatasan MERLIN}
   \begin{columns}[T]
