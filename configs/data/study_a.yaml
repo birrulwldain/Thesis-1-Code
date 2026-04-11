@@ -1,0 +1,7 @@
+base_config: ../base.yaml
+
+study:
+  name: study_a
+  dataset_group: A
+  spectral_tiers: [L, M, H]
+

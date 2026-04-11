@@ -5,22 +5,24 @@
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=96G
 #SBATCH --time=24:00:00
-#SBATCH --output=/home/bwalidain/thesis/logs/study_A_%j.out
-#SBATCH --error=/home/bwalidain/thesis/logs/study_A_%j.err
+#SBATCH --output=/home/bwalidain/thesis/artifacts/logs/study_A_%j.out
+#SBATCH --error=/home/bwalidain/thesis/artifacts/logs/study_A_%j.err
 
 BASE_DIR=/home/bwalidain/thesis
 CONDA_SH=/home/bwalidain/miniconda3/etc/profile.d/conda.sh
 ENV_NAME=bw
 DATASET_GROUP=A
-SAMPLES=${SAMPLES:-200}
+SAMPLES=${SAMPLES:-2000}
 EPOCHS=${EPOCHS:-10}
 MRMR_SCORE_MODE=${MRMR_SCORE_MODE:-miq}
 GENERATE_DATA=${GENERATE_DATA:-1}
 TRAIN_PLAIN=${TRAIN_PLAIN:-1}
-TRAIN_MRMR=${TRAIN_MRMR:-1}
+TRAIN_MRMR=${TRAIN_MRMR:-0}
 
-mkdir -p "$BASE_DIR/logs"
-mkdir -p "$BASE_DIR/data"
+mkdir -p "$BASE_DIR/artifacts/logs"
+mkdir -p "$BASE_DIR/artifacts/models"
+mkdir -p "$BASE_DIR/artifacts/reports"
+mkdir -p "$BASE_DIR/data/processed"
 mkdir -p /home/bwalidain/_scratch
 
 source "$CONDA_SH"
@@ -37,7 +39,7 @@ echo "[Study-A] GENERATE_DATA=$GENERATE_DATA TRAIN_PLAIN=$TRAIN_PLAIN TRAIN_MRMR
 
 for SPECTRAL_TIER in L M H; do
   DATASET_TAG="${DATASET_GROUP}_${SPECTRAL_TIER}"
-  DATASET_PATH="$BASE_DIR/data/dataset_synthetic_${DATASET_TAG}.h5"
+  DATASET_PATH="$BASE_DIR/data/processed/dataset_synthetic_${DATASET_TAG}.h5"
   SCRATCH_OUT="/home/bwalidain/_scratch/dataset_synthetic_${DATASET_TAG}.h5"
 
   if [ "$GENERATE_DATA" = "1" ]; then
@@ -51,20 +53,26 @@ for SPECTRAL_TIER in L M H; do
   fi
 
   if [ "$TRAIN_PLAIN" = "1" ]; then
-    MODEL_OUT="$BASE_DIR/data/model_inversi_plain_pi_${DATASET_TAG}.pkl"
+    MODEL_OUT="$BASE_DIR/artifacts/models/model_inversi_plain_pi_${DATASET_TAG}.pkl"
+    REPORT_OUT="$BASE_DIR/artifacts/reports/model_inversi_plain_pi_${DATASET_TAG}_report.txt"
     echo "[Study-A][Train][plain] $DATASET_TAG -> $MODEL_OUT"
-    python -u "$BASE_DIR/scripts/train_inversion_model.py" \
+    python -u "$BASE_DIR/scripts/train_model.py" \
       --dataset "$DATASET_PATH" \
+      --model pi \
       --out "$MODEL_OUT" \
+      --report-out "$REPORT_OUT" \
       --epochs "$EPOCHS"
   fi
 
   if [ "$TRAIN_MRMR" = "1" ]; then
-    MODEL_OUT="$BASE_DIR/data/model_inversi_mrmr_${MRMR_SCORE_MODE}_pi_${DATASET_TAG}.pkl"
+    MODEL_OUT="$BASE_DIR/artifacts/models/model_inversi_mrmr_${MRMR_SCORE_MODE}_pi_${DATASET_TAG}.pkl"
+    REPORT_OUT="$BASE_DIR/artifacts/reports/model_inversi_mrmr_${MRMR_SCORE_MODE}_pi_${DATASET_TAG}_report.txt"
     echo "[Study-A][Train][mrmr] $DATASET_TAG -> $MODEL_OUT"
-    python -u "$BASE_DIR/scripts/train_inversion_model.py" \
+    python -u "$BASE_DIR/scripts/train_model.py" \
       --dataset "$DATASET_PATH" \
+      --model pi \
       --out "$MODEL_OUT" \
+      --report-out "$REPORT_OUT" \
       --epochs "$EPOCHS" \
       --mrmr \
       --mrmr-features 256 \

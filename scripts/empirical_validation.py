@@ -12,6 +12,11 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import sys
+
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
 
 import joblib
 import numpy as np
@@ -22,10 +27,11 @@ from src.libs_inversion import HierarchicalPIInverter, Phase2GeometrySolver
 from src.libs_physics import SIMULATION_CONFIG
 
 
-_BASE_DIR = os.environ.get(
-    "LIBS_BASE_DIR",
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
-)
+_ENV_BASE_DIR = os.environ.get("LIBS_BASE_DIR")
+if _ENV_BASE_DIR and os.path.exists(os.path.join(_ENV_BASE_DIR, "config.yaml")):
+    _BASE_DIR = _ENV_BASE_DIR
+else:
+    _BASE_DIR = _ROOT
 _CONFIG_PATH = os.path.join(_BASE_DIR, "config.yaml")
 with open(_CONFIG_PATH, "r") as f:
     _CONFIG = yaml.safe_load(f)
@@ -196,7 +202,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model",
         type=str,
-        default=os.path.join(_BASE_DIR, "data", "model_inversi_pi.pkl"),
+        default=os.path.join(_BASE_DIR, "artifacts", "models", "model_inversi_pi.pkl"),
         help="File model inversi (.pkl)",
     )
     parser.add_argument(

@@ -11,6 +11,11 @@ Fungsi:
 """
 
 import os
+import sys
+
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
 
 # =========================================================================
 # MAC OS (APPLE SILICON M1) MULTIPROCESSING DEADLOCK FIX:
@@ -28,7 +33,6 @@ os.environ["NUMEXPR_NUM_THREADS"] = "1"
 import numpy as np
 import h5py
 import time
-import os
 import argparse
 import multiprocessing as mp
 from dataclasses import dataclass
@@ -39,10 +43,11 @@ from src.libs_physics import DataFetcher, PhysicsCalculator, PlasmaZoneParams, T
 import yaml
 
 # Memuat Konfigurasi Gateway
-_BASE_DIR = os.environ.get(
-    "LIBS_BASE_DIR",
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
-)
+_ENV_BASE_DIR = os.environ.get("LIBS_BASE_DIR")
+if _ENV_BASE_DIR and os.path.exists(os.path.join(_ENV_BASE_DIR, "config.yaml")):
+    _BASE_DIR = _ENV_BASE_DIR
+else:
+    _BASE_DIR = _ROOT
 _CONFIG_PATH = os.path.join(_BASE_DIR, "config.yaml")
 with open(_CONFIG_PATH, 'r') as f:
     _CONFIG = yaml.safe_load(f)
@@ -353,8 +358,10 @@ if __name__ == '__main__':
     output_file = args.out or os.path.join(
         _BASE_DIR,
         'data',
+        'processed',
         f'dataset_synthetic_{args.dataset_group}_{args.spectral_tier}.h5',
     )
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     generate_dataset(
         n_samples=args.samples,
         output_file=output_file,

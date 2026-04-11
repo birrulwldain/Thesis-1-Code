@@ -1,0 +1,18 @@
+base_config: ../model/pi.yaml
+
+data:
+  dataset: data/processed/dataset_synthetic_A_L.h5
+
+training:
+  epochs: 10
+  batch_size: 8
+  learning_rate: 0.001
+
+preprocessing:
+  mrmr:
+    enabled: false
+
+outputs:
+  model: artifacts/models/model_inversi_plain_pi_A_L.pkl
+  report: artifacts/reports/model_inversi_plain_pi_A_L_report.txt
+

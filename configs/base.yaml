@@ -1,0 +1,11 @@
+legacy_config_path: ../config.yaml
+
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+
+artifacts:
+  models_dir: artifacts/models
+  reports_dir: artifacts/reports
+  logs_dir: artifacts/logs
+

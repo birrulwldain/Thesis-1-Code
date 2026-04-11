@@ -1,0 +1,9 @@
+base_config: ../base.yaml
+
+model:
+  name: cnn_transformer
+  params:
+    encoder_dim: 128
+    num_heads: 4
+    num_layers: 4
+
