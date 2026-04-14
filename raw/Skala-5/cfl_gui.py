@@ -23,10 +23,11 @@ class NumericTableWidgetItem(QTableWidgetItem):
             return self.text() < other.text()
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, main_plotter=None):
         super().__init__()
         self.setWindowTitle("Interactive CF-LIBS Analyzer")
         self.resize(1200, 800)
+        self.main_plotter = main_plotter
         
         # Initialize Backend
         self.log_buffer = []
@@ -112,6 +113,7 @@ class MainWindow(QMainWindow):
         adv_layout.addWidget(QLabel("(Space aligned, e.g. 'K Ca')"))
         self.input_exclude_el = QLineEdit()
         self.input_exclude_el.setPlaceholderText("Elements to ignore entirely")
+        self.input_exclude_el.setText("C H N O")
         adv_layout.addWidget(self.input_exclude_el)
         
         left_layout.addWidget(self.group_adv)
@@ -140,6 +142,25 @@ class MainWindow(QMainWindow):
         """)
         self.btn_calc.clicked.connect(self.run_calculation)
         left_layout.addWidget(self.btn_calc)
+        
+        # Recommendation Widget
+        self.widget_recommend = QWidget()
+        self.widget_recommend.setVisible(False)
+        rec_layout = QVBoxLayout(self.widget_recommend)
+        rec_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.lbl_recommend = QLabel("")
+        self.lbl_recommend.setWordWrap(True)
+        self.lbl_recommend.setStyleSheet("color: #D84315; font-weight: bold; background: #FFF9C4; padding: 5px; border-radius: 4px;")
+        rec_layout.addWidget(self.lbl_recommend)
+        
+        self.btn_apply_recommend = QPushButton("Terapkan & Hitung Ulang")
+        self.btn_apply_recommend.setCursor(Qt.PointingHandCursor)
+        self.btn_apply_recommend.setStyleSheet("background-color: #FFB300; color: #3E2723; font-weight: bold; border-radius: 4px; padding: 6px;")
+        self.btn_apply_recommend.clicked.connect(self.apply_recommendations)
+        rec_layout.addWidget(self.btn_apply_recommend)
+        
+        left_layout.addWidget(self.widget_recommend)
 
         # Excluded List View (Interactive)
         left_layout.addSpacing(20)
@@ -365,6 +386,7 @@ class MainWindow(QMainWindow):
         # Aggregate Results
         agg_results = []
         agg_details = []
+        self.incomplete_elements = set()
         import numpy as np
         
         if all_results:
@@ -387,6 +409,9 @@ class MainWindow(QMainWindow):
                     cfl_vals[idx] = row['Mass_Fraction_Percent']
                 
                 v_valid = [x for x in cfl_vals[:n_iters] if pd.notna(x) and x > 0]
+                if 0 < len(v_valid) < n_iters and etype == 'Element':
+                    self.incomplete_elements.add(ename)
+                    
                 mean_v = np.mean(v_valid) if v_valid else np.nan
                 std_v = np.std(v_valid) if len(v_valid) > 1 else np.nan
                 rsd_v = (std_v / mean_v * 100) if (pd.notna(mean_v) and mean_v > 0) else np.nan
@@ -472,6 +497,33 @@ class MainWindow(QMainWindow):
         self.populate_results(agg_results)
         self.populate_details(agg_details)
         self.tabs.setCurrentIndex(0)
+        
+        # Display recommendations if any
+        if self.incomplete_elements:
+            rec_str = " ".join(sorted(self.incomplete_elements))
+            self.lbl_recommend.setText(f"💡 Rekomendasi Exclude:\n{rec_str}\n(Elemen tidak stabil di semua iterasi)")
+            self.widget_recommend.setVisible(True)
+        else:
+            self.widget_recommend.setVisible(False)
+
+    def apply_recommendations(self):
+        if not hasattr(self, 'incomplete_elements') or not self.incomplete_elements:
+            return
+            
+        current_excl = self.input_exclude_el.text().strip()
+        existing = set(current_excl.split()) if current_excl else set()
+        
+        # Add new recommendations
+        for el in self.incomplete_elements:
+            existing.add(el)
+            
+        new_excl_str = " ".join(sorted(existing))
+        self.input_exclude_el.setText(new_excl_str)
+        self.widget_recommend.setVisible(False)
+        self.log(f"Auto-applied {len(self.incomplete_elements)} recommended exclusions.")
+        
+        # Automatically calculate again
+        self.run_calculation()
 
     def populate_results(self, results):
         if not results:
@@ -662,6 +714,19 @@ class MainWindow(QMainWindow):
         
         menu = QMenu()
         
+        # Action: Jump to Plot
+        if hasattr(self, 'main_plotter') and self.main_plotter is not None and count == 1:
+            plot_label = f"Iter {clicked_iter + 1}" if clicked_iter is not None else "Keseluruhan"
+            action_plot = QAction(f"🔍 Cek Plot Langsung ({plot_label})", self)
+            
+            # Decide which iter file to jump to, default to Iter 1 if clicked on non-iter column
+            iter_idx_to_load = clicked_iter if clicked_iter is not None else 0
+            if iter_idx_to_load < len(self._iter_files_sorted):
+                target_file = self._iter_files_sorted[iter_idx_to_load]
+                action_plot.triggered.connect(lambda: self.main_plotter.jump_to_plot(target_file, targets[0][1]))
+                menu.addAction(action_plot)
+                menu.addSeparator()
+
         # Action: Exclude specific iteration
         if clicked_iter is not None and count == 1:
             iter_label = f"Iter {clicked_iter + 1}"

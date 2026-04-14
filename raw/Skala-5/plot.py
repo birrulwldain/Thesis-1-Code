@@ -599,6 +599,11 @@ class PlotViewer(QtWidgets.QMainWindow):
         self.btn_open_cfl.clicked.connect(self.open_cfl_analyzer)
         data_row.addWidget(self.btn_open_cfl)
         
+        self.panel_mode_combo = QtWidgets.QComboBox()
+        self.panel_mode_combo.addItems(["1 Jendela", "3 Jendela"])
+        self.panel_mode_combo.currentIndexChanged.connect(self.toggle_panel_mode)
+        data_row.addWidget(self.panel_mode_combo)
+        
         data_row.addWidget(self.full_view_cb)
         data_row.addStretch(1)
         top_layout.addLayout(data_row)
@@ -668,6 +673,20 @@ class PlotViewer(QtWidgets.QMainWindow):
         self.setCentralWidget(container)
         # mouse move proxy untuk koordinat pada plot full
         self.proxy_mouse = pg.SignalProxy(self.plot_roi.scene().sigMouseMoved, rateLimit=30, slot=self.on_mouse_moved_roi)
+        
+        self.toggle_panel_mode()
+
+    def toggle_panel_mode(self):
+        mode = self.panel_mode_combo.currentText()
+        if mode == "1 Jendela":
+            self.panels[1].setVisible(False)
+            self.panels[2].setVisible(False)
+        else:
+            self.panels[1].setVisible(True)
+            self.panels[2].setVisible(True)
+        # Me-reload visual jika ada file yang sedang dibuka
+        if self.list_files.currentItem():
+            self.load_selected_file()
 
     def choose_folder(self):
         default_dir = str((Path.cwd() / "0") if (Path.cwd() / "0").exists() else Path.cwd())
@@ -697,6 +716,10 @@ class PlotViewer(QtWidgets.QMainWindow):
         for offset in [1, 2]:
             idx = row + offset
             panel = self.panels[offset]
+            if self.panel_mode_combo.currentText() == "1 Jendela":
+                panel.clear_plots()
+                continue
+                
             if idx < total:
                 fname = self.list_files.item(idx).text()
                 shift = self.calibration_offsets.get(fname, 0.0)
@@ -3732,12 +3755,27 @@ class PlotViewer(QtWidgets.QMainWindow):
         try:
             from cfl_gui import MainWindow as CFLWindow
             if not hasattr(self, 'cfl_window') or self.cfl_window is None:
-                self.cfl_window = CFLWindow()
+                self.cfl_window = CFLWindow(main_plotter=self)
             self.cfl_window.show()
             self.cfl_window.raise_()
             self.cfl_window.activateWindow()
         except Exception as e:
             QtWidgets.QMessageBox.warning(self, "Error CFL", f"Gagal memuat modul CFL Analyzer:\n{e}\nPastikan cfl_gui.py dan library-nya tersedia.")
+
+    def jump_to_plot(self, base_filename: str, target_wl: float):
+        """Dipanggil oleh cfl_gui.py untuk melompat ke file iterasi tertentu dan zoom."""
+        items = self.list_files.findItems(base_filename, QtCore.Qt.MatchExactly)
+        if items:
+            # Memilih item di list ini akan memicu load otomatis ke ketiga panel
+            self.list_files.setCurrentItem(items[0])
+            
+        # Update ROI di panel pertama (akan otomatis tersebar tersinkronisasi)
+        self.region.setRegion((target_wl - 0.5, target_wl + 0.5))
+        
+        # Bring window ke depan
+        self.showNormal()
+        self.raise_()
+        self.activateWindow()
 
     def batch_automate_iterations(self):
         from datetime import datetime
