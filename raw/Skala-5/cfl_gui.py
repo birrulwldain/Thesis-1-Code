@@ -37,7 +37,9 @@ class MainWindow(QMainWindow):
             self.analyzer = None
             self.log_buffer.append(f"Error initializing Analyzer: {e}")
 
-        self.excluded_lines = set() # Set of (Element, Wavelength) tuples
+        self.excluded_lines = set() # Set of (Element, Wavelength) tuples - all iters
+        self.excluded_iter_lines = set() # Set of (Element, Wavelength, iter_index) - specific iter
+        self._iter_files_sorted = [] # Cached sorted iteration file list
 
         # UI Setup
         central_widget = QWidget()
@@ -238,6 +240,13 @@ class MainWindow(QMainWindow):
         self.lbl_summary.setStyleSheet("font-weight: bold; font-size: 14px; padding: 5px; color: #333;")
         right_layout.addWidget(self.lbl_summary)
         
+        # Te/Ne Info Label
+        self.lbl_tene = QLabel("")
+        self.lbl_tene.setWordWrap(True)
+        self.lbl_tene.setStyleSheet("font-size: 12px; padding: 4px 5px; color: #555; background: #f0f4f8; border-radius: 4px;")
+        self.lbl_tene.setVisible(False)
+        right_layout.addWidget(self.lbl_tene)
+        
         # Add to Splitter
         splitter.addWidget(left_widget)
         splitter.addWidget(right_widget)
@@ -321,13 +330,22 @@ class MainWindow(QMainWindow):
         all_results = []
         all_details = []
         
-        for sid in sorted(target_sids):
+        sorted_sids = sorted(target_sids)
+        self._iter_files_sorted = sorted_sids  # Cache for context menu
+        
+        for iter_idx, sid in enumerate(sorted_sids):
+            # Build per-sid exclusion set: global exclusions + iter-specific exclusions
+            sid_excluded = set(self.excluded_lines)  # Copy global exclusions
+            for (ex_el, ex_wl, ex_iter) in self.excluded_iter_lines:
+                if ex_iter == iter_idx:
+                    sid_excluded.add((ex_el, ex_wl))
+            
             try:
                 res, det, log_msgs = self.analyzer.analyze_sample(
                     sid, 
                     saha_elements=saha_list, 
                     saha_te_overrides=te_map,
-                    excluded_lines=self.excluded_lines,
+                    excluded_lines=sid_excluded,
                     exclude_elements=ex_el_list
                 )
                 for l in log_msgs: self.log(l)
@@ -351,15 +369,24 @@ class MainWindow(QMainWindow):
         
         if all_results:
             full_res = pd.concat(all_results, ignore_index=True)
+            
+            # Get sorted iteration file list for proper Iter 1/2/3 assignment
+            iter_files_sorted = sorted(full_res['Iteration_File'].unique())
+            iter_file_idx = {f: i for i, f in enumerate(iter_files_sorted)}
+            n_iters = len(iter_files_sorted)
+            
             for (etype, ename), grp in full_res.groupby(['Type', 'Name']):
                 x_col = 'XRF_Conc_%' if etype == 'Element' else 'XRF_Oxide_Conc_%'
                 # fallback max untuk dapetin nilai tidak nol
                 xrf_ref = grp.get(x_col, pd.Series([0])).fillna(0).max()
                 
-                cfl_vals = grp['Mass_Fraction_Percent'].tolist()
-                while len(cfl_vals) < 3: cfl_vals.append(np.nan)
+                # Assign values to correct iteration slots
+                cfl_vals = [np.nan] * max(n_iters, 3)
+                for _, row in grp.iterrows():
+                    idx = iter_file_idx[row['Iteration_File']]
+                    cfl_vals[idx] = row['Mass_Fraction_Percent']
                 
-                v_valid = [x for x in cfl_vals[:3] if pd.notna(x) and x > 0]
+                v_valid = [x for x in cfl_vals[:n_iters] if pd.notna(x) and x > 0]
                 mean_v = np.mean(v_valid) if v_valid else np.nan
                 std_v = np.std(v_valid) if len(v_valid) > 1 else np.nan
                 rsd_v = (std_v / mean_v * 100) if (pd.notna(mean_v) and mean_v > 0) else np.nan
@@ -370,7 +397,7 @@ class MainWindow(QMainWindow):
                     'XRF_Ref': xrf_ref,
                     'Iter_1': cfl_vals[0],
                     'Iter_2': cfl_vals[1],
-                    'Iter_3': cfl_vals[2],
+                    'Iter_3': cfl_vals[2] if len(cfl_vals) > 2 else np.nan,
                     'Mean': mean_v,
                     'Std_Dev': std_v,
                     'RSD': rsd_v
@@ -378,26 +405,38 @@ class MainWindow(QMainWindow):
                 
         if all_details:
             full_det = pd.concat(all_details, ignore_index=True)
-            if 'element' in full_det.columns and 'center_nm' in full_det.columns:
-                for (ename, wlen), grp in full_det.groupby(['element', 'center_nm']):
-                cfl_vals = grp['cfl_val_relatif'].tolist()
-                while len(cfl_vals) < 3: cfl_vals.append(np.nan)
+            if 'element' in full_det.columns and 'nist_wavelength_nm' in full_det.columns and 'Iteration_File' in full_det.columns:
+                # Deduplicate: per (element, nist_wavelength_nm, Iteration_File), take mean of cfl_val_relatif
+                deduped = full_det.groupby(['element', 'nist_wavelength_nm', 'Iteration_File'])['cfl_val_relatif'].mean().reset_index()
                 
-                v_valid = [x for x in cfl_vals[:3] if pd.notna(x)]
-                mean_v = np.mean(v_valid) if v_valid else np.nan
-                std_v = np.std(v_valid) if len(v_valid) > 1 else np.nan
-                rsd_v = (std_v / mean_v * 100) if (pd.notna(mean_v) and mean_v > 0) else np.nan
+                # Get sorted iteration file list for proper Iter 1/2/3 assignment
+                iter_files_sorted = sorted(deduped['Iteration_File'].unique())
+                iter_file_idx = {f: i for i, f in enumerate(iter_files_sorted)}
                 
-                agg_details.append({
-                    'Element': ename,
-                    'Wavelength_nm': wlen,
-                    'Iter_1': cfl_vals[0],
-                    'Iter_2': cfl_vals[1],
-                    'Iter_3': cfl_vals[2],
-                    'Mean_Conc': mean_v,
-                    'Std_Dev': std_v,
-                    'RSD': rsd_v
-                })
+                for (ename, wlen), grp in deduped.groupby(['element', 'nist_wavelength_nm']):
+                    # Initialize iter slots
+                    n_iters = len(iter_files_sorted)
+                    cfl_vals = [np.nan] * max(n_iters, 3)
+                    
+                    for _, row in grp.iterrows():
+                        idx = iter_file_idx[row['Iteration_File']]
+                        cfl_vals[idx] = row['cfl_val_relatif']
+                    
+                    v_valid = [x for x in cfl_vals[:n_iters] if pd.notna(x)]
+                    mean_v = np.mean(v_valid) if v_valid else np.nan
+                    std_v = np.std(v_valid) if len(v_valid) > 1 else np.nan
+                    rsd_v = (std_v / mean_v * 100) if (pd.notna(mean_v) and mean_v > 0) else np.nan
+                    
+                    agg_details.append({
+                        'Element': ename,
+                        'Wavelength_nm': wlen,
+                        'Iter_1': cfl_vals[0],
+                        'Iter_2': cfl_vals[1],
+                        'Iter_3': cfl_vals[2] if len(cfl_vals) > 2 else np.nan,
+                        'Mean_Conc': mean_v,
+                        'Std_Dev': std_v,
+                        'RSD': rsd_v
+                    })
         
         # Sort and Cache
         agg_results = sorted(agg_results, key=lambda d: (d['Type'], d['Name']))
@@ -406,6 +445,29 @@ class MainWindow(QMainWindow):
         self.last_results = agg_results
         self.last_details = agg_details
         self.last_sid = sid_base
+        
+        # Extract Te/Ne per iteration from detail data
+        tene_info = []
+        if all_details:
+            full_det_tene = pd.concat(all_details, ignore_index=True)
+            for iter_file in sorted_sids:
+                iter_subset = full_det_tene[full_det_tene['Iteration_File'] == iter_file]
+                if not iter_subset.empty:
+                    te_val = iter_subset['cfl_te_K'].iloc[0] if 'cfl_te_K' in iter_subset.columns else None
+                    ne_val = iter_subset['cfl_ne_cm3'].iloc[0] if 'cfl_ne_cm3' in iter_subset.columns else None
+                    tene_info.append((iter_file, te_val, ne_val))
+        
+        # Update Te/Ne label
+        if tene_info:
+            parts = []
+            for i, (fname, te, ne) in enumerate(tene_info):
+                te_str = f"{te:.0f} K" if te else "N/A"
+                ne_str = f"{ne:.2e} cm⁻³" if ne else "N/A"
+                parts.append(f"<b>Iter {i+1}</b>: Te = {te_str}, Ne = {ne_str}")
+            self.lbl_tene.setText("  |  ".join(parts))
+            self.lbl_tene.setVisible(True)
+        else:
+            self.lbl_tene.setVisible(False)
         
         self.populate_results(agg_results)
         self.populate_details(agg_details)
@@ -565,6 +627,15 @@ class MainWindow(QMainWindow):
         table.setSortingEnabled(True) # Enable sorting
 
     def show_details_context_menu(self, pos):
+        # Detect which cell was clicked
+        clicked_item = self.table_details.itemAt(pos)
+        clicked_col = clicked_item.column() if clicked_item else -1
+        clicked_row = clicked_item.row() if clicked_item else -1
+        
+        # Column mapping: 0=Element, 1=Wavelength, 2=Iter1, 3=Iter2, 4=Iter3, 5=Mean, 6=Std, 7=RSD
+        iter_col_map = {2: 0, 3: 1, 4: 2}  # col_index -> iter_index
+        clicked_iter = iter_col_map.get(clicked_col, None)
+        
         selection = self.table_details.selectionModel().selectedRows()
         targets = []
         
@@ -572,18 +643,14 @@ class MainWindow(QMainWindow):
             for index in selection:
                 row = index.row()
                 el_item = self.table_details.item(row, 0)
-                wl_item = self.table_details.item(row, 1) # Updated index to 1 for Wavelength_nm
+                wl_item = self.table_details.item(row, 1)
                 if el_item and wl_item:
-                    # Clean up "(Missed)" text if present
                     name = el_item.text().split(' ')[0]
                     targets.append((name, float(wl_item.text())))
         else:
-             # Fallback to itemAt if strictly no selection (rare with SelectRows)
-             item = self.table_details.itemAt(pos)
-             if item:
-                 row = item.row()
-                 el_item = self.table_details.item(row, 0)
-                 wl_item = self.table_details.item(row, 1) # Updated index to 1
+             if clicked_item:
+                 el_item = self.table_details.item(clicked_row, 0)
+                 wl_item = self.table_details.item(clicked_row, 1)
                  if el_item and wl_item:
                      name = el_item.text().split(' ')[0]
                      targets.append((name, float(wl_item.text())))
@@ -591,19 +658,25 @@ class MainWindow(QMainWindow):
         if not targets: return
         
         count = len(targets)
-        # Use the first one for display name if single, else generic
         label_name = f"{targets[0][0]} @ {targets[0][1]}" if count == 1 else f"{count} lines"
         
         menu = QMenu()
         
-        # Action 1: Exclude (Session)
-        action_exclude = QAction(f"Exclude {label_name} (Session)", self)
+        # Action: Exclude specific iteration
+        if clicked_iter is not None and count == 1:
+            iter_label = f"Iter {clicked_iter + 1}"
+            action_excl_iter = QAction(f"Exclude {label_name} — {iter_label} only", self)
+            action_excl_iter.triggered.connect(lambda: self.add_iter_exclusions(targets, clicked_iter))
+            menu.addAction(action_excl_iter)
+            menu.addSeparator()
+        
+        # Action: Exclude all iters (Session)
+        action_exclude = QAction(f"Exclude {label_name} — All Iters (Session)", self)
         action_exclude.triggered.connect(lambda: self.add_exclusions(targets))
         menu.addAction(action_exclude)
         
-        # Action 2: Delete (File)
+        # Action: Delete (File)
         action_delete = QAction(f"DELETE {label_name} from SOURCE FILE", self)
-        # action_delete.setStyleSheet(...) # Not supported
         action_delete.triggered.connect(lambda: self.delete_lines_permanently(targets))
         menu.addAction(action_delete)
         
@@ -612,10 +685,18 @@ class MainWindow(QMainWindow):
     def add_exclusions(self, list_of_tuples):
         for (el, wl) in list_of_tuples:
             self.excluded_lines.add((el, wl))
-            self.log(f"Excluded: {el} at {wl}")
+            self.log(f"Excluded (all iters): {el} at {wl}")
         
         self.update_exclusion_view()
         self.log(f"Added {len(list_of_tuples)} exclusions. Click Calculate to update results.")
+    
+    def add_iter_exclusions(self, list_of_tuples, iter_index):
+        for (el, wl) in list_of_tuples:
+            self.excluded_iter_lines.add((el, wl, iter_index))
+            self.log(f"Excluded (Iter {iter_index+1} only): {el} at {wl}")
+        
+        self.update_exclusion_view()
+        self.log(f"Added {len(list_of_tuples)} per-iter exclusions. Click Calculate to update results.")
 
     def delete_lines_permanently(self, list_of_tuples):
         sid = self.combo_samples.currentText()
@@ -637,6 +718,7 @@ class MainWindow(QMainWindow):
 
     def clear_exclusions(self):
         self.excluded_lines.clear()
+        self.excluded_iter_lines.clear()
         self.update_exclusion_view()
         self.log("Exclusions cleared.")
         
@@ -676,6 +758,9 @@ class MainWindow(QMainWindow):
              if data in self.excluded_lines:
                  self.excluded_lines.remove(data)
                  removed_count += 1
+             elif data in self.excluded_iter_lines:
+                 self.excluded_iter_lines.remove(data)
+                 removed_count += 1
         
         if removed_count > 0:
             self.update_exclusion_view()
@@ -685,10 +770,17 @@ class MainWindow(QMainWindow):
 
     def update_exclusion_view(self):
         self.list_excluded.clear()
+        # Global exclusions (all iters)
         sorted_excl = sorted(self.excluded_lines, key=lambda x: (x[0], x[1]))
         for (el, wl) in sorted_excl:
-            item = QListWidgetItem(f"{el} @ {wl:.3f}")
+            item = QListWidgetItem(f"{el} @ {wl:.3f} [All Iters]")
             item.setData(Qt.UserRole, (el, wl))
+            self.list_excluded.addItem(item)
+        # Per-iter exclusions
+        sorted_iter_excl = sorted(self.excluded_iter_lines, key=lambda x: (x[0], x[1], x[2]))
+        for (el, wl, iter_idx) in sorted_iter_excl:
+            item = QListWidgetItem(f"{el} @ {wl:.3f} [Iter {iter_idx+1}]")
+            item.setData(Qt.UserRole, (el, wl, iter_idx))
             self.list_excluded.addItem(item)
 
     def log(self, message):

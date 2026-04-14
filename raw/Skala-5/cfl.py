@@ -289,13 +289,15 @@ class CFLAnalyzer:
                 continue
                 
             wl_obs = _parse_float(row.get(col_wl, 0))
+            nist_wl_row = _parse_float(row.get('nist_wavelength_nm', 0))
             
             # --- Exclusion Check ---
-            # Fuzzy match (within 0.001 nm) to avoid float precision issues if coming from GUI
+            # Match against both center_nm and nist_wavelength_nm
+            # GUI stores nist_wavelength_nm, but we also check center_nm for backward compat
             # excluded_lines expects tuples: (Element, Wavelength)
             is_excluded = False
             for (ex_el, ex_wl) in excluded_lines:
-                if ex_el == el and abs(wl_obs - ex_wl) < 0.001:
+                if ex_el == el and (abs(wl_obs - ex_wl) < 0.01 or (nist_wl_row > 0 and abs(nist_wl_row - ex_wl) < 0.01)):
                     is_excluded = True
                     break
             if is_excluded:
