@@ -4,45 +4,45 @@ The top-level auxiliary file: main.aux
 The style file: elsarticle-num.bst
 Database file #1: reff.bib
 Warning--I didn't find a database entry for "griem_spectral_1974"
-You've used 21 entries,
+You've used 23 entries,
             2952 wiz_defined-function locations,
-            836 strings with 12526 characters,
-and the built_in function-call counts, 8078 in all, are:
-= -- 759
-> -- 363
+            852 strings with 13172 characters,
+and the built_in function-call counts, 8863 in all, are:
+= -- 833
+> -- 401
 < -- 1
-+ -- 135
-- -- 114
-* -- 797
-:= -- 1187
-add.period$ -- 39
-call.type$ -- 21
-change.case$ -- 22
++ -- 149
+- -- 126
+* -- 880
+:= -- 1302
+add.period$ -- 43
+call.type$ -- 23
+change.case$ -- 24
 chr.to.int$ -- 0
-cite$ -- 21
-duplicate$ -- 218
-empty$ -- 806
-format.name$ -- 134
-if$ -- 1975
+cite$ -- 23
+duplicate$ -- 238
+empty$ -- 882
+format.name$ -- 148
+if$ -- 2165
 int.to.chr$ -- 0
-int.to.str$ -- 21
-missing$ -- 20
-newline$ -- 110
-num.names$ -- 21
-pop$ -- 122
+int.to.str$ -- 23
+missing$ -- 22
+newline$ -- 120
+num.names$ -- 23
+pop$ -- 132
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 382
+skip$ -- 418
 stack$ -- 0
-substring$ -- 417
-swap$ -- 86
+substring$ -- 457
+swap$ -- 94
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 0
-while$ -- 49
-width$ -- 23
-write$ -- 233
+while$ -- 54
+width$ -- 25
+write$ -- 255
 (There was 1 warning)

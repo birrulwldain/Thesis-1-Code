@@ -1,0 +1,9 @@
+base_config: ../base.yaml
+
+model:
+  name: svr
+  params:
+    pca_components: 64
+    kernel: rbf
+    C: 10.0
+    epsilon: 0.05

@@ -87,24 +87,34 @@ A.~M~S, S.~S. Xavier, J.~R. Jose, P.~R. Biju, R.~Philip, \href{https://ieeexplor
 \newblock \href {https://doi.org/10.1109/CLEO/Europe-EQEC65582.2025.11110899} {\path{doi:10.1109/CLEO/Europe-EQEC65582.2025.11110899}}.
 \newline\urlprefix\url{https://ieeexplore.ieee.org/document/11110899/}
 
+\bibitem{terashkevich_two-temperature_2024}
+V.~A. Terashkevich, E.~A. Pazyuk, \href{https://link.springer.com/10.1134/S0036024424050285}{Two-{Temperature} {Analysis} of {Intensity} {Distribution} in the {Rovibronic} {Spectra} of the {CN} {Radical}}, Russian Journal of Physical Chemistry A 98~(5) (2024) 912--919.
+\newblock \href {https://doi.org/10.1134/S0036024424050285} {\path{doi:10.1134/S0036024424050285}}.
+\newline\urlprefix\url{https://link.springer.com/10.1134/S0036024424050285}
+
 \bibitem{wu_novel_2025}
 J.~Wu, S.~Wan, Y.~Yang, Z.~Liu, Y.~Han, H.~Zhang, Z.~Huang, \href{https://www.sciencedirect.com/science/article/pii/S2352012425012688}{A novel multi-constraint {SVR} surrogate model: {Interactive} reliability-based design optimization and case study}, Structures 79 (2025) 109453.
 \newblock \href {https://doi.org/10.1016/j.istruc.2025.109453} {\path{doi:10.1016/j.istruc.2025.109453}}.
 \newline\urlprefix\url{https://www.sciencedirect.com/science/article/pii/S2352012425012688}
 
-\bibitem{espinosa_analysis_2019}
-G.~Espinosa, R.~Rodríguez, J.~M. Gil, \href{https://linkinghub.elsevier.com/retrieve/pii/S0022407319304856}{Analysis of radiative opacities for optically thin and thick astrophysical plasmas}, Journal of Quantitative Spectroscopy and Radiative Transfer 237 (2019) 106633.
-\newblock \href {https://doi.org/10.1016/j.jqsrt.2019.106633} {\path{doi:10.1016/j.jqsrt.2019.106633}}.
-\newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0022407319304856}
+\bibitem{hao_machine_2024}
+Z.~Hao, K.~Liu, Q.~Lian, W.~Song, Z.~Hou, R.~Zhang, Q.~Wang, C.~Sun, X.~Li, Z.~Wang, \href{https://link.springer.com/10.1007/s11467-024-1427-2}{Machine learning in laser-induced breakdown spectroscopy: {A} review}, Frontiers of Physics 19~(6) (2024) 62501.
+\newblock \href {https://doi.org/10.1007/s11467-024-1427-2} {\path{doi:10.1007/s11467-024-1427-2}}.
+\newline\urlprefix\url{https://link.springer.com/10.1007/s11467-024-1427-2}
+
+\bibitem{lin_enhancing_2026}
+X.~Lin, W.~Liu, P.~Dai, J.~Yang, J.~Lin, Y.~Huang, \href{https://www.tandfonline.com/doi/full/10.1080/00032719.2025.2504563}{Enhancing {Quantitative} {Analysis} by {Laser}-{Induced} {Breakdown} {Spectroscopy} ({LIBS}) with {Machine} {Learning}}, Analytical Letters 59~(4) (2026) 672--683.
+\newblock \href {https://doi.org/10.1080/00032719.2025.2504563} {\path{doi:10.1080/00032719.2025.2504563}}.
+\newline\urlprefix\url{https://www.tandfonline.com/doi/full/10.1080/00032719.2025.2504563}
 
 \bibitem{rodriguez_mixkiprapcal_2021}
 R.~Rodríguez, G.~Espinosa, J.~Miguel~Gil, \href{https://global-sci.org/index.php/cicp/article/view/6987}{{MIXKIP}/{RAPCAL}: {A} {Computational} {Package} for {Integrated} {Simulations} of {Large}-{Scale} {Atomic} {Kinetics} and {Radiation} {Transport} in {Non}-{Local} {Thermodynamic} {Equilibrium} {Plasmas}}, Communications in Computational Physics 30~(2) (2021) 602--634.
 \newblock \href {https://doi.org/10.4208/cicp.OA-2020-0264} {\path{doi:10.4208/cicp.OA-2020-0264}}.
 \newline\urlprefix\url{https://global-sci.org/index.php/cicp/article/view/6987}
 
-\bibitem{lin_enhancing_2026}
-X.~Lin, W.~Liu, P.~Dai, J.~Yang, J.~Lin, Y.~Huang, \href{https://www.tandfonline.com/doi/full/10.1080/00032719.2025.2504563}{Enhancing {Quantitative} {Analysis} by {Laser}-{Induced} {Breakdown} {Spectroscopy} ({LIBS}) with {Machine} {Learning}}, Analytical Letters 59~(4) (2026) 672--683.
-\newblock \href {https://doi.org/10.1080/00032719.2025.2504563} {\path{doi:10.1080/00032719.2025.2504563}}.
-\newline\urlprefix\url{https://www.tandfonline.com/doi/full/10.1080/00032719.2025.2504563}
+\bibitem{espinosa_analysis_2019}
+G.~Espinosa, R.~Rodríguez, J.~M. Gil, \href{https://linkinghub.elsevier.com/retrieve/pii/S0022407319304856}{Analysis of radiative opacities for optically thin and thick astrophysical plasmas}, Journal of Quantitative Spectroscopy and Radiative Transfer 237 (2019) 106633.
+\newblock \href {https://doi.org/10.1016/j.jqsrt.2019.106633} {\path{doi:10.1016/j.jqsrt.2019.106633}}.
+\newline\urlprefix\url{https://linkinghub.elsevier.com/retrieve/pii/S0022407319304856}
 
 \end{thebibliography}
