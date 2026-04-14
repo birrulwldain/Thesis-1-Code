@@ -46,7 +46,10 @@ data/*.ipynb
 # Raw outputs and Log files
 *.txt
 !requirements.txt
-raw/
+raw/Skala-5/arsip
+raw/Skala-5/b
+raw/Skala-5/c
+raw/Skala-8
 *.log
 *.html
 

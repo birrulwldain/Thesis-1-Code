@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "current_folder": "/Users/birrulwldain/Projects/Project-8-Vulkanik/raw/Skala-5/0",
+  "selected_file": "S1-D0.5us-W50us-ii-3500-acc-5-760-torr-skala5-1.asc",
+  "roi": {
+    "start": 430.053,
+    "end": 430.453
+  },
+  "min_amp": "",
+  "min_dist": "",
+  "prom": "",
+  "max_peaks": "5",
+  "start_peak": "",
+  "lock_width": false,
+  "move_sensitivity": 1.0,
+  "export_enabled": true,
+  "sim_overlay": true,
+  "sim_labels": false,
+  "comp": "Fe, Al, Si",
+  "temp": "12000",
+  "ne": "1e17",
+  "fwhm_line": "0.2355",
+  "fwhm_conv": "0.2355",
+  "window_size": [
+    1680,
+    1050
+  ],
+  "collection_by_file": {
+    "Cu_D1us-W50us-ii-3500-acc-5_760 torr-skala 5.asc": [],
+    "S1-D0.5us-W50us-ii-3500-acc-5-760-torr-skala5-1.asc": [],
+    "S1-D0.5us-W50us-ii-3500-acc-5-760-torr-skala5-2.asc": []
+  },
+  "file_metadata_cache": {},
+  "nist_elem": "Ca",
+  "nist_ion": "I",
+  "nist_min_aki": "1e8"
+}

@@ -1,0 +1,3263 @@
+{
+  "S1": {
+    "Elements": {
+      "Ag": {
+        "Element_Conc": 0.941,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.548
+      },
+      "Al": {
+        "Element_Conc": 8.818,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 11.592
+      },
+      "As": {
+        "Element_Conc": 0.01,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.005
+      },
+      "Br": {
+        "Element_Conc": 0.035,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.016
+      },
+      "Ca": {
+        "Element_Conc": 15.441,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 11.902
+      },
+      "Cl": {
+        "Element_Conc": 0.028,
+        "Oxide_Name": "Cl",
+        "Oxide_Conc": 0.017
+      },
+      "Cr": {
+        "Element_Conc": 0.025,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.013
+      },
+      "Cu": {
+        "Element_Conc": 0.073,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.034
+      },
+      "Eu": {
+        "Element_Conc": 0.408,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.011
+      },
+      "Fe": {
+        "Element_Conc": 27.599,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 19.606
+      },
+      "Ga": {
+        "Element_Conc": 0.024,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.011
+      },
+      "K": {
+        "Element_Conc": 8.574,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 5.968
+      },
+      "Mg": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.0
+      },
+      "Mn": {
+        "Element_Conc": 0.894,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.451
+      },
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "P": {
+        "Element_Conc": 4.193,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 5.899
+      },
+      "Pb": {
+        "Element_Conc": 0.024,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      },
+      "Rb": {
+        "Element_Conc": 0.04,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.018
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.206
+      },
+      "Si": {
+        "Element_Conc": 29.948,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 42.223
+      },
+      "Sr": {
+        "Element_Conc": 0.334,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.152
+      },
+      "Ti": {
+        "Element_Conc": 2.131,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.115
+      },
+      "V": {
+        "Element_Conc": 0.068,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.035
+      },
+      "Y": {
+        "Element_Conc": 0.025,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.011
+      },
+      "Zn": {
+        "Element_Conc": 0.21,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.097
+      },
+      "Zr": {
+        "Element_Conc": 0.155,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.071
+      }
+    }
+  },
+  "S2": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.696,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.783
+      },
+      "Al": {
+        "Element_Conc": 13.747,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 16.763
+      },
+      "Si": {
+        "Element_Conc": 41.91,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 52.819
+      },
+      "P": {
+        "Element_Conc": 4.461,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 5.411
+      },
+      "K": {
+        "Element_Conc": 2.358,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.436
+      },
+      "Ca": {
+        "Element_Conc": 9.685,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 6.64
+      },
+      "Ti": {
+        "Element_Conc": 1.815,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 0.843
+      },
+      "V": {
+        "Element_Conc": 0.067,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.03
+      },
+      "Cr": {
+        "Element_Conc": 0.009,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.004
+      },
+      "Mn": {
+        "Element_Conc": 0.638,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.282
+      },
+      "Fe": {
+        "Element_Conc": 22.904,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 14.232
+      },
+      "Cu": {
+        "Element_Conc": 0.051,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.02
+      },
+      "Zn": {
+        "Element_Conc": 0.109,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.043
+      },
+      "Ga": {
+        "Element_Conc": 0.019,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.008
+      },
+      "As": {
+        "Element_Conc": 0.009,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.003
+      },
+      "Br": {
+        "Element_Conc": 0.144,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.056
+      },
+      "Rb": {
+        "Element_Conc": 0.027,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.01
+      },
+      "Sr": {
+        "Element_Conc": 0.229,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.089
+      },
+      "Y": {
+        "Element_Conc": 0.021,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.008
+      },
+      "Zr": {
+        "Element_Conc": 0.125,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.048
+      },
+      "Ag": {
+        "Element_Conc": 0.546,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.277
+      },
+      "In": {
+        "Element_Conc": 0.105,
+        "Oxide_Name": "In",
+        "Oxide_Conc": 0.051
+      },
+      "Eu": {
+        "Element_Conc": 0.309,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.007
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.136
+      },
+      "Pb": {
+        "Element_Conc": 0.018,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S3": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.0
+      },
+      "Al": {
+        "Element_Conc": 13.421,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 17.092
+      },
+      "Si": {
+        "Element_Conc": 32.375,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 43.472
+      },
+      "P": {
+        "Element_Conc": 4.479,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 5.959
+      },
+      "Cl": {
+        "Element_Conc": 0.347,
+        "Oxide_Name": "Cl",
+        "Oxide_Conc": 0.196
+      },
+      "K": {
+        "Element_Conc": 4.106,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 2.723
+      },
+      "Ca": {
+        "Element_Conc": 12.423,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 9.233
+      },
+      "Ti": {
+        "Element_Conc": 2.078,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.047
+      },
+      "V": {
+        "Element_Conc": 0.078,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.038
+      },
+      "Cr": {
+        "Element_Conc": 0.012,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.006
+      },
+      "Mn": {
+        "Element_Conc": 0.767,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.369
+      },
+      "Fe": {
+        "Element_Conc": 27.916,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 18.899
+      },
+      "Cu": {
+        "Element_Conc": 0.066,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.028
+      },
+      "Zn": {
+        "Element_Conc": 0.127,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.055
+      },
+      "Ga": {
+        "Element_Conc": 0.027,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.012
+      },
+      "As": {
+        "Element_Conc": 0.013,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.006
+      },
+      "Br": {
+        "Element_Conc": 0.049,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.021
+      },
+      "Rb": {
+        "Element_Conc": 0.041,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.018
+      },
+      "Sr": {
+        "Element_Conc": 0.322,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.138
+      },
+      "Y": {
+        "Element_Conc": 0.029,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.012
+      },
+      "Zr": {
+        "Element_Conc": 0.18,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.077
+      },
+      "Ag": {
+        "Element_Conc": 0.576,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.319
+      },
+      "In": {
+        "Element_Conc": 0.144,
+        "Oxide_Name": "In",
+        "Oxide_Conc": 0.076
+      },
+      "Eu": {
+        "Element_Conc": 0.399,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.011
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.192
+      },
+      "Pb": {
+        "Element_Conc": 0.025,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S4": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 1.229,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 1.381
+      },
+      "Al": {
+        "Element_Conc": 9.498,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 11.741
+      },
+      "Si": {
+        "Element_Conc": 39.196,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 51.726
+      },
+      "P": {
+        "Element_Conc": 3.151,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 4.103
+      },
+      "K": {
+        "Element_Conc": 0.893,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 0.588
+      },
+      "Ca": {
+        "Element_Conc": 3.459,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 2.592
+      },
+      "Ti": {
+        "Element_Conc": 3.372,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.748
+      },
+      "V": {
+        "Element_Conc": 0.123,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.062
+      },
+      "Cr": {
+        "Element_Conc": 0.063,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.033
+      },
+      "Mn": {
+        "Element_Conc": 0.439,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.212
+      },
+      "Fe": {
+        "Element_Conc": 36.595,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 24.846
+      },
+      "Ni": {
+        "Element_Conc": 0.043,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.017
+      },
+      "Cu": {
+        "Element_Conc": 0.045,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.019
+      },
+      "Zn": {
+        "Element_Conc": 0.084,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.036
+      },
+      "Ga": {
+        "Element_Conc": 0.018,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.008
+      },
+      "As": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.0
+      },
+      "Br": {
+        "Element_Conc": 0.029,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.012
+      },
+      "Rb": {
+        "Element_Conc": 0.016,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.007
+      },
+      "Sr": {
+        "Element_Conc": 0.082,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.035
+      },
+      "Y": {
+        "Element_Conc": 0.022,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.009
+      },
+      "Zr": {
+        "Element_Conc": 0.387,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.164
+      },
+      "Ag": {
+        "Element_Conc": 0.857,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.468
+      },
+      "In": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "In",
+        "Oxide_Conc": 0.0
+      },
+      "Eu": {
+        "Element_Conc": 0.362,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.016
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.178
+      },
+      "Pb": {
+        "Element_Conc": 0.039,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S5": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.0
+      },
+      "Al": {
+        "Element_Conc": 7.418,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 9.745
+      },
+      "Si": {
+        "Element_Conc": 26.283,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 37.798
+      },
+      "P": {
+        "Element_Conc": 2.579,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 3.8
+      },
+      "Cl": {
+        "Element_Conc": 0.06,
+        "Oxide_Name": "Cl",
+        "Oxide_Conc": 0.038
+      },
+      "K": {
+        "Element_Conc": 1.015,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 0.756
+      },
+      "Ca": {
+        "Element_Conc": 2.359,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 2.007
+      },
+      "Ti": {
+        "Element_Conc": 2.656,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.577
+      },
+      "V": {
+        "Element_Conc": 0.171,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.1
+      },
+      "Cr": {
+        "Element_Conc": 0.068,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.04
+      },
+      "Mn": {
+        "Element_Conc": 0.963,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.538
+      },
+      "Fe": {
+        "Element_Conc": 53.802,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 42.081
+      },
+      "Ni": {
+        "Element_Conc": 0.028,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.012
+      },
+      "Cu": {
+        "Element_Conc": 0.034,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.017
+      },
+      "Zn": {
+        "Element_Conc": 0.074,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.037
+      },
+      "Ga": {
+        "Element_Conc": 0.015,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.007
+      },
+      "As": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.0
+      },
+      "Br": {
+        "Element_Conc": 0.128,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.064
+      },
+      "Rb": {
+        "Element_Conc": 0.016,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.008
+      },
+      "Sr": {
+        "Element_Conc": 0.072,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.036
+      },
+      "Y": {
+        "Element_Conc": 0.018,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.009
+      },
+      "Zr": {
+        "Element_Conc": 0.321,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.16
+      },
+      "Ag": {
+        "Element_Conc": 1.195,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.741
+      },
+      "Eu": {
+        "Element_Conc": 0.659,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.032
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.397
+      },
+      "Pb": {
+        "Element_Conc": 0.064,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S6": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.361,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.409
+      },
+      "Al": {
+        "Element_Conc": 7.334,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 9.196
+      },
+      "Si": {
+        "Element_Conc": 38.101,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 51.532
+      },
+      "P": {
+        "Element_Conc": 2.571,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 3.459
+      },
+      "K": {
+        "Element_Conc": 1.229,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 0.836
+      },
+      "Ca": {
+        "Element_Conc": 2.497,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 1.935
+      },
+      "Ti": {
+        "Element_Conc": 3.124,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.682
+      },
+      "V": {
+        "Element_Conc": 0.146,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.077
+      },
+      "Cr": {
+        "Element_Conc": 0.049,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.027
+      },
+      "Mn": {
+        "Element_Conc": 0.668,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.337
+      },
+      "Fe": {
+        "Element_Conc": 41.654,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 29.344
+      },
+      "Ni": {
+        "Element_Conc": 0.02,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.008
+      },
+      "Cu": {
+        "Element_Conc": 0.029,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.013
+      },
+      "Zn": {
+        "Element_Conc": 0.064,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.029
+      },
+      "Ga": {
+        "Element_Conc": 0.014,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.006
+      },
+      "As": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.0
+      },
+      "Rb": {
+        "Element_Conc": 0.013,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.006
+      },
+      "Sr": {
+        "Element_Conc": 0.075,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.033
+      },
+      "Y": {
+        "Element_Conc": 0.017,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.007
+      },
+      "Zr": {
+        "Element_Conc": 0.379,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.167
+      },
+      "Rh": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.628
+      },
+      "Ag": {
+        "Element_Conc": 1.109,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.02
+      },
+      "Eu": {
+        "Element_Conc": 0.5,
+        "Oxide_Name": "Rh",
+        "Oxide_Conc": 0.0
+      },
+      "Yb": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.251
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Yb",
+        "Oxide_Conc": 0.0
+      },
+      "Ir": {
+        "Element_Conc": 0.001,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      },
+      "Pb": {
+        "Element_Conc": 0.046,
+        "Oxide_Name": "Ir",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S7": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 1.389,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 1.676
+      },
+      "Al": {
+        "Element_Conc": 4.92,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 6.636
+      },
+      "Si": {
+        "Element_Conc": 20.568,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 30.679
+      },
+      "P": {
+        "Element_Conc": 4.17,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 6.423
+      },
+      "K": {
+        "Element_Conc": 2.643,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 2.045
+      },
+      "Ca": {
+        "Element_Conc": 5.226,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 4.596
+      },
+      "Ti": {
+        "Element_Conc": 3.49,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 2.135
+      },
+      "V": {
+        "Element_Conc": 0.161,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.096
+      },
+      "Cr": {
+        "Element_Conc": 0.02,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.012
+      },
+      "Mn": {
+        "Element_Conc": 2.172,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 1.261
+      },
+      "Fe": {
+        "Element_Conc": 52.668,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 42.92
+      },
+      "Ni": {
+        "Element_Conc": 0.035,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.018
+      },
+      "Cu": {
+        "Element_Conc": 0.108,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.057
+      },
+      "Zn": {
+        "Element_Conc": 0.24,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.127
+      },
+      "Ga": {
+        "Element_Conc": 0.041,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.022
+      },
+      "As": {
+        "Element_Conc": 0.011,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.006
+      },
+      "Br": {
+        "Element_Conc": 0.013,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.007
+      },
+      "Rb": {
+        "Element_Conc": 0.096,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.05
+      },
+      "Sr": {
+        "Element_Conc": 0.194,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.102
+      },
+      "Y": {
+        "Element_Conc": 0.04,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.021
+      },
+      "Zr": {
+        "Element_Conc": 0.345,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.182
+      },
+      "Ag": {
+        "Element_Conc": 1.397,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.9
+      },
+      "Yb": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.028
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Yb",
+        "Oxide_Conc": 0.0
+      },
+      "Ir": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      },
+      "Pb": {
+        "Element_Conc": 0.054,
+        "Oxide_Name": "Ir",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S8": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.0
+      },
+      "Al": {
+        "Element_Conc": 13.084,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 16.458
+      },
+      "Si": {
+        "Element_Conc": 33.815,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 45.448
+      },
+      "P": {
+        "Element_Conc": 2.885,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 3.88
+      },
+      "K": {
+        "Element_Conc": 2.198,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.493
+      },
+      "Ca": {
+        "Element_Conc": 3.027,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 2.332
+      },
+      "Ti": {
+        "Element_Conc": 2.847,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.523
+      },
+      "V": {
+        "Element_Conc": 0.114,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.059
+      },
+      "Cr": {
+        "Element_Conc": 0.016,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.008
+      },
+      "Mn": {
+        "Element_Conc": 1.333,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.671
+      },
+      "Fe": {
+        "Element_Conc": 38.105,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 26.799
+      },
+      "Ni": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.0
+      },
+      "Cu": {
+        "Element_Conc": 0.066,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.029
+      },
+      "Zn": {
+        "Element_Conc": 0.139,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.062
+      },
+      "Ga": {
+        "Element_Conc": 0.026,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.011
+      },
+      "As": {
+        "Element_Conc": 0.003,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.001
+      },
+      "Rb": {
+        "Element_Conc": 0.052,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.023
+      },
+      "Sr": {
+        "Element_Conc": 0.092,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.041
+      },
+      "Y": {
+        "Element_Conc": 0.016,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.007
+      },
+      "Zr": {
+        "Element_Conc": 0.191,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.084
+      },
+      "Ag": {
+        "Element_Conc": 1.208,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.683
+      },
+      "Eu": {
+        "Element_Conc": 0.743,
+        "Oxide_Name": "Ta",
+        "Oxide_Conc": 0.0
+      },
+      "Yb": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.018
+      },
+      "Ta": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.368
+      },
+      "Re": {
+        "Element_Conc": 0.002,
+        "Oxide_Name": "Yb",
+        "Oxide_Conc": 0.0
+      },
+      "Pb": {
+        "Element_Conc": 0.04,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.001
+      }
+    }
+  },
+  "S9": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.0
+      },
+      "Al": {
+        "Element_Conc": 16.136,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 20.507
+      },
+      "Si": {
+        "Element_Conc": 28.503,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 38.671
+      },
+      "P": {
+        "Element_Conc": 3.394,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 4.656
+      },
+      "Cl": {
+        "Element_Conc": 0.261,
+        "Oxide_Name": "Cl",
+        "Oxide_Conc": 0.154
+      },
+      "K": {
+        "Element_Conc": 2.051,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.419
+      },
+      "Ca": {
+        "Element_Conc": 2.694,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 2.117
+      },
+      "Ti": {
+        "Element_Conc": 2.639,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.443
+      },
+      "V": {
+        "Element_Conc": 0.104,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.055
+      },
+      "Cr": {
+        "Element_Conc": 0.017,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.009
+      },
+      "Mn": {
+        "Element_Conc": 1.283,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.66
+      },
+      "Fe": {
+        "Element_Conc": 40.131,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 28.854
+      },
+      "Ni": {
+        "Element_Conc": 0.006,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.0
+      },
+      "Cu": {
+        "Element_Conc": 0.077,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.035
+      },
+      "Zn": {
+        "Element_Conc": 0.166,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.076
+      },
+      "Ga": {
+        "Element_Conc": 0.035,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.016
+      },
+      "As": {
+        "Element_Conc": 0.006,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.003
+      },
+      "Rb": {
+        "Element_Conc": 0.055,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.025
+      },
+      "Sr": {
+        "Element_Conc": 0.109,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.049
+      },
+      "Y": {
+        "Element_Conc": 0.023,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.01
+      },
+      "Zr": {
+        "Element_Conc": 0.237,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.107
+      },
+      "Ag": {
+        "Element_Conc": 1.218,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.702
+      },
+      "Eu": {
+        "Element_Conc": 0.814,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.019
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.414
+      },
+      "Pb": {
+        "Element_Conc": 0.043,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S10": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 1.181,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 1.339
+      },
+      "Al": {
+        "Element_Conc": 11.718,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 14.644
+      },
+      "Si": {
+        "Element_Conc": 35.918,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 47.947
+      },
+      "P": {
+        "Element_Conc": 2.725,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 3.616
+      },
+      "K": {
+        "Element_Conc": 1.588,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.065
+      },
+      "Ca": {
+        "Element_Conc": 3.759,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 2.862
+      },
+      "Ti": {
+        "Element_Conc": 2.855,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.504
+      },
+      "V": {
+        "Element_Conc": 0.122,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.063
+      },
+      "Cr": {
+        "Element_Conc": 0.01,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.005
+      },
+      "Mn": {
+        "Element_Conc": 2.639,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 1.306
+      },
+      "Fe": {
+        "Element_Conc": 35.738,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 24.754
+      },
+      "Ni": {
+        "Element_Conc": 0.021,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.009
+      },
+      "Cu": {
+        "Element_Conc": 0.05,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.022
+      },
+      "Zn": {
+        "Element_Conc": 0.146,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.064
+      },
+      "Ga": {
+        "Element_Conc": 0.021,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.009
+      },
+      "As": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.0
+      },
+      "Br": {
+        "Element_Conc": 0.015,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.006
+      },
+      "Rb": {
+        "Element_Conc": 0.044,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.019
+      },
+      "Sr": {
+        "Element_Conc": 0.1,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.043
+      },
+      "Y": {
+        "Element_Conc": 0.032,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.014
+      },
+      "Zr": {
+        "Element_Conc": 0.192,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.083
+      },
+      "Ag": {
+        "Element_Conc": 1.084,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.606
+      },
+      "Re": {
+        "Element_Conc": 0.001,
+        "Oxide_Name": "Tl",
+        "Oxide_Conc": 0.0
+      },
+      "Tl": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.018
+      },
+      "Pb": {
+        "Element_Conc": 0.041,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S11": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.0
+      },
+      "Al": {
+        "Element_Conc": 12.849,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 16.155
+      },
+      "Si": {
+        "Element_Conc": 34.591,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 46.466
+      },
+      "P": {
+        "Element_Conc": 2.542,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 3.409
+      },
+      "K": {
+        "Element_Conc": 1.543,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.046
+      },
+      "Ca": {
+        "Element_Conc": 3.923,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 3.019
+      },
+      "Ti": {
+        "Element_Conc": 2.949,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.57
+      },
+      "V": {
+        "Element_Conc": 0.127,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.066
+      },
+      "Cr": {
+        "Element_Conc": 0.013,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.007
+      },
+      "Mn": {
+        "Element_Conc": 2.162,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 1.081
+      },
+      "Fe": {
+        "Element_Conc": 37.475,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 26.234
+      },
+      "Ni": {
+        "Element_Conc": 0.026,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.011
+      },
+      "Cu": {
+        "Element_Conc": 0.056,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.025
+      },
+      "Zn": {
+        "Element_Conc": 0.147,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.065
+      },
+      "Ga": {
+        "Element_Conc": 0.025,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.011
+      },
+      "As": {
+        "Element_Conc": 0.005,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.002
+      },
+      "Br": {
+        "Element_Conc": 0.012,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.005
+      },
+      "Rb": {
+        "Element_Conc": 0.045,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.02
+      },
+      "Sr": {
+        "Element_Conc": 0.101,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.044
+      },
+      "Y": {
+        "Element_Conc": 0.035,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.015
+      },
+      "Zr": {
+        "Element_Conc": 0.184,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.081
+      },
+      "Ag": {
+        "Element_Conc": 1.156,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.653
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.016
+      },
+      "Ir": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      },
+      "Pb": {
+        "Element_Conc": 0.035,
+        "Oxide_Name": "Ir",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S12": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.049,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.058
+      },
+      "Al": {
+        "Element_Conc": 14.414,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 18.015
+      },
+      "Si": {
+        "Element_Conc": 35.151,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 46.617
+      },
+      "P": {
+        "Element_Conc": 2.502,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 3.3
+      },
+      "K": {
+        "Element_Conc": 1.735,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.156
+      },
+      "Ca": {
+        "Element_Conc": 4.429,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 3.346
+      },
+      "Ti": {
+        "Element_Conc": 2.737,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.428
+      },
+      "V": {
+        "Element_Conc": 0.111,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.056
+      },
+      "Cr": {
+        "Element_Conc": 0.012,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.006
+      },
+      "Mn": {
+        "Element_Conc": 1.878,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.922
+      },
+      "Fe": {
+        "Element_Conc": 35.157,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 24.162
+      },
+      "Ni": {
+        "Element_Conc": 0.027,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.012
+      },
+      "Cu": {
+        "Element_Conc": 0.057,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.025
+      },
+      "Zn": {
+        "Element_Conc": 0.121,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.052
+      },
+      "Ga": {
+        "Element_Conc": 0.024,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.01
+      },
+      "As": {
+        "Element_Conc": 0.01,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.004
+      },
+      "Rb": {
+        "Element_Conc": 0.042,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.018
+      },
+      "Sr": {
+        "Element_Conc": 0.111,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.048
+      },
+      "Y": {
+        "Element_Conc": 0.035,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.015
+      },
+      "Zr": {
+        "Element_Conc": 0.196,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.084
+      },
+      "Ag": {
+        "Element_Conc": 1.172,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.651
+      },
+      "Re": {
+        "Element_Conc": 0.001,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.013
+      },
+      "Pb": {
+        "Element_Conc": 0.03,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S13": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 1.789,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 2.031
+      },
+      "Al": {
+        "Element_Conc": 8.213,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 10.182
+      },
+      "Si": {
+        "Element_Conc": 41.072,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 53.869
+      },
+      "P": {
+        "Element_Conc": 3.45,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 4.384
+      },
+      "K": {
+        "Element_Conc": 2.437,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.552
+      },
+      "Ca": {
+        "Element_Conc": 13.295,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 9.515
+      },
+      "Ti": {
+        "Element_Conc": 2.115,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.017
+      },
+      "V": {
+        "Element_Conc": 0.074,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.035
+      },
+      "Cr": {
+        "Element_Conc": 0.015,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.007
+      },
+      "Mn": {
+        "Element_Conc": 0.35,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.16
+      },
+      "Fe": {
+        "Element_Conc": 25.521,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 16.479
+      },
+      "Cu": {
+        "Element_Conc": 0.053,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.022
+      },
+      "Zn": {
+        "Element_Conc": 0.15,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.062
+      },
+      "Ga": {
+        "Element_Conc": 0.018,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.007
+      },
+      "As": {
+        "Element_Conc": 0.005,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.002
+      },
+      "Rb": {
+        "Element_Conc": 0.045,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.018
+      },
+      "Sr": {
+        "Element_Conc": 0.328,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.133
+      },
+      "Y": {
+        "Element_Conc": 0.019,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.008
+      },
+      "Zr": {
+        "Element_Conc": 0.154,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.062
+      },
+      "Ag": {
+        "Element_Conc": 0.399,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.212
+      },
+      "In": {
+        "Element_Conc": 0.243,
+        "Oxide_Name": "In",
+        "Oxide_Conc": 0.126
+      },
+      "Nd": {
+        "Element_Conc": 0.006,
+        "Oxide_Name": "Nd",
+        "Oxide_Conc": 0.002
+      },
+      "Eu": {
+        "Element_Conc": 0.227,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.009
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.106
+      },
+      "Ir": {
+        "Element_Conc": 0.002,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      },
+      "Pb": {
+        "Element_Conc": 0.021,
+        "Oxide_Name": "Ir",
+        "Oxide_Conc": 0.001
+      }
+    }
+  },
+  "S14": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 1.13,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 1.277
+      },
+      "Al": {
+        "Element_Conc": 9.528,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 11.837
+      },
+      "Si": {
+        "Element_Conc": 40.523,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 53.204
+      },
+      "P": {
+        "Element_Conc": 3.05,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 3.891
+      },
+      "K": {
+        "Element_Conc": 2.324,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.488
+      },
+      "Ca": {
+        "Element_Conc": 12.665,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 9.117
+      },
+      "Ti": {
+        "Element_Conc": 2.183,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.058
+      },
+      "V": {
+        "Element_Conc": 0.078,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.037
+      },
+      "Cr": {
+        "Element_Conc": 0.008,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.004
+      },
+      "Mn": {
+        "Element_Conc": 0.648,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.3
+      },
+      "Fe": {
+        "Element_Conc": 26.158,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 16.993
+      },
+      "Cu": {
+        "Element_Conc": 0.046,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.019
+      },
+      "Zn": {
+        "Element_Conc": 0.074,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.031
+      },
+      "Ga": {
+        "Element_Conc": 0.019,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.008
+      },
+      "As": {
+        "Element_Conc": 0.007,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.003
+      },
+      "Rb": {
+        "Element_Conc": 0.04,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.016
+      },
+      "Sr": {
+        "Element_Conc": 0.304,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.124
+      },
+      "Y": {
+        "Element_Conc": 0.022,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.009
+      },
+      "Zr": {
+        "Element_Conc": 0.149,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.061
+      },
+      "Ag": {
+        "Element_Conc": 0.442,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.236
+      },
+      "In": {
+        "Element_Conc": 0.223,
+        "Oxide_Name": "In",
+        "Oxide_Conc": 0.116
+      },
+      "Eu": {
+        "Element_Conc": 0.359,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.008
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.164
+      },
+      "Pb": {
+        "Element_Conc": 0.02,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S15": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 2.63,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 2.996
+      },
+      "Al": {
+        "Element_Conc": 9.501,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 11.821
+      },
+      "Si": {
+        "Element_Conc": 38.582,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 50.874
+      },
+      "P": {
+        "Element_Conc": 3.088,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 3.984
+      },
+      "K": {
+        "Element_Conc": 2.26,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.464
+      },
+      "Ca": {
+        "Element_Conc": 11.709,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 8.535
+      },
+      "Ti": {
+        "Element_Conc": 2.139,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.054
+      },
+      "V": {
+        "Element_Conc": 0.078,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.038
+      },
+      "Cr": {
+        "Element_Conc": 0.007,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.004
+      },
+      "Mn": {
+        "Element_Conc": 0.987,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.464
+      },
+      "Fe": {
+        "Element_Conc": 26.929,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 17.763
+      },
+      "Cu": {
+        "Element_Conc": 0.051,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.021
+      },
+      "Zn": {
+        "Element_Conc": 0.085,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.036
+      },
+      "Ga": {
+        "Element_Conc": 0.023,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.01
+      },
+      "As": {
+        "Element_Conc": 0.012,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.005
+      },
+      "Rb": {
+        "Element_Conc": 0.038,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.016
+      },
+      "Sr": {
+        "Element_Conc": 0.307,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.127
+      },
+      "Y": {
+        "Element_Conc": 0.024,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.01
+      },
+      "Zr": {
+        "Element_Conc": 0.145,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.06
+      },
+      "Ag": {
+        "Element_Conc": 0.734,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.396
+      },
+      "In": {
+        "Element_Conc": 0.221,
+        "Oxide_Name": "In",
+        "Oxide_Conc": 0.116
+      },
+      "Nd": {
+        "Element_Conc": 0.006,
+        "Oxide_Name": "Nd",
+        "Oxide_Conc": 0.002
+      },
+      "Eu": {
+        "Element_Conc": 0.427,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.007
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.199
+      },
+      "Ir": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      },
+      "Pb": {
+        "Element_Conc": 0.016,
+        "Oxide_Name": "Ir",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S16": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.971,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.62
+      },
+      "Al": {
+        "Element_Conc": 5.737,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 7.14
+      },
+      "Si": {
+        "Element_Conc": 41.565,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 53.192
+      },
+      "P": {
+        "Element_Conc": 3.599,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 4.851
+      },
+      "Cl": {
+        "Element_Conc": 0.023,
+        "Oxide_Name": "Cl",
+        "Oxide_Conc": 0.014
+      },
+      "K": {
+        "Element_Conc": 2.929,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 2.009
+      },
+      "Ca": {
+        "Element_Conc": 14.677,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 11.36
+      },
+      "Ti": {
+        "Element_Conc": 2.128,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.121
+      },
+      "V": {
+        "Element_Conc": 0.073,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.038
+      },
+      "Cr": {
+        "Element_Conc": 0.003,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.002
+      },
+      "Mn": {
+        "Element_Conc": 1.046,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.532
+      },
+      "Fe": {
+        "Element_Conc": 25.07,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 18.0
+      },
+      "Cu": {
+        "Element_Conc": 0.058,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.027
+      },
+      "Zn": {
+        "Element_Conc": 0.166,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.078
+      },
+      "Ga": {
+        "Element_Conc": 0.022,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.01
+      },
+      "As": {
+        "Element_Conc": 0.011,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.005
+      },
+      "Br": {
+        "Element_Conc": 0.013,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.006
+      },
+      "Rb": {
+        "Element_Conc": 0.052,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.024
+      },
+      "Sr": {
+        "Element_Conc": 0.354,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.165
+      },
+      "Y": {
+        "Element_Conc": 0.022,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.01
+      },
+      "Zr": {
+        "Element_Conc": 0.156,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.072
+      },
+      "Ag": {
+        "Element_Conc": 0.578,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.33
+      },
+      "In": {
+        "Element_Conc": 0.318,
+        "Oxide_Name": "In",
+        "Oxide_Conc": 0.177
+      },
+      "Eu": {
+        "Element_Conc": 0.413,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.008
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.21
+      },
+      "Pb": {
+        "Element_Conc": 0.017,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S17": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.0
+      },
+      "Al": {
+        "Element_Conc": 6.275,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 7.542
+      },
+      "Si": {
+        "Element_Conc": 54.372,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 67.283
+      },
+      "P": {
+        "Element_Conc": 3.923,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 4.504
+      },
+      "K": {
+        "Element_Conc": 1.961,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.131
+      },
+      "Ca": {
+        "Element_Conc": 10.146,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 6.584
+      },
+      "Ti": {
+        "Element_Conc": 1.286,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 0.562
+      },
+      "V": {
+        "Element_Conc": 0.052,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.022
+      },
+      "Mn": {
+        "Element_Conc": 0.702,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.293
+      },
+      "Fe": {
+        "Element_Conc": 18.786,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 11.007
+      },
+      "Cu": {
+        "Element_Conc": 0.052,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.019
+      },
+      "Zn": {
+        "Element_Conc": 0.136,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.051
+      },
+      "Ga": {
+        "Element_Conc": 0.015,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.006
+      },
+      "As": {
+        "Element_Conc": 0.008,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.003
+      },
+      "Rb": {
+        "Element_Conc": 0.041,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.015
+      },
+      "Sr": {
+        "Element_Conc": 0.25,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.092
+      },
+      "Y": {
+        "Element_Conc": 0.023,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.009
+      },
+      "Zr": {
+        "Element_Conc": 0.125,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.046
+      },
+      "Ag": {
+        "Element_Conc": 0.578,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.278
+      },
+      "In": {
+        "Element_Conc": 0.278,
+        "Oxide_Name": "In",
+        "Oxide_Conc": 0.13
+      },
+      "Ba": {
+        "Element_Conc": 0.616,
+        "Oxide_Name": "Ba",
+        "Oxide_Conc": 0.268
+      },
+      "Nd": {
+        "Element_Conc": 0.169,
+        "Oxide_Name": "Nd",
+        "Oxide_Conc": 0.07
+      },
+      "Eu": {
+        "Element_Conc": 0.192,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.004
+      },
+      "Re": {
+        "Element_Conc": 0.002,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.08
+      },
+      "Ir": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.001
+      },
+      "Pb": {
+        "Element_Conc": 0.011,
+        "Oxide_Name": "Ir",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S18": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.0
+      },
+      "Al": {
+        "Element_Conc": 5.164,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 6.595
+      },
+      "Si": {
+        "Element_Conc": 40.95,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 54.661
+      },
+      "P": {
+        "Element_Conc": 4.491,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 5.887
+      },
+      "Cl": {
+        "Element_Conc": 0.102,
+        "Oxide_Name": "Cl",
+        "Oxide_Conc": 0.057
+      },
+      "K": {
+        "Element_Conc": 4.817,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 3.155
+      },
+      "Ca": {
+        "Element_Conc": 13.277,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 9.717
+      },
+      "Ti": {
+        "Element_Conc": 1.883,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 0.933
+      },
+      "V": {
+        "Element_Conc": 0.061,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.03
+      },
+      "Cr": {
+        "Element_Conc": 0.011,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.005
+      },
+      "Mn": {
+        "Element_Conc": 0.91,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.432
+      },
+      "Fe": {
+        "Element_Conc": 26.051,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 17.429
+      },
+      "Cu": {
+        "Element_Conc": 0.086,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.037
+      },
+      "Zn": {
+        "Element_Conc": 0.235,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.101
+      },
+      "Ga": {
+        "Element_Conc": 0.023,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.01
+      },
+      "As": {
+        "Element_Conc": 0.01,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.004
+      },
+      "Br": {
+        "Element_Conc": 0.013,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.005
+      },
+      "Rb": {
+        "Element_Conc": 0.061,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.026
+      },
+      "Sr": {
+        "Element_Conc": 0.369,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.157
+      },
+      "Y": {
+        "Element_Conc": 0.029,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.012
+      },
+      "Zr": {
+        "Element_Conc": 0.174,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.074
+      },
+      "Ag": {
+        "Element_Conc": 0.884,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.483
+      },
+      "Eu": {
+        "Element_Conc": 0.377,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.008
+      },
+      "Re": {
+        "Element_Conc": 0.005,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.179
+      },
+      "Pb": {
+        "Element_Conc": 0.018,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.002
+      }
+    }
+  },
+  "S19": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.349,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.414
+      },
+      "Al": {
+        "Element_Conc": 12.943,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 16.705
+      },
+      "Si": {
+        "Element_Conc": 29.284,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 40.214
+      },
+      "P": {
+        "Element_Conc": 3.861,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 5.312
+      },
+      "Cl": {
+        "Element_Conc": 0.066,
+        "Oxide_Name": "Cl",
+        "Oxide_Conc": 0.039
+      },
+      "K": {
+        "Element_Conc": 4.213,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 2.893
+      },
+      "Ca": {
+        "Element_Conc": 12.731,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 9.802
+      },
+      "Ti": {
+        "Element_Conc": 2.343,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.225
+      },
+      "V": {
+        "Element_Conc": 0.084,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.043
+      },
+      "Mn": {
+        "Element_Conc": 0.877,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.439
+      },
+      "Fe": {
+        "Element_Conc": 30.936,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 21.749
+      },
+      "Cu": {
+        "Element_Conc": 0.082,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.037
+      },
+      "Zn": {
+        "Element_Conc": 0.149,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.067
+      },
+      "Ga": {
+        "Element_Conc": 0.029,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.013
+      },
+      "As": {
+        "Element_Conc": 0.025,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.011
+      },
+      "Br": {
+        "Element_Conc": 0.098,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.044
+      },
+      "Rb": {
+        "Element_Conc": 0.054,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.024
+      },
+      "Sr": {
+        "Element_Conc": 0.267,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.119
+      },
+      "Y": {
+        "Element_Conc": 0.029,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.013
+      },
+      "Zr": {
+        "Element_Conc": 0.233,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.104
+      },
+      "Ag": {
+        "Element_Conc": 0.748,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.429
+      },
+      "In": {
+        "Element_Conc": 0.139,
+        "Oxide_Name": "In",
+        "Oxide_Conc": 0.076
+      },
+      "Eu": {
+        "Element_Conc": 0.423,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.015
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.211
+      },
+      "Pb": {
+        "Element_Conc": 0.034,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S20": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.0
+      },
+      "Al": {
+        "Element_Conc": 14.118,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 17.78
+      },
+      "Si": {
+        "Element_Conc": 33.934,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 45.103
+      },
+      "P": {
+        "Element_Conc": 3.768,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 4.957
+      },
+      "K": {
+        "Element_Conc": 3.858,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 2.541
+      },
+      "Ca": {
+        "Element_Conc": 10.464,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 7.731
+      },
+      "Ti": {
+        "Element_Conc": 2.025,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.018
+      },
+      "V": {
+        "Element_Conc": 0.081,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.04
+      },
+      "Cr": {
+        "Element_Conc": 0.008,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.004
+      },
+      "Mn": {
+        "Element_Conc": 0.713,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.341
+      },
+      "Fe": {
+        "Element_Conc": 28.866,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 19.434
+      },
+      "Cu": {
+        "Element_Conc": 0.087,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.037
+      },
+      "Zn": {
+        "Element_Conc": 0.117,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.05
+      },
+      "Ga": {
+        "Element_Conc": 0.028,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.012
+      },
+      "As": {
+        "Element_Conc": 0.031,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.013
+      },
+      "Br": {
+        "Element_Conc": 0.072,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.031
+      },
+      "Rb": {
+        "Element_Conc": 0.048,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.02
+      },
+      "Sr": {
+        "Element_Conc": 0.245,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.104
+      },
+      "Y": {
+        "Element_Conc": 0.029,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.012
+      },
+      "Zr": {
+        "Element_Conc": 0.186,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.079
+      },
+      "Ag": {
+        "Element_Conc": 0.817,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.449
+      },
+      "In": {
+        "Element_Conc": 0.091,
+        "Oxide_Name": "In",
+        "Oxide_Conc": 0.047
+      },
+      "Nd": {
+        "Element_Conc": 0.004,
+        "Oxide_Name": "Nd",
+        "Oxide_Conc": 0.001
+      },
+      "Eu": {
+        "Element_Conc": 0.383,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.011
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.185
+      },
+      "Pb": {
+        "Element_Conc": 0.026,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S21": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.0
+      },
+      "Al": {
+        "Element_Conc": 14.88,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 18.607
+      },
+      "Si": {
+        "Element_Conc": 34.073,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 44.972
+      },
+      "P": {
+        "Element_Conc": 3.886,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 5.087
+      },
+      "K": {
+        "Element_Conc": 2.733,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.797
+      },
+      "Ca": {
+        "Element_Conc": 7.371,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 5.47
+      },
+      "Ti": {
+        "Element_Conc": 2.203,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.121
+      },
+      "V": {
+        "Element_Conc": 0.089,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.044
+      },
+      "Cr": {
+        "Element_Conc": 0.007,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.003
+      },
+      "Mn": {
+        "Element_Conc": 0.84,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.405
+      },
+      "Fe": {
+        "Element_Conc": 31.56,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 21.346
+      },
+      "Ni": {
+        "Element_Conc": 0.005,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.001
+      },
+      "Cu": {
+        "Element_Conc": 0.108,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.046
+      },
+      "Zn": {
+        "Element_Conc": 0.123,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.053
+      },
+      "Ga": {
+        "Element_Conc": 0.031,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.013
+      },
+      "As": {
+        "Element_Conc": 0.026,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.011
+      },
+      "Br": {
+        "Element_Conc": 0.08,
+        "Oxide_Name": "Br",
+        "Oxide_Conc": 0.034
+      },
+      "Rb": {
+        "Element_Conc": 0.034,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.014
+      },
+      "Sr": {
+        "Element_Conc": 0.23,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.097
+      },
+      "Y": {
+        "Element_Conc": 0.032,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.013
+      },
+      "Zr": {
+        "Element_Conc": 0.213,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.09
+      },
+      "Ag": {
+        "Element_Conc": 0.955,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.524
+      },
+      "Eu": {
+        "Element_Conc": 0.484,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.016
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.234
+      },
+      "Pb": {
+        "Element_Conc": 0.037,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S22": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.863,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.956
+      },
+      "Al": {
+        "Element_Conc": 9.416,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 11.246
+      },
+      "Si": {
+        "Element_Conc": 52.982,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 64.761
+      },
+      "P": {
+        "Element_Conc": 3.653,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 4.16
+      },
+      "K": {
+        "Element_Conc": 3.642,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 2.088
+      },
+      "Ca": {
+        "Element_Conc": 4.383,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 2.817
+      },
+      "Ti": {
+        "Element_Conc": 3.018,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.335
+      },
+      "V": {
+        "Element_Conc": 0.085,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.036
+      },
+      "Cr": {
+        "Element_Conc": 0.033,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.015
+      },
+      "Mn": {
+        "Element_Conc": 0.228,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.095
+      },
+      "Fe": {
+        "Element_Conc": 19.907,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 11.715
+      },
+      "Ni": {
+        "Element_Conc": 0.024,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.008
+      },
+      "Cu": {
+        "Element_Conc": 0.047,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.017
+      },
+      "Zn": {
+        "Element_Conc": 0.108,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.04
+      },
+      "Ga": {
+        "Element_Conc": 0.018,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.007
+      },
+      "As": {
+        "Element_Conc": 0.007,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.003
+      },
+      "Rb": {
+        "Element_Conc": 0.075,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.027
+      },
+      "Sr": {
+        "Element_Conc": 0.098,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.036
+      },
+      "Y": {
+        "Element_Conc": 0.027,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.01
+      },
+      "Zr": {
+        "Element_Conc": 0.205,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.075
+      },
+      "Ag": {
+        "Element_Conc": 0.974,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.466
+      },
+      "Eu": {
+        "Element_Conc": 0.181,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.008
+      },
+      "Re": {
+        "Element_Conc": 0.001,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.077
+      },
+      "Pb": {
+        "Element_Conc": 0.023,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S23": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.729,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.809
+      },
+      "Al": {
+        "Element_Conc": 9.641,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 11.587
+      },
+      "Si": {
+        "Element_Conc": 50.221,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 62.378
+      },
+      "P": {
+        "Element_Conc": 3.385,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 3.97
+      },
+      "K": {
+        "Element_Conc": 3.54,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 2.092
+      },
+      "Ca": {
+        "Element_Conc": 3.932,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 2.611
+      },
+      "Ti": {
+        "Element_Conc": 2.975,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.363
+      },
+      "V": {
+        "Element_Conc": 0.09,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.04
+      },
+      "Cr": {
+        "Element_Conc": 0.036,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.016
+      },
+      "Mn": {
+        "Element_Conc": 0.179,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.077
+      },
+      "Fe": {
+        "Element_Conc": 23.465,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 14.244
+      },
+      "Ni": {
+        "Element_Conc": 0.021,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.008
+      },
+      "Cu": {
+        "Element_Conc": 0.037,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.014
+      },
+      "Zn": {
+        "Element_Conc": 0.104,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.04
+      },
+      "Ga": {
+        "Element_Conc": 0.019,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.007
+      },
+      "As": {
+        "Element_Conc": 0.008,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.003
+      },
+      "Rb": {
+        "Element_Conc": 0.078,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.03
+      },
+      "Sr": {
+        "Element_Conc": 0.095,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.036
+      },
+      "Y": {
+        "Element_Conc": 0.025,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.009
+      },
+      "Zr": {
+        "Element_Conc": 0.197,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.074
+      },
+      "Ag": {
+        "Element_Conc": 1.034,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.51
+      },
+      "Eu": {
+        "Element_Conc": 0.167,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.009
+      },
+      "Yb": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.074
+      },
+      "Re": {
+        "Element_Conc": 0.001,
+        "Oxide_Name": "Yb",
+        "Oxide_Conc": 0.0
+      },
+      "Ir": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      },
+      "Pb": {
+        "Element_Conc": 0.024,
+        "Oxide_Name": "Ir",
+        "Oxide_Conc": 0.0
+      }
+    }
+  },
+  "S24": {
+    "Elements": {
+      "Na": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Na2O",
+        "Oxide_Conc": 0.0
+      },
+      "Mg": {
+        "Element_Conc": 0.791,
+        "Oxide_Name": "MgO",
+        "Oxide_Conc": 0.886
+      },
+      "Al": {
+        "Element_Conc": 10.139,
+        "Oxide_Name": "Al2O3",
+        "Oxide_Conc": 12.437
+      },
+      "Si": {
+        "Element_Conc": 41.839,
+        "Oxide_Name": "SiO2",
+        "Oxide_Conc": 54.334
+      },
+      "P": {
+        "Element_Conc": 2.858,
+        "Oxide_Name": "P2O5",
+        "Oxide_Conc": 3.623
+      },
+      "K": {
+        "Element_Conc": 2.87,
+        "Oxide_Name": "K2O",
+        "Oxide_Conc": 1.839
+      },
+      "Ca": {
+        "Element_Conc": 3.498,
+        "Oxide_Name": "CaO",
+        "Oxide_Conc": 2.532
+      },
+      "Ti": {
+        "Element_Conc": 2.346,
+        "Oxide_Name": "Ti",
+        "Oxide_Conc": 1.177
+      },
+      "V": {
+        "Element_Conc": 0.079,
+        "Oxide_Name": "V",
+        "Oxide_Conc": 0.039
+      },
+      "Cr": {
+        "Element_Conc": 0.034,
+        "Oxide_Name": "Cr",
+        "Oxide_Conc": 0.017
+      },
+      "Mn": {
+        "Element_Conc": 0.204,
+        "Oxide_Name": "Mn",
+        "Oxide_Conc": 0.096
+      },
+      "Fe": {
+        "Element_Conc": 33.497,
+        "Oxide_Name": "Fe2O3",
+        "Oxide_Conc": 22.119
+      },
+      "Ni": {
+        "Element_Conc": 0.023,
+        "Oxide_Name": "Ni",
+        "Oxide_Conc": 0.009
+      },
+      "Cu": {
+        "Element_Conc": 0.033,
+        "Oxide_Name": "Cu",
+        "Oxide_Conc": 0.014
+      },
+      "Zn": {
+        "Element_Conc": 0.11,
+        "Oxide_Name": "Zn",
+        "Oxide_Conc": 0.045
+      },
+      "Ga": {
+        "Element_Conc": 0.019,
+        "Oxide_Name": "Ga",
+        "Oxide_Conc": 0.008
+      },
+      "As": {
+        "Element_Conc": 0.004,
+        "Oxide_Name": "As",
+        "Oxide_Conc": 0.002
+      },
+      "Rb": {
+        "Element_Conc": 0.071,
+        "Oxide_Name": "Rb",
+        "Oxide_Conc": 0.029
+      },
+      "Sr": {
+        "Element_Conc": 0.089,
+        "Oxide_Name": "Sr",
+        "Oxide_Conc": 0.037
+      },
+      "Y": {
+        "Element_Conc": 0.023,
+        "Oxide_Name": "Y",
+        "Oxide_Conc": 0.009
+      },
+      "Zr": {
+        "Element_Conc": 0.182,
+        "Oxide_Name": "Zr",
+        "Oxide_Conc": 0.075
+      },
+      "Ag": {
+        "Element_Conc": 1.042,
+        "Oxide_Name": "Ag",
+        "Oxide_Conc": 0.557
+      },
+      "Eu": {
+        "Element_Conc": 0.211,
+        "Oxide_Name": "Pb",
+        "Oxide_Conc": 0.015
+      },
+      "Yb": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Eu",
+        "Oxide_Conc": 0.102
+      },
+      "Re": {
+        "Element_Conc": 0.0,
+        "Oxide_Name": "Yb",
+        "Oxide_Conc": 0.0
+      },
+      "Pb": {
+        "Element_Conc": 0.036,
+        "Oxide_Name": "Re",
+        "Oxide_Conc": 0.0
+      }
+    }
+  }
+}
