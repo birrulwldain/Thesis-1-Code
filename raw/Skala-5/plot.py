@@ -3740,8 +3740,6 @@ class PlotViewer(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "Error CFL", f"Gagal memuat modul CFL Analyzer:\n{e}\nPastikan cfl_gui.py dan library-nya tersedia.")
 
     def batch_automate_iterations(self):
-        import pandas as pd
-        from pathlib import Path
         from datetime import datetime
 
         target_dir = Path.cwd() / "0-b"
@@ -3756,21 +3754,12 @@ class PlotViewer(QtWidgets.QMainWindow):
         if not asc_files:
             QtWidgets.QMessageBox.warning(self, "Error", "Tidak ada file .asc di folder 0.")
             return
-            
-        ref_input, ok = QtWidgets.QInputDialog.getText(
-            self, "Auto-Calibration Option",
-            f"Ditemukan {len(asc_files)} sampel iterasi.\n\nMasukkan panjang gelombang referensi (NIST nm) untuk Auto-Calibration secara global (Contoh: 396.84 untuk Ca II):\nKosongkan jika tidak ada shift."
-        )
-        if not ok: return
-        
-        target_calib_wl = None
-        if ref_input.strip():
-            try:
-                target_calib_wl = float(ref_input.strip())
-            except ValueError:
-                QtWidgets.QMessageBox.warning(self, "Error", "Input panjang gelombang tidak valid. Harus angka desimal.")
-                return
 
+        dlg = BatchCalibrationDialog(self)
+        if dlg.exec() == QtWidgets.QDialog.Accepted:
+            target_calib_wl = dlg.selected_wl
+        else:
+            return  # Cancelled batch
         self.multi_peak_cb.setChecked(True)
         
         progress = QtWidgets.QProgressDialog("Memproses Batch (3 iterasi/sampel)...", "Batal", 0, len(asc_files), self)
@@ -4108,6 +4097,105 @@ class CalibrationDialog(QtWidgets.QDialog):
                  self.pv.calibration_offsets[fname] = shift
             self.pv.statusBar().showMessage(f"Auto-Calibration applied to {len(shifts)} panels.", 4000)
             self.accept()
+
+class BatchCalibrationDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Batch Auto-Calibration Target")
+        self.resize(400, 450)
+        self.selected_wl = None
+        self.pv = parent
+        
+        ly = QtWidgets.QVBoxLayout(self)
+        lbl = QtWidgets.QLabel("Pilih garis referensi NIST untuk menggeser posisi X (kalibrasi) seluruh sampel secara otomatis pada background processing.\n\nKlik 'Bypass (Tanpa Offset)' jika tidak mengharapkan kalibrasi data.")
+        lbl.setWordWrap(True)
+        lbl.setStyleSheet("font-weight: bold; margin-bottom: 10px;")
+        ly.addWidget(lbl)
+        
+        # Row 1: Element Selector
+        r1 = QtWidgets.QHBoxLayout()
+        r1.addWidget(QtWidgets.QLabel("Element:"))
+        self.txt_el = QtWidgets.QLineEdit(getattr(self.pv, 'last_calib_element', ''))
+        r1.addWidget(self.txt_el)
+        r1.addWidget(QtWidgets.QLabel("Ion:"))
+        self.combo_ion = QtWidgets.QComboBox()
+        self.combo_ion.addItems(["I", "II", "III"])
+        self.combo_ion.setCurrentText(getattr(self.pv, 'last_calib_ion', 'I'))
+        r1.addWidget(self.combo_ion)
+        
+        btn_fetch = QtWidgets.QPushButton("Fetch NIST")
+        btn_fetch.clicked.connect(self.fetch_lines)
+        r1.addWidget(btn_fetch)
+        ly.addLayout(r1)
+        
+        # List of Lines
+        self.list_lines = QtWidgets.QListWidget()
+        self.list_lines.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        ly.addWidget(self.list_lines)
+        
+        self.lbl_status = QtWidgets.QLabel("Select element and fetch lines...")
+        ly.addWidget(self.lbl_status)
+        
+        btn_layout = QtWidgets.QHBoxLayout()
+        btn_apply = QtWidgets.QPushButton("Gunakan Garis Ini")
+        btn_apply.setStyleSheet("background-color: #0288D1; color: white; font-weight: bold; padding: 5px;")
+        btn_apply.clicked.connect(self.apply_wl)
+        
+        btn_bypass = QtWidgets.QPushButton("Bypass (Tanpa Offset)")
+        btn_bypass.clicked.connect(self.bypass)
+        
+        btn_layout.addWidget(btn_apply)
+        btn_layout.addWidget(btn_bypass)
+        ly.addLayout(btn_layout)
+        
+    def fetch_lines(self):
+        el = self.txt_el.text().strip()
+        ion_str = self.combo_ion.currentText()
+        if not el: return
+        if self.pv:
+            self.pv.last_calib_element = el
+            self.pv.last_calib_ion = ion_str
+            
+        try:
+            from sim import DataFetcher
+            if DataFetcher is None:
+                 self.lbl_status.setText("DataFetcher/sim.py not available.")
+                 return
+                 
+            fetcher = DataFetcher("nist_lines_all.h5")
+            ion = 1 if ion_str == "I" else (2 if ion_str == "II" else 3)
+            data, _ = fetcher.get_nist_data(el, ion)
+            self.list_lines.clear()
+            
+            if not data:
+                self.lbl_status.setText(f"No NIST lines found for {el} {ion_str}")
+                return
+            
+            data.sort(key=lambda x: x[0])
+            for row in data:
+                wl = row[0]
+                aki = row[1]
+                item = QtWidgets.QListWidgetItem(f"{wl:.4f} nm  (Aki: {aki:.2e})")
+                item.setData(QtCore.Qt.UserRole, wl)
+                self.list_lines.addItem(item)
+                
+            self.lbl_status.setText(f"Loaded {len(data)} lines.")
+        except Exception as e:
+             QtWidgets.QMessageBox.critical(self, "Error", f"Fetch Failed:\n{e}")
+
+    def apply_wl(self):
+        item = self.list_lines.currentItem()
+        if not item:
+            QtWidgets.QMessageBox.warning(self, "Warning", "Pilih garis terlebih dahulu.")
+            return
+        self.selected_wl = item.data(QtCore.Qt.UserRole)
+        self.accept()
+        
+    def bypass(self):
+        self.selected_wl = None
+        self.accept()
+
+
 
 def main():
     print("=== PLOT.PY VERSION: ERROR HANDLING UPDATED ===")
