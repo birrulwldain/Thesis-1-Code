@@ -88,9 +88,10 @@ Contributions of this work are threefold: (i) the first encoder--decoder framewo
 \subsection{Framework overview}
 % --------------------------------------------------------------------------------------------
 
-The proposed approach follows a two-stage workflow.
-In the first stage \emph{(offline)}, a physics-based forward model generates pairs of monoatomic and polyatomic synthetic spectra across a grid of plasma conditions; these serve as training data.
-In the second stage \emph{(online)}, a CNN--Transformer encoder--decoder consumes the spectral pairs and predicts elemental concentrations.
+The proposed approach followed a two-stage workflow.
+In the first stage \emph{(offline)}, a physics-based forward model generated pairs of monoatomic and polyatomic synthetic spectra across a grid of plasma conditions; these served as training data.
+In the second stage \emph{(online)}, a CNN--Transformer encoder--decoder consumed the spectral pairs and predicted elemental concentrations.
+This separation allowed the forward model to serve purely as a data generator, while the deep-learning architecture was responsible for learning the inverse mapping from spectra to concentrations.
 % Figure~\ref{fig:framework} illustrates the end-to-end pipeline.
 
 % --- Figure 1 excluded for now ---
@@ -158,7 +159,7 @@ In the second stage \emph{(online)}, a CNN--Transformer encoder--decoder consume
 \subsection{Synthetic data generation} \label{sec:synth}
 % --------------------------------------------------------------------------------------------
 
-Synthetic spectra are produced under the assumption of LTE, which is reasonable for the early-to-mid temporal window of nanosecond LIBS plasmas \cite{cristoforetti_local_2010}.
+Synthetic spectra were produced under the assumption of LTE, which is reasonable for the early-to-mid temporal window of nanosecond LIBS plasmas \cite{cristoforetti_local_2010}.
 The population of each ionisation stage is governed by the Saha equation \cite{fujimoto_plasma_2004},
 \begin{equation} \label{eq:saha}
 \frac{n_e \, n_{z+1}}{n_z} = 2\,\frac{Z_{z+1}(T_e)}{Z_z(T_e)} \left(\frac{2\pi m_e k_B T_e}{h^2}\right)^{3/2} \exp\!\left(-\frac{E_{\mathrm{ion},z}}{k_B T_e}\right),
@@ -185,30 +186,52 @@ and a Lorentzian component dominated by Stark broadening \cite{griem_spectral_19
 \end{equation}
 where $\omega_{ki}$ is the electron-impact half-width at reference density $n_{e,\mathrm{ref}}$.
 
-Atomic transition data ($\lambda_{ki}$, $A_{ki}$, $g_i$, $E_i$) are taken from the NIST Atomic Spectra Database \cite{kramida_nist_2024}.
-The spectral window covers 200--900~nm.
-Plasma parameters are sampled on a grid with $T_e \in [5\,000,\;15\,000]$~K and $n_e \in [10^{16},\;10^{18}]$~cm$^{-3}$.
-For each plasma condition and each element $z$, a monoatomic spectrum $S_{\mathrm{mono}}^{(z)}(\lambda)$ is computed by summing equation~(\ref{eq:emiss}) over all transitions of that element.
-The corresponding polyatomic spectrum is constructed as a concentration-weighted superposition,
+Atomic transition data ($\lambda_{ki}$, $A_{ki}$, $g_i$, $E_i$) were taken from the NIST Atomic Spectra Database \cite{kramida_nist_2024}.
+The spectral window covered 200--900~nm with a resolution of $\Delta\lambda = 0.02$~nm, yielding approximately 35\,000 spectral channels per spectrum.
+Seven major elements were simulated: Si, Al, Fe, Ca, Mg, Na, and K, whose concentration ranges were chosen to reflect the geochemistry of volcanic soils (table~\ref{tab:comp}).
+Plasma parameters were uniformly randomly sampled within $T_e \in [6\,000,\;15\,000]$~K and $n_e \in [10^{16},\;10^{17}]$~cm$^{-3}$, yielding a total of 10\,000 synthetic spectra.
+For each plasma condition and each element $z$, a monoatomic spectrum $S_{\mathrm{mono}}^{(z)}(\lambda)$ was computed by summing equation~(\ref{eq:emiss}) over all transitions of that element.
+The corresponding polyatomic spectrum was constructed as a concentration-weighted superposition,
 \begin{equation} \label{eq:poly}
 S_{\mathrm{poly}}(\lambda) = \sum_{z} c_z \, S_{\mathrm{mono}}^{(z)}(\lambda),
 \end{equation}
 where $c_z$ is the fractional concentration of element $z$, with $\sum_z c_z = 1$.
-Finally, the synthetic spectrum is convolved with an instrumental Gaussian of full width at half maximum $\Delta\lambda_{\mathrm{inst}} \approx 0.1$~nm to match the spectral resolution of the laboratory spectrometer.
+Finally, each synthetic spectrum was convolved with an instrumental Gaussian of full width at half maximum $\Delta\lambda_{\mathrm{inst}} = 0.02$~nm to match the spectral resolution of the echelle spectrometer.
+The resulting dataset was split into 80\% training and 20\% test partitions.
+
+\begin{table}[htbp]
+\centering
+\caption{Reference elemental composition ranges (\% wt) used for synthetic spectral dataset generation, based on typical volcanic soil geochemistry and experimental XRF observations.}
+\label{tab:comp}
+\begin{tabular}{llll}
+\toprule
+Group & Element & Range (\%) & Role / Notes \\
+\midrule
+Major & Si & 40--60 & Dominant silicate component \\
+Major & Al & 10--20 & Aluminosilicate / feldspar minerals \\
+Major & Fe & 5--15  & Iron oxides and ferromagnesian minerals \\
+Major & Ca & 3--10  & Plagioclase and carbonate minerals \\
+Major & Mg & 2--8   & Olivine and pyroxene minerals \\
+Major & Na & 1--5   & Alkali feldspar component \\
+Major & K  & 1--5   & Potassium feldspar \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 
 % --------------------------------------------------------------------------------------------
 \subsection{Experimental data} \label{sec:exp}
 % --------------------------------------------------------------------------------------------
 
-Experimental LIBS spectra are acquired from volcanic-soil samples collected in the Aceh region of Sumatra, Indonesia.
-The soil pellets are ablated with a Q-switched Nd:YAG laser operating at 1064~nm.
-Emission is collected and dispersed by an echelle spectrometer coupled to an intensified CCD detector.
-Each spectrum represents the average of multiple laser shots to improve the signal-to-noise ratio.
+Experimental LIBS spectra were acquired from 24~volcanic-soil samples collected on the flanks of Gunung Seulawah Agam, Aceh, Sumatra, Indonesia.
+Samples were taken from four cardinal directions (North, West, South, East) at three depths (0--20, 20--40, and 40--60~cm), yielding a spatially representative dataset of the volcanic edifice.
+Each soil pellet was ablated with a Q-switched Nd:YAG laser operating at 1064~nm with a pulse energy of 114~mJ.
+Plasma emission was collected and dispersed by an echelle spectrometer coupled to an optical multichannel analyser (OMA) detector.
+Three laser shots were acquired per sample and averaged to improve the signal-to-noise ratio.
 
-Ground-truth elemental concentrations are obtained independently by X-ray fluorescence (XRF) analysis.
-The XRF concentrations serve as regression targets during fine-tuning, while CF-LIBS derived concentrations \cite{cristoforetti_local_2010} provide supplementary validation.
-Detailed instrumental parameters and sample-preparation protocols are summarised in table~\ref{tab:exp}.
+Ground-truth elemental concentrations were obtained independently by X-ray fluorescence (XRF) analysis.
+The XRF concentrations served as regression targets during fine-tuning, while CF-LIBS derived concentrations \cite{cristoforetti_local_2010} provided supplementary validation.
+Instrumental parameters are summarised in table~\ref{tab:exp}.
 
 \begin{table}[htbp]
 \centering
@@ -218,12 +241,18 @@ Detailed instrumental parameters and sample-preparation protocols are summarised
 \toprule
 Parameter & Value \\
 \midrule
+Laser type             & Q-switched Nd:YAG \\
 Laser wavelength       & 1064~nm \\
 Pulse energy           & 114~mJ \\
 Gate delay             & 0.5~$\mu$s \\
 Gate width             & 0.5~$\mu$s \\
+Spectrometer           & Echelle \\
+Detector               & OMA \\
 Spectral range         & 200--900~nm \\
+Shots per sample       & 3 \\
 Number of samples      & 24 \\
+Sampling directions    & 4 (N, W, S, E) \\
+Sampling depths        & 0--20, 20--40, 40--60~cm \\
 Ground-truth method    & XRF \\
 \bottomrule
 \end{tabular}
@@ -234,8 +263,9 @@ Ground-truth method    & XRF \\
 \subsection{CNN--Transformer encoder--decoder architecture} \label{sec:model}
 % --------------------------------------------------------------------------------------------
 
-The architecture comprises four modules: (i) a shared 1D~CNN feature extractor, (ii) a Transformer encoder operating on monoatomic representations, (iii) a Transformer decoder with cross-attention operating on the polyatomic spectrum, and (iv) a regression head that outputs elemental concentrations.
+The architecture comprised four modules: (i) a shared 1D~CNN feature extractor, (ii) a Transformer encoder operating on monoatomic representations, (iii) a Transformer decoder with cross-attention operating on the polyatomic spectrum, and (iv) a regression head that outputs elemental concentrations.
 Figure~\ref{fig:architecture} shows the complete model.
+The hyperparameters used throughout the experiments are listed in table~\ref{tab:hyper}.
 
 \begin{figure}[htbp]
 \centering
@@ -248,31 +278,31 @@ Figure~\ref{fig:architecture} shows the complete model.
 
 A monoatomic spectrum $S_{\mathrm{mono}}^{(z)}(\lambda) \in \mathbb{R}^{L}$ is a one-dimensional signal of length $L$ (number of wavelength channels) corresponding to element~$z$.
 The polyatomic spectrum $S_{\mathrm{poly}}(\lambda) \in \mathbb{R}^{L}$ is the experimentally measured or synthetically generated mixture signal.
-Both are normalised to unit maximum intensity before being input to the model.
+Both were normalised to unit maximum intensity before being input to the model.
 
 \subsubsection{1D CNN feature extractor.}
 
-Each spectrum is passed through a stack of 1D convolutional layers \cite{he_deep_2016} that capture local emission-line patterns:
+Each spectrum was passed through a stack of three 1D convolutional layers \cite{he_deep_2016} with kernel sizes of 7, 5, and 3 and filter counts of 64, 128, and 128, respectively, to capture local emission-line patterns:
 \begin{equation}
 \mathbf{F} = \mathrm{ReLU}\!\bigl(\mathrm{BN}(\mathrm{Conv1D}(S;\,\Theta_{\mathrm{cnn}}))\bigr),
 \end{equation}
 where $\mathrm{BN}$ denotes batch normalisation \cite{ioffe_batch_2015} and $\Theta_{\mathrm{cnn}}$ are the learnable convolutional parameters.
-The CNN parameters are shared between the encoder and decoder paths to enforce a common spectral feature space.
-The output is a sequence of feature vectors $\mathbf{F} \in \mathbb{R}^{L' \times d}$, where $L'$ is the reduced sequence length after pooling and $d$ is the feature dimension.
+The CNN parameters were shared between the encoder and decoder paths to enforce a common spectral feature space.
+The output is a sequence of feature vectors $\mathbf{F} \in \mathbb{R}^{L' \times d}$, where $L'$ is the reduced sequence length after pooling and $d = 128$ is the feature dimension.
 
 \subsubsection{Transformer encoder.}
 
-The encoder receives the CNN features of all $Z$ monoatomic spectra, concatenated along the sequence dimension, together with learnable element-type and positional embeddings \cite{vaswani_attention_2017}.
-Multi-head self-attention learns intra-element and inter-element dependencies:
+The encoder received the CNN features of all $Z$ monoatomic spectra, concatenated along the sequence dimension, together with learnable element-type and positional embeddings \cite{vaswani_attention_2017}.
+Multi-head self-attention with $h = 8$ heads learns intra-element and inter-element dependencies:
 \begin{equation}
 \mathrm{Attention}(\mathbf{Q},\mathbf{K},\mathbf{V}) = \mathrm{softmax}\!\left(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d_k}}\right)\mathbf{V}.
 \end{equation}
-After $N_{\mathrm{enc}}$ encoder layers, the output is a set of element-specific latent representations $\mathbf{H}_{\mathrm{enc}} \in \mathbb{R}^{(Z \cdot L') \times d}$.
+After $N_{\mathrm{enc}} = 4$ encoder layers, the output is a set of element-specific latent representations $\mathbf{H}_{\mathrm{enc}} \in \mathbb{R}^{(Z \cdot L') \times d}$.
 
 \subsubsection{Transformer decoder with cross-attention.}
 
-The decoder operates on the CNN features of the polyatomic spectrum \cite{vaswani_attention_2017}.
-Each decoder layer contains three sub-layers: masked self-attention over the mixture features, cross-attention with the encoder output, and a position-wise feed-forward network.
+The decoder operated on the CNN features of the polyatomic spectrum \cite{vaswani_attention_2017}.
+Each decoder layer contained three sub-layers: masked self-attention over the mixture features, cross-attention with the encoder output, and a position-wise feed-forward network.
 The cross-attention mechanism is the key structural innovation:
 \begin{equation}
 \mathbf{Q}_{\mathrm{dec}} = \mathbf{F}_{\mathrm{poly}}\,\mathbf{W}_Q, \quad
@@ -282,33 +312,59 @@ The cross-attention mechanism is the key structural innovation:
 where $\mathbf{F}_{\mathrm{poly}}$ denotes the decoder's polyatomic features and $\mathbf{W}_Q, \mathbf{W}_K, \mathbf{W}_V$ are learnable projections.
 The resulting cross-attention scores have a physically meaningful interpretation: high attention weight between a decoder position (a spectral region of the mixture) and an encoder position (an element-specific feature) indicates that the corresponding element contributes to the mixture intensity at that wavelength.
 
-After $N_{\mathrm{dec}}$ decoder layers, a global average pooling and a linear projection yield the predicted concentration vector:
+After $N_{\mathrm{dec}} = 4$ decoder layers, a global average pooling and a linear projection yielded the predicted concentration vector:
 \begin{equation}
 \hat{\mathbf{c}} = \mathrm{Linear}\!\bigl(\mathrm{GAP}(\mathbf{H}_{\mathrm{dec}})\bigr) \in \mathbb{R}^{Z}.
 \end{equation}
 
+\begin{table}[htbp]
+\centering
+\caption{Model hyperparameters.}
+\label{tab:hyper}
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+CNN layers / kernel sizes       & 3 / (7, 5, 3) \\
+CNN filter counts               & 64, 128, 128 \\
+Model dimension $d$             & 128 \\
+Attention heads $h$             & 8 \\
+Encoder layers $N_{\mathrm{enc}}$ & 4 \\
+Decoder layers $N_{\mathrm{dec}}$ & 4 \\
+Dropout                         & 0.1 \\
+Batch size                      & 32 \\
+Pre-training epochs             & 200 \\
+Fine-tuning epochs              & 50 \\
+Learning rate (pre-train)       & $10^{-4}$ \\
+Learning rate (fine-tune)       & $10^{-5}$ \\
+Reconstruction weight $\alpha$  & 0.1 \\
+GRL weight $\lambda$            & 0.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsubsection{Training strategy.}
 
-The model is trained in two phases.
+The model was trained in two phases.
 
 \emph{Pre-training on synthetic data.}
-The encoder--decoder is trained on $(\{S_{\mathrm{mono}}^{(z)}\}_{z=1}^{Z},\,S_{\mathrm{poly}},\,\mathbf{c})$ triplets generated by the forward model (section~\ref{sec:synth}).
-The loss function combines a concentration regression term and an optional spectral reconstruction term:
+The encoder--decoder was trained on $(\{S_{\mathrm{mono}}^{(z)}\}_{z=1}^{Z},\,S_{\mathrm{poly}},\,\mathbf{c})$ triplets generated by the forward model (section~\ref{sec:synth}).
+The loss function combined a concentration regression term and a spectral reconstruction term:
 \begin{equation} \label{eq:loss}
 \mathcal{L} = \frac{1}{Z}\sum_{z=1}^{Z}(\hat{c}_z - c_z)^2 + \alpha\,\|S_{\mathrm{poly}} - \hat{S}_{\mathrm{poly}}\|_2^2,
 \end{equation}
-where $\alpha$ is a regularisation weight.
-The Adam optimiser \cite{kingma_adam_2015} is used with a learning rate of $10^{-4}$ and cosine annealing schedule.
+where $\alpha = 0.1$ is the reconstruction regularisation weight.
+The Adam optimiser \cite{kingma_adam_2015} was used with an initial learning rate of $10^{-4}$ and a cosine annealing schedule \cite{loshchilov_sgdr_2017}.
 
 \emph{Fine-tuning on experimental data.}
-The pre-trained model is fine-tuned on experimental LIBS spectra with XRF-derived concentrations as targets.
-During fine-tuning the monoatomic spectra are generated by the forward model at plasma conditions estimated from each experimental spectrum.
-The learning rate is reduced by a factor of ten to preserve the representations learned during pre-training.
+The pre-trained model was fine-tuned on experimental LIBS spectra with XRF-derived concentrations as targets.
+During fine-tuning the monoatomic spectra were generated by the forward model at plasma conditions estimated from each experimental spectrum.
+The learning rate was reduced to $10^{-5}$ to preserve the representations learned during pre-training.
 
 \emph{Domain adaptation.}
-To further bridge the synthetic--experimental domain gap, a domain-adversarial training strategy is employed.
-A Gradient Reversal Layer (GRL) is attached to the shared Transformer encoder, feeding into a domain classifier that distinguishes synthetic from experimental spectra.
-During backpropagation the GRL reverses the gradient sign, encouraging the encoder to learn domain-invariant representations.
+To further bridge the synthetic--experimental domain gap, a domain-adversarial training strategy \cite{ganin_domain_2016} was employed.
+A Gradient Reversal Layer (GRL) was attached to the shared Transformer encoder, feeding into a domain classifier that distinguished synthetic from experimental spectra.
+During backpropagation the GRL reversed the gradient sign, encouraging the encoder to learn domain-invariant representations.
 Figure~\ref{fig:domain} illustrates the domain-adaptation architecture.
 
 \begin{figure}[htbp]
@@ -322,7 +378,7 @@ Figure~\ref{fig:domain} illustrates the domain-adaptation architecture.
 \subsection{Evaluation protocol} \label{sec:eval}
 % --------------------------------------------------------------------------------------------
 
-Model performance is quantified by three metrics computed per element:
+Model performance was quantified by three metrics computed per element:
 
 \begin{itemize}
 \item Root Mean Square Error: $\mathrm{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(c_i - \hat{c}_i)^2}$
@@ -330,17 +386,21 @@ Model performance is quantified by three metrics computed per element:
 \item Mean Absolute Percentage Error: $\mathrm{MAPE} = \frac{100\%}{n}\sum\left|\frac{c_i - \hat{c}_i}{c_i}\right|$
 \end{itemize}
 
-Five baseline models are compared:
+Four baseline models were compared:
 \begin{enumerate}
 \item \textbf{PLS}: Partial least-squares regression \cite{wold_pls_2001} on the raw spectrum.
 \item \textbf{CNN-only}: The shared CNN feature extractor followed by a linear regression head, without Transformer layers.
 \item \textbf{Transformer-only}: A Transformer encoder applied directly to the raw polyatomic spectrum without CNN preprocessing or mono--polyatomic decomposition.
 \item \textbf{Informer}: The ProbSparse self-attention Transformer of \cite{zhou_informer_2021}, adapted for spectral regression following \cite{walidain_informer-based_2026}.
-% \item \textbf{TransCNN}: The Transformer--CNN hybrid of \cite{liu_remote_2026} applied as a single-signal model without mono--polyatomic decomposition.
 \end{enumerate}
 
-All models are evaluated using stratified $k$-fold cross-validation ($k = 5$) on the experimental dataset.
-Additionally, a domain-transfer experiment assesses generalisation from synthetic to experimental data without fine-tuning.
+All models were evaluated using stratified $k$-fold cross-validation ($k = 5$) on the experimental dataset.
+Additionally, a domain-transfer experiment assessed generalisation from synthetic to experimental data without fine-tuning.
+
+It should be noted that several sources of uncertainty affect the reported metrics.
+The XRF ground-truth concentrations carry an inherent measurement uncertainty of approximately 1--5\% relative, which propagates into the regression targets.
+Furthermore, the LTE assumption underlying the synthetic data may introduce a systematic bias when the model is applied to experimental spectra acquired outside the early-time plasma window.
+These limitations are discussed further in the concluding section.
 
 
 % % ============================================================================================

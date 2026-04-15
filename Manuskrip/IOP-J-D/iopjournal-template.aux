@@ -46,37 +46,43 @@
 \newlabel{eq:doppler}{{4}{3}{Synthetic data generation}{equation.4}{}}
 \newlabel{eq:stark}{{5}{3}{Synthetic data generation}{equation.5}{}}
 \newlabel{eq:poly}{{6}{3}{Synthetic data generation}{equation.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Reference elemental composition ranges (\% wt) used for synthetic spectral dataset generation, based on typical volcanic soil geochemistry and experimental XRF observations.}}{3}{table.1}\protected@file@percent }
+\newlabel{tab:comp}{{1}{3}{Reference elemental composition ranges (\% wt) used for synthetic spectral dataset generation, based on typical volcanic soil geochemistry and experimental XRF observations}{table.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Experimental data}{3}{subsection.2.3}\protected@file@percent }
 \newlabel{sec:exp}{{2.3}{3}{Experimental data}{subsection.2.3}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Summary of experimental parameters.}}{3}{table.1}\protected@file@percent }
-\newlabel{tab:exp}{{1}{3}{Summary of experimental parameters}{table.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}CNN--Transformer encoder--decoder architecture}{3}{subsection.2.4}\protected@file@percent }
-\newlabel{sec:model}{{2.4}{3}{CNN--Transformer encoder--decoder architecture}{subsection.2.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Detailed CNN--Transformer encoder--decoder architecture. The encoder (left) processes monoatomic spectra through 1D~CNN, input embedding, positional encoding, and $N_\mathrm  {enc}$ self-attention layers. The decoder (right) processes polyatomic spectra through masked self-attention and cross-attention with the encoder output. Three output heads predict elemental concentrations (Softplus), reconstructed spectra (Sigmoid), and plasma parameters (Softplus).}}{4}{figure.1}\protected@file@percent }
-\newlabel{fig:architecture}{{1}{4}{Detailed CNN--Transformer encoder--decoder architecture. The encoder (left) processes monoatomic spectra through 1D~CNN, input embedding, positional encoding, and $N_\mathrm {enc}$ self-attention layers. The decoder (right) processes polyatomic spectra through masked self-attention and cross-attention with the encoder output. Three output heads predict elemental concentrations (Softplus), reconstructed spectra (Sigmoid), and plasma parameters (Softplus)}{figure.1}{}}
 \citation{he_deep_2016}
 \citation{ioffe_batch_2015}
 \citation{vaswani_attention_2017}
 \citation{vaswani_attention_2017}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Summary of experimental parameters.}}{4}{table.2}\protected@file@percent }
+\newlabel{tab:exp}{{2}{4}{Summary of experimental parameters}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}CNN--Transformer encoder--decoder architecture}{4}{subsection.2.4}\protected@file@percent }
+\newlabel{sec:model}{{2.4}{4}{CNN--Transformer encoder--decoder architecture}{subsection.2.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.1}Input representation.}{4}{subsubsection.2.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.2}1D CNN feature extractor.}{4}{subsubsection.2.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.3}Transformer encoder.}{4}{subsubsection.2.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.4}Transformer decoder with cross-attention.}{4}{subsubsection.2.4.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Detailed CNN--Transformer encoder--decoder architecture. The encoder (left) processes monoatomic spectra through 1D~CNN, input embedding, positional encoding, and $N_\mathrm  {enc}$ self-attention layers. The decoder (right) processes polyatomic spectra through masked self-attention and cross-attention with the encoder output. Three output heads predict elemental concentrations (Softplus), reconstructed spectra (Sigmoid), and plasma parameters (Softplus).}}{5}{figure.1}\protected@file@percent }
+\newlabel{fig:architecture}{{1}{5}{Detailed CNN--Transformer encoder--decoder architecture. The encoder (left) processes monoatomic spectra through 1D~CNN, input embedding, positional encoding, and $N_\mathrm {enc}$ self-attention layers. The decoder (right) processes polyatomic spectra through masked self-attention and cross-attention with the encoder output. Three output heads predict elemental concentrations (Softplus), reconstructed spectra (Sigmoid), and plasma parameters (Softplus)}{figure.1}{}}
 \citation{kingma_adam_2015}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.1}Input representation.}{5}{subsubsection.2.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.2}1D CNN feature extractor.}{5}{subsubsection.2.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.3}Transformer encoder.}{5}{subsubsection.2.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.4}Transformer decoder with cross-attention.}{5}{subsubsection.2.4.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.5}Training strategy.}{5}{subsubsection.2.4.5}\protected@file@percent }
-\newlabel{eq:loss}{{11}{5}{Training strategy}{equation.11}{}}
+\citation{loshchilov_sgdr_2017}
+\citation{ganin_domain_2016}
 \citation{wold_pls_2001}
 \citation{zhou_informer_2021}
 \citation{walidain_informer-based_2026}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Model hyperparameters.}}{6}{table.3}\protected@file@percent }
+\newlabel{tab:hyper}{{3}{6}{Model hyperparameters}{table.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.5}Training strategy.}{6}{subsubsection.2.4.5}\protected@file@percent }
+\newlabel{eq:loss}{{11}{6}{Training strategy}{equation.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Evaluation protocol}{6}{subsection.2.5}\protected@file@percent }
+\newlabel{sec:eval}{{2.5}{6}{Evaluation protocol}{subsection.2.5}{}}
 \bibstyle{unsrt}
 \bibdata{revv}
 \bibcite{legnaioli_laser-induced_2025}{1}
 \bibcite{sawyers_database_2025}{2}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Domain-adaptation architecture. Source-domain (synthetic) and target-domain (experimental) spectra share the same Transformer encoder. A Gradient Reversal Layer (GRL) feeds a domain classifier that encourages domain-invariant encoder representations through adversarial training.}}{6}{figure.2}\protected@file@percent }
-\newlabel{fig:domain}{{2}{6}{Domain-adaptation architecture. Source-domain (synthetic) and target-domain (experimental) spectra share the same Transformer encoder. A Gradient Reversal Layer (GRL) feeds a domain classifier that encourages domain-invariant encoder representations through adversarial training}{figure.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Evaluation protocol}{6}{subsection.2.5}\protected@file@percent }
-\newlabel{sec:eval}{{2.5}{6}{Evaluation protocol}{subsection.2.5}{}}
 \bibcite{babos_laser-induced_2024}{3}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Domain-adaptation architecture. Source-domain (synthetic) and target-domain (experimental) spectra share the same Transformer encoder. A Gradient Reversal Layer (GRL) feeds a domain classifier that encourages domain-invariant encoder representations through adversarial training.}}{7}{figure.2}\protected@file@percent }
+\newlabel{fig:domain}{{2}{7}{Domain-adaptation architecture. Source-domain (synthetic) and target-domain (experimental) spectra share the same Transformer encoder. A Gradient Reversal Layer (GRL) feeds a domain classifier that encourages domain-invariant encoder representations through adversarial training}{figure.2}{}}
 \bibcite{manzoor_machine_2025}{4}
 \bibcite{zhang_improving_2025}{5}
 \bibcite{hao_machine_2024}{6}
@@ -98,6 +104,8 @@
 \bibcite{he_deep_2016}{22}
 \bibcite{ioffe_batch_2015}{23}
 \bibcite{kingma_adam_2015}{24}
-\bibcite{wold_pls_2001}{25}
-\bibcite{zhou_informer_2021}{26}
-\gdef \@abspage@last{8}
+\bibcite{loshchilov_sgdr_2017}{25}
+\bibcite{ganin_domain_2016}{26}
+\bibcite{wold_pls_2001}{27}
+\bibcite{zhou_informer_2021}{28}
+\gdef \@abspage@last{9}

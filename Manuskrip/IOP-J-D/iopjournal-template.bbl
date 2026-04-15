@@ -1,140 +1,99 @@
 \begin{thebibliography}{10}
 
 \bibitem{legnaioli_laser-induced_2025}
-Stefano Legnaioli, Giulia Lorenzetti, Francesco Poggialini, Beatrice
-  Campanella, Vincenzo Palleschi, Silvana De~Iuliis, Laura~Eleonora Depero,
-  Laura Borgese, Elza Bontempi, and Simona Raneri.
-\newblock Laser-{Induced} {Breakdown} {Spectroscopy} {Analysis} of {Lithium}:
-  {A} {Comprehensive} {Review}.
+Stefano Legnaioli, Giulia Lorenzetti, Francesco Poggialini, Beatrice Campanella, Vincenzo Palleschi, Silvana De~Iuliis, Laura~Eleonora Depero, Laura Borgese, Elza Bontempi, and Simona Raneri.
+\newblock Laser-{Induced} {Breakdown} {Spectroscopy} {Analysis} of {Lithium}: {A} {Comprehensive} {Review}.
 \newblock {\em Sensors}, 25(24):7689, December 2025.
 
 \bibitem{sawyers_database_2025}
-E.R. Sawyers, G.~Lopez-Reyes, A.~Barlow, M.~Veneranda, E.A. Lymer, E.A.
-  Cloutis, J.~Manrique, B.~Barrios, S.~Julve, J.~Freemantle, M.~Aznar, M.G.
-  Daly, and E.A. Lalla.
-\newblock Database development and {LIBS} calibration for the {LIBS}-{Raman}
-  {Sensor} for planetary exploration.
+E.R. Sawyers, G.~Lopez-Reyes, A.~Barlow, M.~Veneranda, E.A. Lymer, E.A. Cloutis, J.~Manrique, B.~Barrios, S.~Julve, J.~Freemantle, M.~Aznar, M.G. Daly, and E.A. Lalla.
+\newblock Database development and {LIBS} calibration for the {LIBS}-{Raman} {Sensor} for planetary exploration.
 \newblock {\em Icarus}, 442:116742, December 2025.
 
 \bibitem{babos_laser-induced_2024}
-Diego~Victor Babos, Wesley~Nascimento Guedes, Vitor~Silveira Freitas,
-  Fernanda~Pavani Silva, Marcelo Larsen De~Lima Tozo, Paulino~Ribeiro
-  Villas-Boas, Ladislau Martin-Neto, and Débora Marcondes Bastos~Pereira
-  Milori.
-\newblock Laser-induced breakdown spectroscopy as an analytical tool for total
-  carbon quantification in tropical and subtropical soils: evaluation of
-  calibration algorithms.
+Diego~Victor Babos, Wesley~Nascimento Guedes, Vitor~Silveira Freitas, Fernanda~Pavani Silva, Marcelo Larsen De~Lima Tozo, Paulino~Ribeiro Villas-Boas, Ladislau Martin-Neto, and Débora Marcondes Bastos~Pereira Milori.
+\newblock Laser-induced breakdown spectroscopy as an analytical tool for total carbon quantification in tropical and subtropical soils: evaluation of calibration algorithms.
 \newblock {\em Frontiers in Soil Science}, 3:1242647, January 2024.
 
 \bibitem{manzoor_machine_2025}
-Maryam Manzoor, Muhammad Faheem, Muhammad Nadeem, Guljan Shreen, Faisal Hayat,
-  Adnan Younis, and Yasir Jamil.
-\newblock A machine learning assisted approach to classify rose species and
-  varieties with laser induced breakdown spectroscopy.
+Maryam Manzoor, Muhammad Faheem, Muhammad Nadeem, Guljan Shreen, Faisal Hayat, Adnan Younis, and Yasir Jamil.
+\newblock A machine learning assisted approach to classify rose species and varieties with laser induced breakdown spectroscopy.
 \newblock {\em Analytica Chimica Acta}, 1373:344489, November 2025.
 
 \bibitem{zhang_improving_2025}
 Youqi Zhang, Guofeng Yang, Ben-Xin Wang, and Xiangyang Zhang.
-\newblock Improving the accuracy of laser-induced breakdown spectroscopy using
-  the single-element standard curve calibration.
-\newblock {\em Instrumentation Science \& Technology}, pages 1--20, December
-  2025.
+\newblock Improving the accuracy of laser-induced breakdown spectroscopy using the single-element standard curve calibration.
+\newblock {\em Instrumentation Science \& Technology}, pages 1--20, December 2025.
 
 \bibitem{hao_machine_2024}
-Zhongqi Hao, Ke~Liu, Qianlin Lian, Weiran Song, Zongyu Hou, Rui Zhang, Qianqian
-  Wang, Chen Sun, Xiangyou Li, and Zhe Wang.
+Zhongqi Hao, Ke~Liu, Qianlin Lian, Weiran Song, Zongyu Hou, Rui Zhang, Qianqian Wang, Chen Sun, Xiangyou Li, and Zhe Wang.
 \newblock Machine learning in laser-induced breakdown spectroscopy: {A} review.
 \newblock {\em Frontiers of Physics}, 19(6):62501, December 2024.
 
 \bibitem{manelski_libs_2024}
-H.T. Manelski, R.C. Wiens, B.~Bousquet, P.B. Hansen, S.~Schröder, S.~Clegg,
-  N.D. Martin, A.E. Nelson, R.K. Martinez, A.M. Ollila, and A.~Cousin.
-\newblock {LIBS} plasma diagnostics with {SuperCam} on {Mars}: {Implications}
-  for quantification of elemental abundances.
-\newblock {\em Spectrochimica Acta Part B: Atomic Spectroscopy}, 222:107061,
-  December 2024.
+H.T. Manelski, R.C. Wiens, B.~Bousquet, P.B. Hansen, S.~Schröder, S.~Clegg, N.D. Martin, A.E. Nelson, R.K. Martinez, A.M. Ollila, and A.~Cousin.
+\newblock {LIBS} plasma diagnostics with {SuperCam} on {Mars}: {Implications} for quantification of elemental abundances.
+\newblock {\em Spectrochimica Acta Part B: Atomic Spectroscopy}, 222:107061, December 2024.
 
 \bibitem{cristoforetti_local_2010}
-G.~Cristoforetti, A.~De~Giacomo, M.~Dell'Aglio, S.~Legnaioli, E.~Tognoni,
-  V.~Palleschi, and N.~Omenetto.
-\newblock Local {Thermodynamic} {Equilibrium} in {Laser}-{Induced} {Breakdown}
-  {Spectroscopy}: {Beyond} the {McWhirter} criterion.
-\newblock {\em Spectrochimica Acta Part B: Atomic Spectroscopy}, 65(1):86--95,
-  January 2010.
+G.~Cristoforetti, A.~De~Giacomo, M.~Dell'Aglio, S.~Legnaioli, E.~Tognoni, V.~Palleschi, and N.~Omenetto.
+\newblock Local {Thermodynamic} {Equilibrium} in {Laser}-{Induced} {Breakdown} {Spectroscopy}: {Beyond} the {McWhirter} criterion.
+\newblock {\em Spectrochimica Acta Part B: Atomic Spectroscopy}, 65(1):86--95, January 2010.
 
 \bibitem{zaitsev_two-zone_2024}
 S.~M. Zaitsev, I.~N. Krylov, A.~M. Popov, and T.~A. Labutin.
 \newblock Two-{Zone} {Model} of {Laser}-{Induced} {Plasma}.
-\newblock {\em Journal of Applied Spectroscopy}, 90(6):1183--1189, January
-  2024.
+\newblock {\em Journal of Applied Spectroscopy}, 90(6):1183--1189, January 2024.
 
 \bibitem{bultel_mcwhirter_2025}
 Arnaud Bultel, Vincent Morel, and Aurélien Favre.
-\newblock {THE} {MCWHIRTER} {CRITERION} {REVISITED} {FOR} {LASER}-{INDUCED}
-  {PLASMAS}, July 2025.
-\newblock Publisher: Gilles Cartry Published: ICPIG International Conférence
-  on Phenomena in Ionized Gases.
+\newblock {THE} {MCWHIRTER} {CRITERION} {REVISITED} {FOR} {LASER}-{INDUCED} {PLASMAS}, July 2025.
+\newblock Publisher: Gilles Cartry Published: ICPIG International Conférence on Phenomena in Ionized Gases.
 
 \bibitem{tang_review_2024}
 Yun Tang and Nan Zhao.
-\newblock A {Review} of {Development} in the {Research} of {Self}-{Absorption}
-  on {Laser}-{Induced} {Breakdown} {Spectroscopy}.
+\newblock A {Review} of {Development} in the {Research} of {Self}-{Absorption} on {Laser}-{Induced} {Breakdown} {Spectroscopy}.
 \newblock {\em Atomic Spectroscopy}, 45(04):336--357, August 2024.
 
 \bibitem{hansen_modeling_2021}
-P.B. Hansen, S.~Schröder, S.~Kubitza, K.~Rammelkamp, D.S. Vogt, and H.-W.
-  Hübers.
-\newblock Modeling of time-resolved {LIBS} spectra obtained in {Martian}
-  atmospheric conditions with a stationary plasma approach.
-\newblock {\em Spectrochimica Acta Part B: Atomic Spectroscopy}, 178:106115,
-  April 2021.
+P.B. Hansen, S.~Schröder, S.~Kubitza, K.~Rammelkamp, D.S. Vogt, and H.-W. Hübers.
+\newblock Modeling of time-resolved {LIBS} spectra obtained in {Martian} atmospheric conditions with a stationary plasma approach.
+\newblock {\em Spectrochimica Acta Part B: Atomic Spectroscopy}, 178:106115, April 2021.
 
 \bibitem{favre_merlin_2025}
 Aurélien Favre, Arnaud Bultel, Vincent Morel, Morgan Lesage, and Léo Gosse.
-\newblock {MERLIN}, an adaptative {LTE} radiative transfer model for any
-  mixture: {Validation} on {Eurofer97} in argon atmosphere.
-\newblock {\em Journal of Quantitative Spectroscopy and Radiative Transfer},
-  330:109222, January 2025.
+\newblock {MERLIN}, an adaptative {LTE} radiative transfer model for any mixture: {Validation} on {Eurofer97} in argon atmosphere.
+\newblock {\em Journal of Quantitative Spectroscopy and Radiative Transfer}, 330:109222, January 2025.
 
 \bibitem{favre_towards_2025}
-Aurélien Favre, Alexis Abad, Alexandre Poux, Léo Gosse, Ahmad Berjaoui,
-  Vincent Morel, and Arnaud Bultel.
-\newblock Towards real-time calibration-free {LIBS} supported by machine
-  learning.
-\newblock {\em Spectrochimica Acta Part B: Atomic Spectroscopy}, 224:107082,
-  February 2025.
+Aurélien Favre, Alexis Abad, Alexandre Poux, Léo Gosse, Ahmad Berjaoui, Vincent Morel, and Arnaud Bultel.
+\newblock Towards real-time calibration-free {LIBS} supported by machine learning.
+\newblock {\em Spectrochimica Acta Part B: Atomic Spectroscopy}, 224:107082, February 2025.
 
 \bibitem{liu_remote_2026}
 Danyao Liu, Xuezheng Chu, and Hao Liu.
-\newblock Remote {LIBS} based on transformer-{CNN} method for quantitative
-  analysis of trace elements in steel.
+\newblock Remote {LIBS} based on transformer-{CNN} method for quantitative analysis of trace elements in steel.
 \newblock {\em AIP Advances}, 16(4):045110, April 2026.
 
 \bibitem{wang_simulation_2024}
-Ying Wang, Heyan Gao, Jifei Ye, Anmin Chen, Diankai Wang, Sai Li, and Qianqian
-  Cui.
-\newblock Simulation of laser-induced plasma temperature based on machine
-  learning.
+Ying Wang, Heyan Gao, Jifei Ye, Anmin Chen, Diankai Wang, Sai Li, and Qianqian Cui.
+\newblock Simulation of laser-induced plasma temperature based on machine learning.
 \newblock 2024.
 
 \bibitem{vaswani_attention_2017}
-Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,
-  Aidan~N. Gomez, {\L}ukasz Kaiser, and Illia Polosukhin.
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan~N. Gomez, {\L}ukasz Kaiser, and Illia Polosukhin.
 \newblock Attention is all you need.
-\newblock In {\em Advances in Neural Information Processing Systems},
-  volume~30. Curran Associates, Inc., 2017.
+\newblock In {\em Advances in Neural Information Processing Systems}, volume~30. Curran Associates, Inc., 2017.
 
 \bibitem{walidain_informer-based_2026}
 Birrul Walidain, Nasrullah Idris, Natasya Yuzza, and Rara Mitaphonna.
-\newblock Informer-{Based} {LIBS} for {Qualitative} {Multi}-{Element}
-  {Analysis} of an {Aceh} {Traditional} {Women}’s {Medicine}.
+\newblock Informer-{Based} {LIBS} for {Qualitative} {Multi}-{Element} {Analysis} of an {Aceh} {Traditional} {Women}’s {Medicine}.
 \newblock {\em IOP Conf. Ser.: Earth Environ. Sci.}, page in press, 2026.
 
 \bibitem{fujimoto_plasma_2004}
 Takashi Fujimoto.
 \newblock {\em Plasma spectroscopy}.
-\newblock Number 123 in The international series of monographs on physics.
-  Clarendon Press ; Oxford University Press, Oxford : New York, 2004.
+\newblock Number 123 in The international series of monographs on physics. Clarendon Press ; Oxford University Press, Oxford : New York, 2004.
 
 \bibitem{griem_spectral_1974}
 Hans~R. Griem.
@@ -149,15 +108,12 @@ A.~Kramida, Yu. Ralchenko, J.~Reader, and {NIST ASD Team}.
 \bibitem{he_deep_2016}
 Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
 \newblock Deep residual learning for image recognition.
-\newblock In {\em Proceedings of the IEEE Conference on Computer Vision and
-  Pattern Recognition (CVPR)}, pages 770--778, 2016.
+\newblock In {\em Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 770--778, 2016.
 
 \bibitem{ioffe_batch_2015}
 Sergey Ioffe and Christian Szegedy.
-\newblock Batch normalization: Accelerating deep network training by reducing
-  internal covariate shift.
-\newblock In {\em Proceedings of the 32nd International Conference on Machine
-  Learning (ICML)}, volume~37, pages 448--456. PMLR, 2015.
+\newblock Batch normalization: Accelerating deep network training by reducing internal covariate shift.
+\newblock In {\em Proceedings of the 32nd International Conference on Machine Learning (ICML)}, volume~37, pages 448--456. PMLR, 2015.
 
 \bibitem{kingma_adam_2015}
 Diederik~P. Kingma and Jimmy Ba.
@@ -165,18 +121,24 @@ Diederik~P. Kingma and Jimmy Ba.
 \newblock {\em arXiv preprint arXiv:1412.6980}, 2015.
 \newblock Published as a conference paper at ICLR 2015.
 
+\bibitem{loshchilov_sgdr_2017}
+Ilya Loshchilov and Frank Hutter.
+\newblock {SGDR}: Stochastic gradient descent with warm restarts.
+\newblock In {\em Proceedings of the 5th International Conference on Learning Representations (ICLR)}, 2017.
+
+\bibitem{ganin_domain_2016}
+Yaroslav Ganin, Evgeniya Ustinova, Hana Ajakan, Pascal Germain, Hugo Larochelle, Fran{\c{c}}ois Laviolette, Mario Marchand, and Victor Lempitsky.
+\newblock Domain-adversarial training of neural networks.
+\newblock {\em Journal of Machine Learning Research}, 17(59):1--35, 2016.
+
 \bibitem{wold_pls_2001}
 Svante Wold, Michael Sj{\"o}str{\"o}m, and Lennart Eriksson.
 \newblock {PLS}-regression: a basic tool of chemometrics.
-\newblock {\em Chemometrics and Intelligent Laboratory Systems},
-  58(2):109--130, 2001.
+\newblock {\em Chemometrics and Intelligent Laboratory Systems}, 58(2):109--130, 2001.
 
 \bibitem{zhou_informer_2021}
-Haoyi Zhou, Shanghang Zhang, Jieqi Peng, Shuai Zhang, Jianxin Li, Hui Xiong,
-  and Wancai Zhang.
-\newblock Informer: Beyond efficient transformer for long sequence time-series
-  forecasting.
-\newblock In {\em Proceedings of the AAAI Conference on Artificial
-  Intelligence}, volume~35, pages 11106--11115, 2021.
+Haoyi Zhou, Shanghang Zhang, Jieqi Peng, Shuai Zhang, Jianxin Li, Hui Xiong, and Wancai Zhang.
+\newblock Informer: Beyond efficient transformer for long sequence time-series forecasting.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial Intelligence}, volume~35, pages 11106--11115, 2021.
 
 \end{thebibliography}
