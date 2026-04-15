@@ -1,4 +1,5 @@
 %This is a template file for use of iopjournal.cls
+% Target: IOP Machine Learning: Science and Technology
 
 \documentclass{iopjournal}
 
@@ -6,126 +7,395 @@
 % 	[anonymous]	Provides output without author names, affiliations or acknowledgments to facilitate double-anonymous peer-review
 
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, fit, backgrounds, calc, decorations.pathreplacing}
 
 \begin{document}
 
-\articletype{Paper} %	 e.g. Paper, Letter, Topical Review...
+\articletype{Paper}
 
-\title{Physics-Informed Surrogate Model Based on Partial-LTE and Two-Zone Radiative Transfer Equation for Calibration-Free Plasma Diagnostics}
+\title{CNN--Transformer Encoder--Decoder for Quantitative LIBS Analysis: Explicit Mono--Polyatomic Spectral Decomposition Applied to Volcanic Soil Characterization}
 
-\author{Birrul Walidain$^{1}$, Khairun Saddami$^2$,Rara Mitaphonna$^3$ and Nasrullah Idris$^{1,*}$}
+\author{Birrul Walidain$^{1}$, Khairun Saddami$^2$, Rara Mitaphonna$^3$ and Nasrullah Idris$^{1,*}$}
 
 \affil{$^1$Department of Physics, Faculty of Mathematics and Natural Sciences, Universitas Syiah Kuala, Banda Aceh, Indonesia}
 
 \affil{$^2$Department of Electrical and Computer Engineering, Faculty of Engineering, Universitas Syiah Kuala, Banda Aceh, Indonesia}
 
 \affil{$^3$Research Center for Photonics, National Research and Innovation Agency (BRIN), South Tangerang 15314, Indonesia}
-% \affil{$^*$Author to whom any correspondence should be addressed.}
 
-\email{nasrullah.idris@.usk.ac.id}
+\email{nasrullah.idris@usk.ac.id}
 
-\keywords{LIBS, calibration-free, partial-LTE, two-zone model, radiative transfer, self-absorption, surrogate model}
+\keywords{LIBS, deep learning, CNN--Transformer, encoder--decoder, cross-attention, spectral decomposition, volcanic soil}
 
 \begin{abstract}
-Quantitative analysis in Calibration-Free Laser-Induced Breakdown Spectroscopy (CF-LIBS) heavily relies on the assumption of a homogeneous plasma in local thermodynamic equilibrium (LTE).
-% However, transient plasmas possess severe spatial gradients and optical opacities, triggering self-absorption that distorts the emission spectrum. Furthermore, pure collisional-radiative (CR) kinetic models often fail due to the absence of complete collisional cross-section data in standard databases (the "Atomic Data Desert" phenomenon). To overcome these limitations, this study proposes a deterministic two-zone (Core-Shell) forward model that couples partial-LTE (pLTE) with the Radiative Transfer Equation (RTE). The pLTE paradigm stabilizes the internal excitation population from the deficit of collisional data, while the RTE analytically resolves the macroscopic self-reversal effect. By integrating exact Stark broadening parameters from literature rather than using probabilistic correlations, the model accurately reproduces Fraunhofer-like spectral depressions on optically thick resonance transitions. This deterministic architecture completely bypasses black-box machine learning algorithms on the fundamental physics engine, providing a physically rigorous calibration-free synthetic spectrum generator. This framework significantly reduces quantitative uncertainties in analyzing complex matrix materials, offering a robust foundation for dynamic plasma diagnostics.
-
+Laser-Induced Breakdown Spectroscopy (LIBS) enables rapid multi-element analysis without extensive sample preparation, yet quantifying elemental concentrations in complex geological matrices remains challenging due to spectral overlap, matrix effects, and plasma variability.
+Existing machine learning models for LIBS treat the measured spectrum as a single composite signal and thus disregard the physically meaningful decomposition into individual elemental (monoatomic) contributions.
+This work introduces a CNN--Transformer encoder--decoder architecture that explicitly models the relationship between monoatomic component spectra and the observed polyatomic mixture spectrum.
+The encoder, fed with individual monoatomic spectra produced by a Saha--Boltzmann forward model, learns element-specific latent representations through self-attention.
+The decoder receives the polyatomic mixture spectrum and recovers elemental concentrations via cross-attention over the encoder output, effectively learning the compositional rules that govern spectral superposition.
+One-dimensional convolutional layers precede both encoder and decoder to extract local emission-line features before the Transformer captures long-range wavelength dependencies.
+The model is pre-trained on synthetic spectra generated from NIST Atomic Spectra Database transitions and fine-tuned on experimental LIBS measurements of volcanic soil samples from Aceh, Indonesia, using X-ray fluorescence data as ground-truth concentrations.
+Baseline comparisons against CNN-only, Transformer-only, partial least-squares, and Informer models are reported.
+The proposed framework is, to our knowledge, the first to embed an explicit mono--polyatomic spectral decomposition within a deep-learning pipeline for quantitative LIBS analysis.
 \end{abstract}
 
+% ============================================================================================
 \section{Introduction}
+% ============================================================================================
 
-The assumption of a homogeneous plasma in pure Local Thermodynamic Equilibrium (LTE) acts as a fundamental prerequisite for quantitative analysis methods in calibration-free Laser-Induced Breakdown Spectroscopy (CF-LIBS) \cite{favre_towards_2025, cristoforetti_local_2010}. However, this theoretical prerequisite has been proven to fail in describing the recombination dynamics of real plasmas with severe gradients \cite{favre_merlin_2025, zaitsev_two-zone_2024}. Under ideal conditions, this thermodynamic framework ensures that the fundamental plasma parameters, namely electron temperature ($T_e$) and electron density ($n_e$), can be extracted precisely to directly quantify elemental composition, which is also a primary foundation in modeling ionic mixtures in astrophysical plasmas \cite{fritzsche_atomic_2025}. Conversely, deviations from the LTE condition not only distort analytical accuracy but also render the quantification mechanism invalid \cite{cristoforetti_local_2010, hansen_modeling_2021, zaytsev_accurate_2026}. Given this complexity, formulating a rigorously validated plasma characterization becomes essential, particularly in the analysis of complex matrix materials that are inherently susceptible to spatial inhomogeneity anomalies during observation, such as those applied in space exploration instruments \cite{sawyers_database_2025, manelski_libs_2024}, analysis of rocks under extreme atmospheric conditions \cite{zhang_improving_2025}, in-situ characterization of liquid metal phase transitions \cite{leosson_analysis_2022}, evaluation of spacecraft heat shield abrasion during atmospheric reentry \cite{leistikow_quantification_2026}, and in-situ monitoring of nuclear fusion reactor walls \cite{marin_roldan_libs_2021}.
+% --- General Background ---
+Laser-Induced Breakdown Spectroscopy (LIBS) is an emission spectroscopy technique that has been widely applied to elemental analysis of complex materials, including minerals, rocks, and soils \cite{legnaioli_laser-induced_2025}.
+Its ability to perform rapid multi-element analysis with minimal sample preparation makes it attractive for geochemical prospecting and natural-resource exploration \cite{sawyers_database_2025}.
+Multiple studies have demonstrated successful elemental quantification in geological samples through approaches ranging from multivariate regression and univariate calibration curves to machine-learning methods \cite{babos_laser-induced_2024, manzoor_machine_2025, zhang_improving_2025}.
+Although these approaches can achieve high analytical accuracy, their performance depends strongly on the spectral modelling strategy and on the sensitivity of the method to matrix effects in compositionally heterogeneous samples \cite{hao_machine_2024, manelski_libs_2024}.
+This dependence is particularly pronounced in volcanic soils, which inherently exhibit complex multi-element compositions with large matrix variability.
+Among quantitative LIBS approaches, Calibration-Free LIBS (CF-LIBS) enables elemental quantification without reference standards by extracting fundamental plasma parameters, namely the electron temperature $T_e$ and the electron density $n_e$, under the assumption of Local Thermodynamic Equilibrium (LTE) \cite{cristoforetti_local_2010}.
+However, the assumption of a homogeneous LTE plasma is often inadequate for describing the highly transient, spatially graded plasmas generated by nanosecond laser pulses \cite{zaitsev_two-zone_2024, bultel_mcwhirter_2025}.
+Deviations from LTE induce spectral distortions through optical opacity and self-absorption, which destabilise temperature and density estimates \cite{tang_review_2024, hansen_modeling_2021}.
 
-Conventional efforts to justify such absolute equilibrium traditionally rely on the McWhirter criterion (1965). However, this classical formulation has been empirically proven to be a necessary but insufficient condition to describe real plasma dynamics \cite{bultel_mcwhirter_2025}. This validation failure roots in two destructive distortions. Spatially, thermal gradients trigger a self-absorption effect that disrupts the linearity of the emission spectral profile \cite{tang_review_2024}. Thermodynamically, anomalies in molecular energy level populations such as the intensity of vibration-rotation transitions exhibit extreme deviations from conventional LTE predictions thus demanding a multi-temperature approach \cite{zaytsev_accurate_2026}. To mitigate this spatial anomaly, several recent computational studies have begun integrating the Artificial Neural Network (ANN) architecture with a two-zone model \cite{zaitsev_two-zone_2024, amogh_libs_2026,m_s_machine_2025}. Although this data-driven computational approach successfully reduces spatial interference, these models suffer from epistemological flaws because they remain confined to stationary condition assumptions. In fact, recent theoretical kinetic studies assert that plasmas fundamentally operate in a highly transient manner, where massive cooling rates and high radiative opacity ($\tau$) force the electron density threshold to jump far beyond stationary predictions \cite{bultel_mcwhirter_2025}. This condition exposes an absolute methodological gap. Computational architectures that solely rely on spatial resolution without the intervention of transient kinetic solutions carry a strong risk of providing a false validation on spectra that are inherently non-LTE.
+% --- Previous Findings ---
+Physics-based approaches such as the MERLIN adaptive radiative-transfer model have addressed these distortions by coupling Saha--Boltzmann population distributions with the radiative transfer equation, thereby reproducing emission spectra with thermodynamic consistency \cite{favre_merlin_2025, favre_towards_2025}.
+Despite their physical rigour, these forward models entail computationally expensive nonlinear inversions that limit their applicability for routine analysis.
+Machine learning and deep learning have emerged as alternatives that learn the nonlinear mapping from spectra to plasma parameters directly from data \cite{favre_towards_2025, liu_remote_2026, wang_simulation_2024}.
+Convolutional Neural Networks (CNNs) capture local spectral features such as emission-line profiles, while Transformer architectures model long-range dependencies across the wavelength axis \cite{vaswani_attention_2017, liu_remote_2026}.
+Hybrid CNN--Transformer models in particular have demonstrated promising results for quantifying trace elements in steel \cite{liu_remote_2026} and for classifying spectral signatures in multi-element samples \cite{walidain_informer-based_2026}.
+Nevertheless, most data-driven models operate as black boxes that do not explicitly encode the physics governing spectrum formation \cite{hao_machine_2024}.
+This lack of physical structure limits generalisation and demands large experimental datasets for reliable training.
+A fundamental physical fact, however, remains unexploited in current modelling practice: a polyatomic LIBS spectrum is, to a first approximation, a concentration-weighted superposition of monoatomic component spectra.
+All existing models, whether physics-based or data-driven, treat the measured spectrum as a single signal and thereby ignore this compositional structure \cite{liu_remote_2026, favre_towards_2025}.
+No prior work has explicitly modelled the decomposition of a mixture spectrum into its monoatomic constituents within a learning framework.
+Cross-attention, a mechanism originally proposed for sequence-to-sequence translation \cite{vaswani_attention_2017}, is ideally suited for this task: the decoder can query encoder-produced element representations to discover which monoatomic contributions compose a given polyatomic observation.
 
-Addressing this methodological gap while responding to the trilemma between analytical equilibrium failure, deterministic computational paralysis, and machine learning causality fallacy, this study formulates a Physics-Informed Surrogate Model architecture resolution. This architecture fundamentally rejects the use of predictive algorithms as blind pattern matchers, but rather formulates them to operate exclusively within a pre-constrained thermodynamic manifold. To achieve this, the computational phase is split into two absolute domains. An offline forward model generator that weaves the Two-Zone partial-LTE (pLTE) thermodynamics \cite{zaitsev_two-zone_2024} with the analytical solution of the Radiative Transfer Equation (RTE), and an online Support Vector Regression (SVR) proxy \cite{wu_novel_2025}. Through this deterministic algorithmic separation, this study aims to accurately extract plasma temperature and density parameters from emission spectra distorted by self-absorption, without the need to run a single numerical RTE iteration online. In this hybrid integration, the pLTE paradigm serves to stabilize the internal excitation population from equilibrium failure, while the SVR execution guarantees that the diagnostics are executed in real-time with an absolute level of compliance to the fundamental laws of quantum mechanics. A formulation explicitly designed to conquer physical anomalies at the optically thick limit while eliminating computational time barriers in analytical spectroscopy.
+% --- State of the Art ---
+This paper presents a CNN--Transformer encoder--decoder architecture that introduces explicit mono--polyatomic spectral decomposition into quantitative LIBS analysis.
+The encoder processes individual monoatomic spectra generated by a Saha--Boltzmann forward model to learn element-specific latent representations.
+The decoder receives the polyatomic mixture spectrum and predicts elemental concentrations through cross-attention over the encoder output.
+One-dimensional convolutional layers extract local emission-line features before the Transformer stages capture global wavelength dependencies.
+The model is pre-trained on synthetic spectra derived from the NIST Atomic Spectra Database and fine-tuned on experimental LIBS measurements of volcanic soil from Aceh, Indonesia, with X-ray fluorescence (XRF) analysis providing ground-truth concentrations.
+Contributions of this work are threefold: (i) the first encoder--decoder framework that structurally separates monoatomic from polyatomic spectral representations for LIBS, (ii) a cross-attention mechanism that enables physically interpretable concentration regression, and (iii) a validated application to complex volcanic-soil matrices.
 
-
-\section{Methodology}
-
-The methodological design in this study was developed using a dual-phase hybrid architecture. Unlike the conventional analytical approaches that comprehensively model the entire material components (brute-force), this computational framework is focused on modeling the main diagnostic lines. Synthetic data generation (offline forward modeling) was performed using fundamental physics modeling encompassing the dimensions of radiative transfer and pLTE equilibrium (Sections \ref{sec:rte} -- \ref{sec:aparatus}). The accumulated dataset was then utilized to train the prediction of a statistical-based interpolation model (online surrogate modeling) (Section \ref{sec:surrogate}). This two-phase approach is systematically designed to overcome the sluggishness of the iterative numerical resolution of the Radiative Transfer Equation (RTE) matrix, while simultaneously reducing empirical dependence on the stochastic black-box extraction of machine learning algorithms.
-
-\subsection{Two-Zone Radiative Transfer Architecture} \label{sec:rte}
-
-To capture spatial trends in a heterogeneous plasma without adding heavy computational costs at the full matrix resolution level of 3D hydrodynamic resolution, the macroscopic emission is described through the assumption of a Two-Zone distribution model comprising a dominant emission core area ($V_1$) and a peripheral marginal absorption area (Shell, $V_p$) \cite{zaitsev_two-zone_2024,hansen_modeling_2021}. Radiation transport along this non-isothermal plasma follows the fundamental Radiative Transfer Equation comprehensively in a differential manner.
-\begin{equation} \label{eq:rte_general}
-\frac{dI_\lambda}{ds} = j_\lambda - \kappa_\lambda I_\lambda
-\end{equation}
-
-The internal zone radiation is projected as a pure primary radiation intensity $I_{\text{core}}(\lambda)$, which is subsequently reduced and passes through the shell's local absorptional parameters (optical thickness parameter $d_{\text{shell}}$ and local constants $j_{\text{shell}}$ and $\kappa_{\text{shell}}$). When the linear integral is evaluated along the optical boundary limits.
-\begin{equation} \label{eq:rte_integral}
-\int_{I_{\text{core}}}^{I_{\text{obs}}} \frac{dI_\lambda}{j_{\text{shell}} - \kappa_{\text{shell}} I_\lambda} = \int_{0}^{d_{\text{shell}}} ds
-\end{equation}
-
-The representation of the final distorted spectrum observation from the plasma ($I_{\text{obs}}$) referring to this analytical transfer analysis is presented precisely moving away from the fictional approximation of Black Body thermal wave radiation \cite{espinosa_analysis_2019}.
-\begin{equation} \label{eq:rte_solution}
-I_{\text{obs}}(\lambda) = I_{\text{core}}(\lambda) e^{-\tau_\lambda} + \frac{j_{\text{shell}}(\lambda)}{\kappa_{\text{shell}}(\lambda)} \left( 1 - e^{-\tau_\lambda} \right)
-\end{equation}
-The plasma optical dimension $\tau_\lambda$ is represented by the function $\kappa_{\text{shell}} d_{\text{shell}}$, with the ratio $\frac{j}{\kappa}$ constituting the equilibrium absorption level parameter that does not purely depart from the emission-absorption identity of the asymptotic Kirchhoff model \cite{rodriguez_mixkiprapcal_2021}.
-
-\subsection{Partial-LTE (pLTE) Kinetics Approach}
-
-The complete conventional kinetic method tends to track transient atomic electron displacement dynamics referring to the Collisional-Radiative (CR) model matrix \cite{fujimoto_plasma_2004}.
-\begin{equation} \label{eq:master_kinetic}
-\frac{dn_i}{dt} = \sum_{j > i} \left( n_j A_{ji} + n_j n_e q_{ji}^{\text{down}} \right) + \sum_{j < i} n_j n_e q_{ji}^{\text{up}} - n_i \sum_{j < i} \left( A_{ij} + n_e q_{ij}^{\text{down}} \right) - n_i \sum_{j > i} n_e q_{ij}^{\text{up}}
-\end{equation}
-The emissivity probability variable is defined via the Einstein coefficient $A_{ji}$, alongside the components of density and collisional excitation ($n_e, q^{\text{up}}, q^{\text{down}}$). However, computational literature concerning secondary excitation level model transitions experiences uncertainty deviations (Atomic Data Desert) over the empirical atomic collisional data mechanics parameters of NIST on billions of atomic lines \cite{bultel_mcwhirter_2025,favre_merlin_2025}. The limitation of this data causes the matrix $\mathbf{M}$ in the linear rate equation system $\frac{d\mathbf{n}}{dt} = \mathbf{M} \cdot \mathbf{n}$ to become too sparse, thereby generating defective analytical resolution of the population distribution computation. Although Fujimoto has comprehensively formulated the excitation phase level of the CR matrix \cite{fujimoto_plasma_2004}, the absence of such complete empirical collisional data forces us to absolutely reduce this computational system back towards the pLTE limit.
-
-As a transient experimental spectrum kinetic diagnostic solution, the computational structure is purely restricted and simplified into a Partial-LTE (pLTE) thermal structure. At the extreme density pressures of early LIBS transient collisions, the electron-ionic ratio equilibrium of the bound-free species is derived in a calibrated manner via the Saha Equation.
-\begin{equation} \label{eq:saha}
-\frac{n_{e} n_{II}}{n_{I}} = 2 \frac{Z_{II}(T_e)}{Z_{I}(T_e)} \left( \frac{2\pi m_e k_B T_e}{h^2} \right)^{3/2} \exp\left(-\frac{E_{ion}}{k_B T_e}\right)
-\end{equation}
-Meanwhile, the analytical probability resolution to distribute the electron configuration status of the bound excited states population is governed using a proportional exponential Boltzmann distribution approximation to compensate for the scarcity of secondary empirical collision correlations.
-\begin{equation} \label{eq:boltzmann_plte}
-n_i = \frac{n_{\text{total}} \cdot g_i \exp\left(-E_i / k_B T_e\right)}{Z(T_e)}
-\end{equation}
-The application of this pLTE enables the preservation of the physical representation of the optical absorption model spatially-macroscopically along with the independent simplification of the internal computational microscopic atomic collision cross-section level barriers \cite{cristoforetti_local_2010}.
-
-\subsection{Assimilation of Selected Diagnostic Line Parameters}
-
-The distributions of emission $j$ and radiative absorption $\kappa$ expressed as a macroscopic ratio (Equation \ref{eq:rte_solution}) are constructed microscopically by non-LTE thermal probability components.
-\begin{equation} \label{eq:emission_coeff}
-j_\lambda = \sum_{k \to i} \frac{hc}{4\pi\lambda} A_{ki} n_k \phi_V(\lambda)
-\end{equation}
-In addition, optical decay of radiative correlations due to photons stimulating the excitation band depletion rate (detailed balance) reinforces the magnitude of the pure absorption function convolution \cite{espinosa_analysis_2019}.
-\begin{equation} \label{eq:absorption_coeff}
-\kappa_\lambda = \sum_{i \to k} \frac{\lambda^4}{8\pi c} \left(\frac{g_k}{g_i}\right) A_{ki} n_i \phi_V(\lambda) \left[ 1 - \frac{n_k g_i}{n_i g_k} \right]
-\end{equation}
-
-The computational spectral modeling in this study is focused independently on the identification of experimentally validated resonance parameter lines. Comprehensive theoretical computational methods fundamentally tend to extrapolate data and agglomerate all possible secondary atomic resolution pathways polynomially \cite{favre_merlin_2025}, carrying the risk of creating vulnerable margin deviations due to unreliable simulation profiles. Hence, the simulation structure prioritizes the "Main Diagnostic Lines" (for example the resonance doublets of Ca II and Si I elements) where every foundation of its quantum mechanics emissiology can be directly referred to definitive empirical spectroscopy literature \cite{griem_spectral_1974}. The determination scheme of the element-specific resolution benchmark diagnostic aims to isolate the generative dataset (database) purely within the boundaries of the physical accuracy matrix so that the Surrogate-type algorithm in the advanced phase can be executed without the interference of stochastic correlations of minor prediction parameters \cite{tang_review_2024, manelski_libs_2024}.
-
-\subsection{Voigt Profile Convolution and Apparatus Resolution} \label{sec:aparatus}
-
-The distribution profile of physical thermodynamic energy dispersion on the frequency band of the linear spectroscopy function is summarized in the blended convolution curve of the mathematical function $\phi_V(\lambda)$. The composition of the convolution is calculated based on the Doppler broadening effect related to the Gaussian asymmetrical function profile of the thermal electron motion.
-\begin{equation} \label{eq:broadening_doppler}
-\Delta\lambda_D = \lambda_{ki} \sqrt{8 \ln 2 \frac{k_B T_i}{m_k c^2}}
-\end{equation}
-Along with the electrostatic interaction combination of the dominant LIBS pressure plasma turbulence resolution (Stark Broadening) that characterizes the Lorentzian profile at the electron density analyte boundary of $n_e \ge 10^{16}$ cm$^{-3}$ consistent with the empirical quantum mechanical broadening formulation by Griem \cite{griem_spectral_1974}.
-\begin{equation} \label{eq:broadening_stark_simp}
-\Delta\lambda_S \approx 2 \omega_{ki}(T) \frac{n_e}{n_{e,r}}
-\end{equation}
-The combination of the temperature density function and the Stark parameter is extracted into the Voigt convolution $\phi_V(\lambda)$. The structure of the Voigt function together with the Two-Zone RTE formula (Equation \ref{eq:rte_solution}) formulates the deformation of the spectral peak intensity due to the high optical thickness medium distortion of the plasma (self-reversal).
-
-Furthermore, the real optical detection experiments also induce a smearing effect on the precision of the physical optical Fraunhofer absorption broadening concavity due to the interference of the instrumental micrometer spectrometer diffraction function limitations (analytical diffraction slit) \cite{zaitsev_two-zone_2024}. The final empirical form of this instrumental resolution analytical convolution modifies the simulated dispersion ($I_{obs}$) with the instrument's average Gaussian pixel distribution ($G_{inst}$) ($\Delta\lambda_{inst} \approx 0.1$ nm).
-\begin{equation} \label{eq:instrumental}
-I_{final}(\lambda) = I_{obs}(\lambda) \otimes G_{inst}(\lambda, \Delta\lambda_{inst})
-\end{equation}
-The final instrument apparatus resolution procedure bridges the theoretical parameter differences so that it is equivalently distributed in parallel matching the spectral concavity profile gradient recorded \cite{favre_merlin_2025}.
-
-\subsection{SVR-Based Surrogate Model Training} \label{sec:surrogate}
-
-The extractive phase of the computational algorithm of the plasma diagnostic architecture is implemented as a linear parameter resolution inversion scheme in the final stage.
-
-Entering the pure computational (offline) phase, the simulation system generator manifests the equilibrium formulation of the RTE equation, pLTE convolution, and optical diffraction broadening (Voigt-apparatus), into a periodic system representation. The transient plasma parameters are then constructed with the iteration execution of $T_e$ starting from the value range of [4000, 20000] K against $n_e \in [10^{14}, 10^{18}]$ cm$^{-3}$ focused on validating the divalent line set of Ca II in a composite atomic mixture with Si I. This thermodynamic simulative data produces a deterministic physical curated pre-conditioned maturation domain of pLTE.
-
-The transient emission collection is adapted to train an asymptotic Support Vector Regression (SVR) matrix specifically (online phase) \cite{wu_novel_2025, lin_enhancing_2026}. The regression learning model is deduced as a linear instant interpolation proxy (surrogate) on the inversion value of the emission identity that is actually constructed based on fundamental physics. The thermodynamic pilot approach mitigates the complexity of the iterative deterministic calculation resolution in solving the roots of the RTE inversion into an instant parametric evaluation of analytical predictive mathematical algorithm (real-time diagnostic scale). The realization of the deterministic asymptotic speed proclamation of thermodynamic SVR promises accuracy in measuring the dense line profile observational analytes regardless of the physical empirical value of the optically thick plasma laboratory.
 
 % ============================================================================================
-\bibliographystyle{elsarticle-num}
-\bibliography{reff}
+\section{Methodology}
+% ============================================================================================
 
-\section*{References}
+% --------------------------------------------------------------------------------------------
+\subsection{Framework overview}
+% --------------------------------------------------------------------------------------------
+
+The proposed approach follows a two-stage workflow.
+In the first stage \emph{(offline)}, a physics-based forward model generates pairs of monoatomic and polyatomic synthetic spectra across a grid of plasma conditions; these serve as training data.
+In the second stage \emph{(online)}, a CNN--Transformer encoder--decoder consumes the spectral pairs and predicts elemental concentrations.
+% Figure~\ref{fig:framework} illustrates the end-to-end pipeline.
+
+% --- Figure 1 excluded for now ---
+% \begin{figure}[htbp]
+% \centering
+% \resizebox{\columnwidth}{!}{%
+% \begin{tikzpicture}[
+%     box/.style={draw, rounded corners=3pt, minimum width=2.2cm, minimum height=0.6cm, align=center, font=\footnotesize},
+%     sbox/.style={draw, rounded corners=2pt, minimum width=1.8cm, minimum height=0.5cm, align=center, font=\scriptsize},
+%     arrow/.style={-{Stealth[length=2mm]}, thick},
+%     darrow/.style={-{Stealth[length=2mm]}, thick, dashed},
+%     zone/.style={draw, dashed, rounded corners=5pt, inner sep=6pt},
+%     zlabel/.style={font=\scriptsize\bfseries},
+% ]
+% % ZONE 1: OFFLINE
+% \node[box, fill=blue!10] (nist) at (0, 0) {NIST ASD};
+% \node[box, fill=blue!10] (saha) at (3.2, 0) {Saha--Boltzmann};
+% \node[sbox, fill=blue!18] (mono) at (1.0, -1.2) {$S_\mathrm{mono}^{(z)}$};
+% \node[sbox, fill=blue!18] (poly) at (3.5, -1.2) {$S_\mathrm{poly}$};
+% \draw[arrow] (nist) -- (saha);
+% \draw[arrow] (saha.south) -- ++(0,-0.2) -| (mono);
+% \draw[arrow] (saha.south) -- ++(0,-0.2) -| (poly);
+% \begin{scope}[on background layer]
+% \node[zone, fill=blue!4, fit=(nist)(saha)(mono)(poly), label={[zlabel, blue!70]above:Offline: data generation}] {};
+% \end{scope}
+% % ZONE 2: MODEL
+% \node[sbox, fill=cyan!12] (cnn1) at (0.5, -3.0) {1D CNN};
+% \node[box, fill=cyan!20] (enc) at (0.5, -4.0) {Transformer\\Encoder};
+% \node[sbox, fill=orange!12] (cnn2) at (3.5, -3.0) {1D CNN};
+% \node[box, fill=orange!20] (dec) at (3.5, -4.0) {Transformer\\Decoder};
+% \draw[arrow] (mono) -- (cnn1);
+% \draw[arrow] (poly) -- (cnn2);
+% \draw[arrow] (cnn1) -- (enc);
+% \draw[arrow] (cnn2) -- (dec);
+% \draw[darrow, blue!60] (enc) -- node[above, font=\tiny\itshape, text=blue!60]{cross-attn} (dec);
+% \node[sbox, fill=green!15] (o1) at (0.5, -5.3) {Physics Params\\(Softplus)};
+% \node[sbox, fill=green!15] (o2) at (2.5, -5.3) {Spectrum Recon.\\(Sigmoid)};
+% \node[sbox, fill=green!15] (o3) at (4.5, -5.3) {Concentration\\(Softplus)};
+% \draw[arrow] (dec.south) -- ++(0,-0.35) -| (o1);
+% \draw[arrow] (dec.south) -- ++(0,-0.35) -| (o2);
+% \draw[arrow] (dec.south) -- ++(0,-0.35) -| (o3);
+% \begin{scope}[on background layer]
+% \node[zone, fill=orange!4, fit=(cnn1)(enc)(cnn2)(dec)(o1)(o2)(o3), label={[zlabel, orange!70]above:Online: CNN--Transformer encoder--decoder}] {};
+% \end{scope}
+% % ZONE 3: DOMAIN ADAPTATION
+% \node[box, fill=red!10] (libs) at (0.5, -7.0) {Exp. LIBS};
+% \node[box, fill=red!10] (xrf) at (2.5, -7.0) {XRF};
+% \node[sbox, fill=purple!12] (grl) at (4.0, -7.0) {GRL};
+% \node[sbox, fill=purple!12] (dc) at (4.0, -7.9) {Domain\\Classifier};
+% \draw[darrow, red!50] (libs) -- node[above, font=\tiny\itshape, text=gray]{fine-tune} (enc);
+% \draw[darrow, red!50] (xrf) -- node[right, font=\tiny\itshape, text=gray]{supervision} (o3);
+% \draw[darrow, purple!50] (enc.east) -- ++(1.0, 0) |- (grl);
+% \draw[arrow] (grl) -- (dc);
+% \begin{scope}[on background layer]
+% \node[zone, fill=red!4, fit=(libs)(xrf)(grl)(dc), label={[zlabel, red!60]above:Domain adaptation \& fine-tuning}] {};
+% \end{scope}
+% \end{tikzpicture}%
+% }
+% \caption{End-to-end framework.}
+% \label{fig:framework}
+% \end{figure}
 
 
+% --------------------------------------------------------------------------------------------
+\subsection{Synthetic data generation} \label{sec:synth}
+% --------------------------------------------------------------------------------------------
+
+Synthetic spectra are produced under the assumption of LTE, which is reasonable for the early-to-mid temporal window of nanosecond LIBS plasmas \cite{cristoforetti_local_2010}.
+The population of each ionisation stage is governed by the Saha equation \cite{fujimoto_plasma_2004},
+\begin{equation} \label{eq:saha}
+\frac{n_e \, n_{z+1}}{n_z} = 2\,\frac{Z_{z+1}(T_e)}{Z_z(T_e)} \left(\frac{2\pi m_e k_B T_e}{h^2}\right)^{3/2} \exp\!\left(-\frac{E_{\mathrm{ion},z}}{k_B T_e}\right),
+\end{equation}
+where $n_z$ and $n_{z+1}$ are the number densities of ionisation stages $z$ and $z+1$, $Z_z$ denotes the partition function, $E_{\mathrm{ion},z}$ is the ionisation energy, and the remaining symbols have their usual meanings.
+Within each ionisation stage the excited-state populations follow the Boltzmann distribution \cite{fujimoto_plasma_2004},
+\begin{equation} \label{eq:boltz}
+n_i = \frac{n_z \, g_i \exp(-E_i / k_B T_e)}{Z_z(T_e)},
+\end{equation}
+where $g_i$ and $E_i$ are the degeneracy and energy of level $i$.
+
+The spectral emission coefficient for a transition $k \to i$ is \cite{fujimoto_plasma_2004}
+\begin{equation} \label{eq:emiss}
+j_\lambda = \frac{hc}{4\pi\lambda}\,A_{ki}\,n_k\,\phi_V(\lambda),
+\end{equation}
+with Einstein coefficient $A_{ki}$ and Voigt profile $\phi_V(\lambda)$.
+The Voigt profile arises from the convolution of a Gaussian component due to Doppler broadening \cite{griem_spectral_1974},
+\begin{equation} \label{eq:doppler}
+\Delta\lambda_D = \lambda_{ki}\sqrt{\frac{8\ln 2\,k_B T_i}{m_k c^2}},
+\end{equation}
+and a Lorentzian component dominated by Stark broadening \cite{griem_spectral_1974},
+\begin{equation} \label{eq:stark}
+\Delta\lambda_S \approx 2\,\omega_{ki}(T_e)\,\frac{n_e}{n_{e,\mathrm{ref}}},
+\end{equation}
+where $\omega_{ki}$ is the electron-impact half-width at reference density $n_{e,\mathrm{ref}}$.
+
+Atomic transition data ($\lambda_{ki}$, $A_{ki}$, $g_i$, $E_i$) are taken from the NIST Atomic Spectra Database \cite{kramida_nist_2024}.
+The spectral window covers 200--900~nm.
+Plasma parameters are sampled on a grid with $T_e \in [5\,000,\;15\,000]$~K and $n_e \in [10^{16},\;10^{18}]$~cm$^{-3}$.
+For each plasma condition and each element $z$, a monoatomic spectrum $S_{\mathrm{mono}}^{(z)}(\lambda)$ is computed by summing equation~(\ref{eq:emiss}) over all transitions of that element.
+The corresponding polyatomic spectrum is constructed as a concentration-weighted superposition,
+\begin{equation} \label{eq:poly}
+S_{\mathrm{poly}}(\lambda) = \sum_{z} c_z \, S_{\mathrm{mono}}^{(z)}(\lambda),
+\end{equation}
+where $c_z$ is the fractional concentration of element $z$, with $\sum_z c_z = 1$.
+Finally, the synthetic spectrum is convolved with an instrumental Gaussian of full width at half maximum $\Delta\lambda_{\mathrm{inst}} \approx 0.1$~nm to match the spectral resolution of the laboratory spectrometer.
+
+
+% --------------------------------------------------------------------------------------------
+\subsection{Experimental data} \label{sec:exp}
+% --------------------------------------------------------------------------------------------
+
+Experimental LIBS spectra are acquired from volcanic-soil samples collected in the Aceh region of Sumatra, Indonesia.
+The soil pellets are ablated with a Q-switched Nd:YAG laser operating at 1064~nm.
+Emission is collected and dispersed by an echelle spectrometer coupled to an intensified CCD detector.
+Each spectrum represents the average of multiple laser shots to improve the signal-to-noise ratio.
+
+Ground-truth elemental concentrations are obtained independently by X-ray fluorescence (XRF) analysis.
+The XRF concentrations serve as regression targets during fine-tuning, while CF-LIBS derived concentrations \cite{cristoforetti_local_2010} provide supplementary validation.
+Detailed instrumental parameters and sample-preparation protocols are summarised in table~\ref{tab:exp}.
+
+\begin{table}[htbp]
+\centering
+\caption{Summary of experimental parameters.}
+\label{tab:exp}
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Laser wavelength       & 1064~nm \\
+Pulse energy           & 114~mJ \\
+Gate delay             & 0.5~$\mu$s \\
+Gate width             & 0.5~$\mu$s \\
+Spectral range         & 200--900~nm \\
+Number of samples      & 24 \\
+Ground-truth method    & XRF \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+% --------------------------------------------------------------------------------------------
+\subsection{CNN--Transformer encoder--decoder architecture} \label{sec:model}
+% --------------------------------------------------------------------------------------------
+
+The architecture comprises four modules: (i) a shared 1D~CNN feature extractor, (ii) a Transformer encoder operating on monoatomic representations, (iii) a Transformer decoder with cross-attention operating on the polyatomic spectrum, and (iv) a regression head that outputs elemental concentrations.
+Figure~\ref{fig:architecture} shows the complete model.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.65\textwidth]{img/Arsitektur-PCST-P5.drawio.png}
+\caption{Detailed CNN--Transformer encoder--decoder architecture. The encoder (left) processes monoatomic spectra through 1D~CNN, input embedding, positional encoding, and $N_\mathrm{enc}$ self-attention layers. The decoder (right) processes polyatomic spectra through masked self-attention and cross-attention with the encoder output. Three output heads predict elemental concentrations (Softplus), reconstructed spectra (Sigmoid), and plasma parameters (Softplus).}
+\label{fig:architecture}
+\end{figure}
+
+\subsubsection{Input representation.}
+
+A monoatomic spectrum $S_{\mathrm{mono}}^{(z)}(\lambda) \in \mathbb{R}^{L}$ is a one-dimensional signal of length $L$ (number of wavelength channels) corresponding to element~$z$.
+The polyatomic spectrum $S_{\mathrm{poly}}(\lambda) \in \mathbb{R}^{L}$ is the experimentally measured or synthetically generated mixture signal.
+Both are normalised to unit maximum intensity before being input to the model.
+
+\subsubsection{1D CNN feature extractor.}
+
+Each spectrum is passed through a stack of 1D convolutional layers \cite{he_deep_2016} that capture local emission-line patterns:
+\begin{equation}
+\mathbf{F} = \mathrm{ReLU}\!\bigl(\mathrm{BN}(\mathrm{Conv1D}(S;\,\Theta_{\mathrm{cnn}}))\bigr),
+\end{equation}
+where $\mathrm{BN}$ denotes batch normalisation \cite{ioffe_batch_2015} and $\Theta_{\mathrm{cnn}}$ are the learnable convolutional parameters.
+The CNN parameters are shared between the encoder and decoder paths to enforce a common spectral feature space.
+The output is a sequence of feature vectors $\mathbf{F} \in \mathbb{R}^{L' \times d}$, where $L'$ is the reduced sequence length after pooling and $d$ is the feature dimension.
+
+\subsubsection{Transformer encoder.}
+
+The encoder receives the CNN features of all $Z$ monoatomic spectra, concatenated along the sequence dimension, together with learnable element-type and positional embeddings \cite{vaswani_attention_2017}.
+Multi-head self-attention learns intra-element and inter-element dependencies:
+\begin{equation}
+\mathrm{Attention}(\mathbf{Q},\mathbf{K},\mathbf{V}) = \mathrm{softmax}\!\left(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d_k}}\right)\mathbf{V}.
+\end{equation}
+After $N_{\mathrm{enc}}$ encoder layers, the output is a set of element-specific latent representations $\mathbf{H}_{\mathrm{enc}} \in \mathbb{R}^{(Z \cdot L') \times d}$.
+
+\subsubsection{Transformer decoder with cross-attention.}
+
+The decoder operates on the CNN features of the polyatomic spectrum \cite{vaswani_attention_2017}.
+Each decoder layer contains three sub-layers: masked self-attention over the mixture features, cross-attention with the encoder output, and a position-wise feed-forward network.
+The cross-attention mechanism is the key structural innovation:
+\begin{equation}
+\mathbf{Q}_{\mathrm{dec}} = \mathbf{F}_{\mathrm{poly}}\,\mathbf{W}_Q, \quad
+\mathbf{K}_{\mathrm{enc}} = \mathbf{H}_{\mathrm{enc}}\,\mathbf{W}_K, \quad
+\mathbf{V}_{\mathrm{enc}} = \mathbf{H}_{\mathrm{enc}}\,\mathbf{W}_V,
+\end{equation}
+where $\mathbf{F}_{\mathrm{poly}}$ denotes the decoder's polyatomic features and $\mathbf{W}_Q, \mathbf{W}_K, \mathbf{W}_V$ are learnable projections.
+The resulting cross-attention scores have a physically meaningful interpretation: high attention weight between a decoder position (a spectral region of the mixture) and an encoder position (an element-specific feature) indicates that the corresponding element contributes to the mixture intensity at that wavelength.
+
+After $N_{\mathrm{dec}}$ decoder layers, a global average pooling and a linear projection yield the predicted concentration vector:
+\begin{equation}
+\hat{\mathbf{c}} = \mathrm{Linear}\!\bigl(\mathrm{GAP}(\mathbf{H}_{\mathrm{dec}})\bigr) \in \mathbb{R}^{Z}.
+\end{equation}
+
+\subsubsection{Training strategy.}
+
+The model is trained in two phases.
+
+\emph{Pre-training on synthetic data.}
+The encoder--decoder is trained on $(\{S_{\mathrm{mono}}^{(z)}\}_{z=1}^{Z},\,S_{\mathrm{poly}},\,\mathbf{c})$ triplets generated by the forward model (section~\ref{sec:synth}).
+The loss function combines a concentration regression term and an optional spectral reconstruction term:
+\begin{equation} \label{eq:loss}
+\mathcal{L} = \frac{1}{Z}\sum_{z=1}^{Z}(\hat{c}_z - c_z)^2 + \alpha\,\|S_{\mathrm{poly}} - \hat{S}_{\mathrm{poly}}\|_2^2,
+\end{equation}
+where $\alpha$ is a regularisation weight.
+The Adam optimiser \cite{kingma_adam_2015} is used with a learning rate of $10^{-4}$ and cosine annealing schedule.
+
+\emph{Fine-tuning on experimental data.}
+The pre-trained model is fine-tuned on experimental LIBS spectra with XRF-derived concentrations as targets.
+During fine-tuning the monoatomic spectra are generated by the forward model at plasma conditions estimated from each experimental spectrum.
+The learning rate is reduced by a factor of ten to preserve the representations learned during pre-training.
+
+\emph{Domain adaptation.}
+To further bridge the synthetic--experimental domain gap, a domain-adversarial training strategy is employed.
+A Gradient Reversal Layer (GRL) is attached to the shared Transformer encoder, feeding into a domain classifier that distinguishes synthetic from experimental spectra.
+During backpropagation the GRL reverses the gradient sign, encouraging the encoder to learn domain-invariant representations.
+Figure~\ref{fig:domain} illustrates the domain-adaptation architecture.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.55\textwidth]{img/Domain Adaption.png}
+\caption{Domain-adaptation architecture. Source-domain (synthetic) and target-domain (experimental) spectra share the same Transformer encoder. A Gradient Reversal Layer (GRL) feeds a domain classifier that encourages domain-invariant encoder representations through adversarial training.}
+\label{fig:domain}
+\end{figure}
+
+% --------------------------------------------------------------------------------------------
+\subsection{Evaluation protocol} \label{sec:eval}
+% --------------------------------------------------------------------------------------------
+
+Model performance is quantified by three metrics computed per element:
+
+\begin{itemize}
+\item Root Mean Square Error: $\mathrm{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(c_i - \hat{c}_i)^2}$
+\item Coefficient of determination: $R^2 = 1 - \frac{\sum(c_i - \hat{c}_i)^2}{\sum(c_i - \bar{c})^2}$
+\item Mean Absolute Percentage Error: $\mathrm{MAPE} = \frac{100\%}{n}\sum\left|\frac{c_i - \hat{c}_i}{c_i}\right|$
+\end{itemize}
+
+Five baseline models are compared:
+\begin{enumerate}
+\item \textbf{PLS}: Partial least-squares regression \cite{wold_pls_2001} on the raw spectrum.
+\item \textbf{CNN-only}: The shared CNN feature extractor followed by a linear regression head, without Transformer layers.
+\item \textbf{Transformer-only}: A Transformer encoder applied directly to the raw polyatomic spectrum without CNN preprocessing or mono--polyatomic decomposition.
+\item \textbf{Informer}: The ProbSparse self-attention Transformer of \cite{zhou_informer_2021}, adapted for spectral regression following \cite{walidain_informer-based_2026}.
+% \item \textbf{TransCNN}: The Transformer--CNN hybrid of \cite{liu_remote_2026} applied as a single-signal model without mono--polyatomic decomposition.
+\end{enumerate}
+
+All models are evaluated using stratified $k$-fold cross-validation ($k = 5$) on the experimental dataset.
+Additionally, a domain-transfer experiment assesses generalisation from synthetic to experimental data without fine-tuning.
+
+
+% % ============================================================================================
+% \section{Results and discussion}
+% % ============================================================================================
+
+% % --------------------------------------------------------------------------------------------
+% \subsection{Synthetic data characteristics}
+% % --------------------------------------------------------------------------------------------
+
+% \textit{[To be completed.  This section will report the size and statistical properties of the synthetic dataset, including representative monoatomic and polyatomic spectra at selected plasma conditions.]}
+
+% % --------------------------------------------------------------------------------------------
+% \subsection{Model performance on synthetic test set}
+% % --------------------------------------------------------------------------------------------
+
+% \textit{[To be completed.  Quantitative comparison of the proposed encoder--decoder against all baselines on held-out synthetic data will be presented here, including per-element RMSE, $R^2$, and MAPE values.]}
+
+% % --------------------------------------------------------------------------------------------
+% \subsection{Fine-tuning on experimental volcanic-soil spectra}
+% % --------------------------------------------------------------------------------------------
+
+% \textit{[To be completed.  This section will present results after fine-tuning on experimental LIBS spectra with XRF ground truth, demonstrating domain transfer from synthetic to real data.]}
+
+% % --------------------------------------------------------------------------------------------
+% \subsection{Cross-attention interpretability}
+% % --------------------------------------------------------------------------------------------
+
+% \textit{[To be completed.  Attention-weight visualisations will be analysed to assess whether the cross-attention mechanism identifies element-specific spectral regions consistent with known emission lines.]}
+
+
+% % ============================================================================================
+% \section{Conclusions}
+% % ============================================================================================
+
+% This work presented a CNN--Transformer encoder--decoder architecture for quantitative LIBS analysis that explicitly models the decomposition of polyatomic emission spectra into monoatomic elemental constituents.
+% The encoder learns element-specific latent representations from individual monoatomic spectra, while the decoder recovers elemental concentrations from the observed polyatomic mixture via a cross-attention mechanism.
+% Three principal contributions were demonstrated.
+% First, the encoder--decoder framework structurally separates monoatomic and polyatomic spectral information, embedding a physically motivated inductive bias into the model architecture.
+% Second, the cross-attention weights provide an interpretable link between predicted concentrations and specific spectral regions, advancing transparency in data-driven spectral analysis.
+% Third, the approach was applied to volcanic-soil samples from Aceh, Indonesia, with XRF-validated ground truth, demonstrating applicability to complex geological matrices.
+
+% \textit{[To be completed with specific performance metrics following experimental evaluation.]}
+
+% The primary limitation of the current study is the LTE assumption underlying synthetic data generation; extending the forward model to partial-LTE or non-LTE conditions may improve the fidelity of pre-training spectra for late-delay-time measurements.
+% Future work will investigate domain-adaptation strategies to further bridge the synthetic--experimental gap, explore the integration of self-absorption modelling into the forward generator, and assess the architecture's suitability for real-time deployment in field and planetary exploration scenarios.
+
+
+% ============================================================================================
+% \ack{
+% The authors acknowledge the support of the Department of Physics, Universitas Syiah Kuala, and the Research Center for Photonics, BRIN.
+% }
+
+% ============================================================================================
+\bibliographystyle{unsrt}
+\bibliography{revv}
 
 \end{document}
