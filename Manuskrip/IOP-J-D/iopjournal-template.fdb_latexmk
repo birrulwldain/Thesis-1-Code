@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex iopjournal-template"] 1776276174.52316 "iopjournal-template.aux" "iopjournal-template.bbl" "iopjournal-template" 1776276175.74494 0
+["bibtex iopjournal-template"] 1776277213.9537 "iopjournal-template.aux" "iopjournal-template.bbl" "iopjournal-template" 1776277215.0423 0
   "./revv.bib" 1776275609.05857 48899 61077fcd1030c430af5378aeec48abcb ""
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/base/unsrt.bst" 1292289607 18030 1376b4b231b50c66211e47e42eda2875 ""
-  "iopjournal-template.aux" 1776276175.45738 7560 b7655790f442247b2f76713889773f02 "pdflatex"
+  "iopjournal-template.aux" 1776277214.76897 7560 b7655790f442247b2f76713889773f02 "pdflatex"
   (generated)
   "iopjournal-template.bbl"
   "iopjournal-template.blg"
   (rewritten before read)
-["pdflatex"] 1776276174.65006 "/Users/birrulwldain/Projects/Thesis-1-Code/Manuskrip/IOP-J-D/iopjournal-template.tex" "iopjournal-template.pdf" "iopjournal-template" 1776276175.74506 0
-  "/Users/birrulwldain/Projects/Thesis-1-Code/Manuskrip/IOP-J-D/iopjournal-template.tex" 1776276174.27851 33332 6d2a4bdae3869174d007d29f7752bd26 ""
+["pdflatex"] 1776277214.06141 "/Users/birrulwldain/Projects/Thesis-1-Code/Manuskrip/IOP-J-D/iopjournal-template.tex" "iopjournal-template.pdf" "iopjournal-template" 1776277215.04242 0
+  "/Users/birrulwldain/Projects/Thesis-1-Code/Manuskrip/IOP-J-D/iopjournal-template.tex" 1776277212.56397 33425 b29e5abcced0245a498b07d0ff463517 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -196,10 +196,10 @@
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
   "img/Arsitektur-PCST-P5.drawio.png" 1776268314.83164 93783 0708f9b455ec3c99ffcf4fa07c4af20d ""
   "img/Domain Adaption.png" 1776268338.61982 31431 d954063050314a4d5cc30297f3ae92da ""
-  "iopjournal-template.aux" 1776276175.45738 7560 b7655790f442247b2f76713889773f02 "pdflatex"
-  "iopjournal-template.bbl" 1776276174.6441 8339 a3143750209b75749008486c37bcb51c "bibtex iopjournal-template"
-  "iopjournal-template.out" 1776276175.45816 2118 dd64085bb1ec47c83d5199ddca07664e "pdflatex"
-  "iopjournal-template.tex" 1776276174.27851 33332 6d2a4bdae3869174d007d29f7752bd26 ""
+  "iopjournal-template.aux" 1776277214.76897 7560 b7655790f442247b2f76713889773f02 "pdflatex"
+  "iopjournal-template.bbl" 1776277214.0587 8339 a3143750209b75749008486c37bcb51c "bibtex iopjournal-template"
+  "iopjournal-template.out" 1776277214.76991 2118 dd64085bb1ec47c83d5199ddca07664e "pdflatex"
+  "iopjournal-template.tex" 1776277212.56397 33425 b29e5abcced0245a498b07d0ff463517 ""
   "iopjournal.cls" 1776157111.21612 5945 a926ce0cbf85e8cf61e19f761ed71d40 ""
   (generated)
   "iopjournal-template.aux"
