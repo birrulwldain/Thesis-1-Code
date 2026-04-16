@@ -1,0 +1,313 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\title{Notes on ``Towards Real-Time Calibration-Free LIBS Supported by Machine Learning”}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Laser-Induced Breakdown Spectroscopy (LIBS) is a spectroscopic technique used to determine elemental composition of materials by analyzing emission from laser-induced plasma. A major challenge in LIBS is performing \textbf{quantitative analysis without calibration samples}. This approach is known as \textbf{Calibration-Free LIBS (CF-LIBS)}.
+
+Traditional CF-LIBS requires strong expertise because it involves plasma diagnostics such as:
+
+\begin{itemize}
+\item Electron density ($n_e$) estimation from Stark broadening
+\item Temperature ($T$) estimation using Boltzmann or Saha-Boltzmann plots
+\item Spectral line integration and deconvolution
+\end{itemize}
+
+The paper proposes using \textbf{deep learning} to directly infer plasma parameters and elemental composition from spectra, enabling near \textbf{real-time CF-LIBS analysis}.
+
+\section{Dataset Generation}
+Instead of using experimental spectra, the authors generated a large synthetic dataset using a radiative transfer simulation code called \textbf{MERLIN}. This simulator models plasma emission under Local Thermodynamic Equilibrium (LTE).
+
+The spectral radiance is modeled using the radiative transfer equation:
+
+\begin{equation}
+L_{\lambda}(x_i, n_e, T) = L_{\lambda,T}^{0}\left(1-e^{-\alpha_{\lambda}(x_i,n_e,T),\ell_c}\right)
+\end{equation}
+
+where:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Symbol & Meaning \\
+\midrule
+$L_{\lambda}$ & Spectral radiance \\
+$x_i$ & Mole fraction of element $i$ \\
+$n_e$ & Electron density \\
+$T$ & Plasma temperature \\
+$\alpha_{\lambda}$ & Spectral absorption coefficient \\
+$\ell_c$ & Plasma core dimension \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A total of \textbf{$10^6$ synthetic spectra} were generated.
+
+\section{Elements Considered}
+The dataset includes mixtures of nine elements:
+
+\begin{itemize}
+\item Ag
+\item Ar
+\item B
+\item C
+\item Cu
+\item H
+\item Mo
+\item Ni
+\item W
+\end{itemize}
+
+Their mole fractions satisfy the compositional constraint:
+
+\begin{equation}
+\sum_{i=1}^{9} x_i = 1
+\end{equation}
+
+The compositions are sampled using a \textbf{Dirichlet distribution} so that all possible mixtures are represented.
+
+Minimum detectable concentration:
+
+\begin{equation}
+x_i = 10^{-6}
+\end{equation}
+
+which corresponds to parts-per-million level detection.
+
+\section{Spectral Range}
+The simulated spectra cover the range:
+
+\begin{equation}
+200 \text{ nm} \leq \lambda \leq 800 \text{ nm}
+\end{equation}
+
+However, each sample only contains a \textbf{60 nm window}. The center wavelength $\lambda_c$ is randomly selected from:
+
+\begin{equation}
+\lambda_c \sim U(230,770)
+\end{equation}
+
+This mimics real experimental spectrometers which only observe part of the spectrum.
+
+\section{Plasma Parameters}
+Two plasma parameters are varied during simulation.
+
+\subsection{Electron Density}
+
+\begin{equation}
+5\times10^{22} \leq n_e \leq 5\times10^{23} ; m^{-3}
+\end{equation}
+
+This parameter controls Stark broadening of spectral lines.
+
+\subsection{Temperature}
+
+\begin{equation}
+10,000K \leq T \leq 13,000K
+\end{equation}
+
+Temperature determines the population of excited states through the Boltzmann distribution.
+
+\section{Data Normalization}
+Spectral intensity ranges from $10^9$ to $10^{15}$, therefore normalization is required.
+
+First, logarithmic scaling is applied:
+
+\begin{equation}
+L = \log(L_{\lambda})
+\end{equation}
+
+Then Z-score normalization:
+
+\begin{equation}
+L^* = \frac{L - \bar{L}}{\sigma_L}
+\end{equation}
+
+where $\bar{L}$ is the mean and $\sigma_L$ the standard deviation.
+
+\section{Compositional Data Transformation}
+To improve learning, mole fractions are transformed into log-ratio space:
+
+\begin{equation}
+x_i^* = \log(x_i) - \frac{1}{9} \sum_{j=1}^{9} \log(x_j)
+\end{equation}
+
+This transformation removes the sum-to-one constraint and improves neural network stability.
+
+\section{Neural Network Architecture}
+A \textbf{Convolutional Neural Network (CNN)} with residual connections is used.
+
+Input:
+
+\begin{itemize}
+\item Spectral vector with 10240 values
+\item Represents range 200–800 nm
+\item Only 60 nm window contains real data
+\end{itemize}
+
+The architecture has two parts:
+
+\subsection{Feature Extraction}
+Three convolutional stages extract spectral features such as:
+
+\begin{itemize}
+\item spectral lines
+\item line shapes
+\item line overlaps
+\end{itemize}
+
+\subsection{Regression Layers}
+Three fully connected layers predict physical quantities.
+
+Outputs:
+
+\begin{itemize}
+\item 9 elemental mole fractions
+\item electron density $n_e$
+\item temperature $T$
+\item center wavelength $\lambda_c$
+\end{itemize}
+
+The model contains approximately $6 \times 10^7$ parameters.
+
+\section{Training Configuration}
+
+Dataset size:
+
+\begin{itemize}
+\item Total spectra: $10^6$
+\item Used for training: $10^5$
+\end{itemize}
+
+Split:
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+Dataset & Size \\
+\midrule
+Training & 90,000 \\
+Testing & 10,000 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Training parameters:
+
+\begin{itemize}
+\item Batch size: 32
+\item Learning rate: $5 \times 10^{-5}$
+\item Epochs: 100
+\end{itemize}
+
+\section{Loss Function}
+The loss function includes a confidence weighting:
+
+\begin{equation}
+L(p,t,c)=\sum_i c_i^2 (p_i - t_i)^2 + \sum_i (1-c_i)^2
+\end{equation}
+
+where:
+
+\begin{itemize}
+\item $p_i$ = predicted value
+\item $t_i$ = target value
+\item $c_i$ = confidence score
+\end{itemize}
+
+The network therefore learns both prediction and its reliability.
+
+\section{Plasma Parameter Prediction Results}
+The model predicts plasma parameters with high accuracy.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Parameter & Correlation & Mean Error \\
+\midrule
+Electron density & 0.996 & $<5\%$ \\
+Temperature & 0.996 & $<1\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This shows neural networks can replace traditional diagnostics methods.
+
+\section{Element Quantification}
+The paper compares two cases.
+
+\subsection{Nickel (Ni)}
+Nickel has many spectral lines across the full spectral range.
+
+Prediction performance:
+
+\begin{itemize}
+\item Pearson correlation: 0.965
+\item Mean error: about 26%
+\end{itemize}
+
+\subsection{Hydrogen (H)}
+Hydrogen has only a few spectral lines (Balmer series):
+
+\begin{itemize}
+\item $H_\delta$ 410 nm
+\item $H_\gamma$ 434 nm
+\item $H_\beta$ 486 nm
+\item $H_\alpha$ 656 nm
+\end{itemize}
+
+Prediction accuracy improves dramatically if the spectral window contains $H_\alpha$.
+
+Filtered results:
+
+\begin{itemize}
+\item Pearson correlation: 0.984
+\item Mean error: 18%
+\end{itemize}
+
+\section{Real-Time Performance}
+The entire pipeline includes:
+
+\begin{enumerate}
+\item reading camera image
+\item spectral calibration
+\item spatial integration
+\item neural network inference
+\end{enumerate}
+
+Average processing time:
+
+\begin{equation}
+0.084 ; s
+\end{equation}
+
+This corresponds to approximately:
+
+\begin{equation}
+10 ; Hz
+\end{equation}
+
+which matches the repetition rate of typical LIBS lasers.
+
+\section{Conclusion}
+The study demonstrates that deep learning can enable real-time calibration-free LIBS analysis. Using synthetic spectra generated by radiative transfer simulations, a CNN model can simultaneously predict:
+
+\begin{itemize}
+\item plasma temperature
+\item electron density
+\item multi-element composition
+\end{itemize}
+
+This approach eliminates the need for manual spectral analysis and opens the possibility of fast, automated chemical diagnostics.
+
+\end{document}
