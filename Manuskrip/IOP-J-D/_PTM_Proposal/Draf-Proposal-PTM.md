@@ -34,9 +34,9 @@ LIBS; deep learning; CNN–Transformer; encoder–decoder; cross-attention; deko
 
 ### Latar Belakang
 
-Laser-Induced Breakdown Spectroscopy (LIBS) merupakan teknik spektroskopi emisi yang telah banyak digunakan untuk analisis komposisi unsur pada berbagai material kompleks, termasuk mineral, batuan, dan material tanah (Legnaioli et al., 2025). Kemampuan LIBS untuk melakukan analisis multi-elemen secara cepat tanpa memerlukan preparasi sampel yang kompleks menjadikannya metode yang menarik untuk aplikasi geokimia dan eksplorasi sumber daya alam (Sawyers et al., 2025). Berbagai penelitian menunjukkan bahwa LIBS telah berhasil digunakan untuk kuantifikasi unsur pada sampel geologi melalui beragam pendekatan analitik, mulai dari regresi multivariat, kurva kalibrasi univariat berbasis garis spektral tertentu, hingga metode berbasis machine learning (Babos et al., 2024; Manzoor et al., 2025). Pendekatan-pendekatan tersebut mampu mencapai akurasi analitik yang tinggi, namun keberhasilan kuantifikasi sangat bergantung pada strategi pemodelan spektrum serta sensitivitas metode terhadap efek matriks pada sampel geologi yang kompleks (Hao et al., 2024). Kondisi ini menjadi semakin relevan pada analisis tanah vulkanik, yang secara inheren memiliki komposisi multi-elemen dengan variasi matriks yang tinggi.
+Laser-Induced Breakdown Spectroscopy (LIBS) merupakan teknik spektroskopi emisi yang telah banyak digunakan untuk analisis komposisi unsur pada berbagai material kompleks, termasuk mineral, batuan, dan material tanah (Legnaioli et al., 2025). Kemampuan LIBS untuk melakukan analisis multi-elemen secara cepat tanpa memerlukan preparasi sampel yang kompleks menjadikannya metode yang menarik untuk aplikasi geokimia dan eksplorasi sumber daya alam (Sawyers et al., 2025). Berbagai penelitian menunjukkan bahwa LIBS telah berhasil digunakan untuk kuantifikasi unsur pada sampel geologi melalui beragam pendekatan analitik, mulai dari regresi multivariat, kurva kalibrasi univariat berbasis garis spektral tertentu (Zhang et al., 2025), hingga metode berbasis machine learning (Babos et al., 2024; Manzoor et al., 2025). Pendekatan-pendekatan tersebut mampu mencapai akurasi analitik yang tinggi, namun keberhasilan kuantifikasi sangat bergantung pada strategi pemodelan spektrum serta sensitivitas metode terhadap efek matriks pada sampel geologi yang kompleks (Hao et al., 2024; Manelski et al., 2024). Kondisi ini menjadi semakin relevan pada analisis tanah vulkanik, yang secara inheren memiliki komposisi multi-elemen dengan variasi matriks yang tinggi.
 
-Dalam pendekatan kuantitatif LIBS, salah satu metode yang banyak digunakan adalah Calibration-Free LIBS (CF-LIBS), yang memungkinkan estimasi komposisi unsur tanpa memerlukan sampel standar kalibrasi. Metode ini bergantung pada ekstraksi parameter plasma fundamental seperti temperatur elektron (T_e) dan densitas elektron (n_e), yang dihitung berdasarkan asumsi Local Thermodynamic Equilibrium (LTE) (Cristoforetti et al., 2010). Namun, asumsi plasma homogen dalam kondisi LTE sering kali tidak memadai untuk mendeskripsikan plasma LIBS yang bersifat sangat transien dan bergradien tinggi (Zaitsev et al., 2024; Bultel et al., 2025). Penyimpangan dari kondisi LTE ini dapat memicu distorsi spektral akibat efek opasitas optik dan penyerapan mandiri (self-absorption), yang pada akhirnya mengganggu stabilitas estimasi temperatur dan densitas plasma (Tang et al., 2024). Pendekatan berbasis model fisika plasma seperti model radiative transfer adaptif MERLIN (Favre et al., 2025) yang memanfaatkan distribusi Saha–Boltzmann serta Persamaan Transfer Radiatif menunjukkan bahwa rekonstruksi spektrum LIBS yang kompleks dapat dicapai dengan mempertahankan konsistensi termodinamika plasma, meskipun implementasinya masih menghadapi hambatan komputasi yang signifikan akibat kebutuhan inversi numerik nonlinier (Favre et al., 2025b).
+Dalam pendekatan kuantitatif LIBS, salah satu metode yang banyak digunakan adalah Calibration-Free LIBS (CF-LIBS), yang memungkinkan estimasi komposisi unsur tanpa memerlukan sampel standar kalibrasi. Metode ini bergantung pada ekstraksi parameter plasma fundamental seperti temperatur elektron (T_e) dan densitas elektron (n_e), yang dihitung berdasarkan asumsi Local Thermodynamic Equilibrium (LTE) (Cristoforetti et al., 2010). Namun, asumsi plasma homogen dalam kondisi LTE sering kali tidak memadai untuk mendeskripsikan plasma LIBS yang bersifat sangat transien dan bergradien tinggi (Zaitsev et al., 2024; Bultel et al., 2025). Penyimpangan dari kondisi LTE ini dapat memicu distorsi spektral akibat efek opasitas optik dan penyerapan mandiri (self-absorption), yang pada akhirnya mengganggu stabilitas estimasi temperatur dan densitas plasma (Tang et al., 2024; Hansen et al., 2021). Pendekatan berbasis model fisika plasma seperti model radiative transfer adaptif MERLIN (Favre et al., 2025) yang memanfaatkan distribusi Saha–Boltzmann serta Persamaan Transfer Radiatif menunjukkan bahwa rekonstruksi spektrum LIBS yang kompleks dapat dicapai dengan mempertahankan konsistensi termodinamika plasma, meskipun implementasinya masih menghadapi hambatan komputasi yang signifikan akibat kebutuhan inversi numerik nonlinier (Favre et al., 2025b).
 
 Perkembangan metode machine learning dan deep learning telah menawarkan alternatif untuk mempercepat analisis spektrum LIBS dengan mempelajari hubungan nonlinier antara spektrum dan parameter plasma secara langsung dari data. Convolutional Neural Networks (CNN) mampu menangkap fitur lokal seperti profil garis emisi, sementara arsitektur Transformer memodelkan dependensi jarak jauh sepanjang sumbu panjang gelombang (Liu et al., 2026). Model hibrida CNN–Transformer telah menunjukkan hasil menjanjikan untuk kuantifikasi unsur jejak pada baja (Liu et al., 2026) dan untuk klasifikasi signatur spektral pada sampel multi-elemen (Walidain et al., 2026). Namun, sebagian besar model data-driven beroperasi sebagai black box yang tidak secara eksplisit mempertimbangkan hukum fisika plasma yang mendasari pembentukan spektrum emisi (Hao et al., 2024). Fakta fisik fundamental yang belum dieksploitasi adalah: spektrum LIBS poliatomik merupakan superposisi terbobot konsentrasi dari spektrum monoatomik penyusunnya. Seluruh model eksisting—baik berbasis fisika maupun data-driven—memperlakukan spektrum sebagai single signal dan mengabaikan struktur komposisional ini. **Belum ada penelitian sebelumnya yang secara eksplisit memodelkan dekomposisi spektrum campuran ke dalam konstituennya dalam kerangka pembelajaran.** Cross-attention, mekanisme yang awalnya diusulkan untuk translasi sekuens-ke-sekuens (Vaswani et al., 2017), sangat ideal untuk tugas ini: decoder dapat meng-query representasi elemen dari encoder untuk mengetahui kontribusi monoatomik mana yang membentuk observasi poliatomik tertentu (Liu et al., 2026; Walidain et al., 2026).
 
@@ -116,14 +116,14 @@ Mahasiswa telah menyelesaikan desain arsitektur CNN–Transformer encoder–deco
 ## METODE PENELITIAN
 
 ### Tempat dan Waktu Penelitian
-Penelitian dilaksanakan di:
-- **Laboratorium Optika dan Aplikasi Laser, FMIPA USK** — akuisisi data LIBS eksperimental.
-- **Laboratorium Material, FMIPA** — preparasi sampel pellet tanah vulkanik.
-- **Workstation komputasi (GPU Server)** — training dan inferensi model CNN–Transformer.
 
-Rentang waktu penelitian: **10 bulan** (Februari 2025 – November 2025).
+Penelitian ini dilaksanakan dalam dua tahap utama yang mencakup kegiatan eksperimental dan komputasional. Tahap eksperimental meliputi preparasi sampel yang dilakukan di **Laboratorium Material, FMIPA Universitas Syiah Kuala**, serta akuisisi data spektrum LIBS yang dilaksanakan di **Laboratorium Optika dan Aplikasi Laser, FMIPA Universitas Syiah Kuala**. Laboratorium ini dilengkapi dengan sistem LIBS berbasis laser Nd:YAG dan spektrometer Echelle yang telah digunakan dalam berbagai studi spektroskopi sebelumnya (Mitaphonna et al., 2023; Mitaphonna et al., 2024; Khumaeni et al., 2025). Pengukuran komposisi unsur sebagai data referensi (*ground-truth*) menggunakan instrumen X-Ray Fluorescence (XRF) dilakukan di fasilitas analisis yang tersedia di lingkungan Universitas Syiah Kuala.
+
+Tahap komputasional — yang mencakup pembangkitan data sintetis, pengembangan arsitektur model CNN–Transformer encoder–decoder, serta seluruh siklus pelatihan dan evaluasi — dilaksanakan menggunakan **GPU Compute Server** yang tersedia di laboratorium penelitian. Keseluruhan penelitian direncanakan berlangsung selama **10 bulan**, dari Februari 2025 hingga November 2025, dengan rincian per fase disajikan pada bagian Jadwal Penelitian.
 
 ### Alat dan Bahan Penelitian
+
+Peralatan dan bahan yang digunakan dalam penelitian ini disajikan pada Tabel berikut:
 
 | No | Alat/Bahan | Spesifikasi | Jumlah |
 |----|-----------|-------------|--------|
@@ -142,43 +142,156 @@ Rentang waktu penelitian: **10 bulan** (Februari 2025 – November 2025).
 
 ### Prosedur Penelitian
 
-Prosedur mengikuti two-stage workflow:
+Prosedur pelaksanaan penelitian ini terdiri dari beberapa tahapan utama sebagaimana diilustrasikan dalam diagram alir pada Gambar 1. Secara garis besar, penelitian mengikuti *two-stage workflow* yang mengintegrasikan pendekatan berbasis simulasi fisika plasma dengan teknik *deep learning*:
 
-#### Tahap 1 — Offline: Pembangkitan Data Sintetis (Pre-training)
+1. **Tahap Offline** — Pembangkitan dataset sintetis menggunakan *forward model* Saha–Boltzmann berdasarkan data transisi atomik NIST, yang digunakan untuk *pre-training* model.
+2. **Tahap Online** — Akuisisi data eksperimental LIBS dari sampel tanah vulkanik, diikuti dengan *fine-tuning* dan evaluasi model pada data riil.
 
-1. **Pengumpulan data transisi atomik** dari NIST Atomic Spectra Database: panjang gelombang transisi (λ_ki), koefisien Einstein (A_ki), degenerasi (g_i), dan energi level (E_i) untuk 7 elemen mayor: **Si, Al, Fe, Ca, Mg, Na, K**.
-2. **Penghitungan populasi** tiap tingkat ionisasi menggunakan Persamaan Saha dan distribusi keadaan tereksitasi menggunakan Distribusi Boltzmann. Parameter plasma di-sampling secara acak seragam: T_e ∈ [6.000–15.000] K, n_e ∈ [10^16 – 10^17] cm^{-3}.
-3. **Pembangkitan spektrum monoatomik** S_mono^(z)(λ) per elemen dengan menjumlahkan koefisien emisi spektral menggunakan profil Voigt (konvolusi pelebaran Doppler + Stark).
-4. **Konstruksi spektrum poliatomik** S_poly(λ) = Σ_z c_z · S_mono^(z)(λ) — superposisi terbobot konsentrasi fraksional.
-5. **Konvolusi instrumental** dengan fungsi Gaussian (FWHM = 0,02 nm) untuk mencocokkan resolusi spektrometer echelle.
-6. Total dataset: **10.000 pasangan spektrum sintetis**, dibagi 80% training / 20% test.
+Kombinasi dua tahap ini dirancang untuk mengatasi keterbatasan jumlah data eksperimental yang tersedia (24 sampel) dengan cara memanfaatkan pengetahuan fisika plasma terlebih dahulu melalui data sintetis (Wang et al., 2024; Favre et al., 2025b), kemudian mentransfer representasi yang telah dipelajari ke domain eksperimental.
 
-#### Tahap 2 — Online: Akuisisi Eksperimental dan Training Model
+**Gambar 1. Diagram Alir Penelitian**
 
-**2a. Preparasi dan Akuisisi Sampel**
-1. Pengumpulan sampel tanah vulkanik dari lereng **Gunung Seulawah Agam, Aceh** — 4 arah mata angin (Utara, Barat, Selatan, Timur) × 3 kedalaman (0–20, 20–40, 40–60 cm) = **24 sampel**.
-2. Preparasi sampel: penggerusan menggunakan mortar → pengayakan 40 mesh → pengepresan hidrolik 7 ton → pembentukan pelet (∅ ~4 mm).
-3. Ablasi dengan laser Nd:YAG (1064 nm, 114 mJ). 3 tembakan laser per sampel, dirata-ratakan untuk meningkatkan rasio sinyal-terhadap-noise (SNR).
-4. Perekaman spektrum emisi plasma dengan spektrometer Echelle + detektor OMA.
-5. Pengukuran XRF independen sebagai **ground-truth konsentrasi unsur** untuk supervisi fine-tuning.
+![Diagram Alir Penelitian](diagram-alir-M.png)
 
-**2b. Arsitektur Model CNN–Transformer Encoder–Decoder**
-1. **1D-CNN Feature Extractor** (shared encoder–decoder): 3 lapisan konvolusi 1D (kernel: 7, 5, 3; filter: 64, 128, 128) + Batch Normalization + ReLU. Menangkap profil puncak emisi lokal.
-2. **Transformer Encoder** (4 layer, 8 attention heads): menerima fitur CNN dari **seluruh** spektrum monoatomik (concatenated) + positional & element-type embedding → menghasilkan representasi laten spesifik-elemen via self-attention.
-3. **Transformer Decoder** (4 layer, 8 heads): menerima fitur CNN spektrum campuran poliatomik → **masked self-attention** → **cross-attention** terhadap output encoder → mempelajari aturan komposisi spektral.
+#### Pembangkitan Data Sintetis
+
+Keterbatasan utama dalam pengembangan model *deep learning* untuk analisis LIBS adalah minimnya ketersediaan data eksperimental berlabel yang memadai untuk pelatihan. Untuk mengatasi hal ini, penelitian ini memanfaatkan *forward model* berbasis fisika plasma untuk membangkitkan dataset sintetis berskala besar. Pendekatan ini telah terbukti efektif dalam meningkatkan kemampuan generalisasi model melalui *pre-training* pada data sintetis sebelum *fine-tuning* pada data eksperimental (Wang et al., 2024; Favre et al., 2025b). Tahapan pembangkitan data sintetis adalah sebagai berikut:
+
+1. **Pengumpulan data transisi atomik** dari NIST Atomic Spectra Database (Kramida et al., 2024): panjang gelombang transisi (λ_ki), koefisien Einstein (A_ki), degenerasi (g_i), dan energi level (E_i). Agar rentang simulasi bersifat representatif, parameter elemen dikompilasi secara spesifik untuk **8 elemen mayor** dan **15 elemen jejak (*trace elements*)** khas tanah vulkanik, dengan batasan rentang konsentrasi sesuai Tabel berikut:
+
+**Tabel Rentang Referensi Komposisi Elemen Tanah Vulkanik**
+
+| Grup | Elemen | Rentang Komposisi (%) | Peran / Catatan |
+|------|--------|-----------------------|-----------------|
+| **Mayor** | Si | 40 – 60 | Komponen silikat dominan |
+| **Mayor** | Al | 10 – 18 | Mineral aluminosilikat / feldspar |
+| **Mayor** | Fe | 5 – 15 | Oksida besi dan mineral feromagnesia |
+| **Mayor** | Ca | 3 – 10 | Plagioklas dan mineral karbonat |
+| **Mayor** | Mg | 2 – 8 | Mineral olivin dan piroksen |
+| **Mayor** | Na | 1 – 5 | Komponen feldspar alkali |
+| **Mayor** | K | 1 – 5 | Feldspar kalium |
+| **Mayor** | Ti | 0.5 – 2 | Mineral oksida (ilmenit / rutil) |
+| **Jejak** | Mn | 0.05 – 0.5 | Berasosiasi dengan mineral Fe |
+| **Jejak** | P | 0.05 – 0.5 | Mineral apatit |
+| **Jejak** | Ba | 0.01 – 0.3 | Elemen jejak asosiasi alkali |
+| **Jejak** | Sr | 0.01 – 0.2 | Mensubstitusi Ca dalam feldspar |
+| **Jejak** | Zn | 0.005 – 0.1 | Elemen jejak sulfida / oksida |
+| **Jejak** | Cu | 0.001 – 0.05 | Logam jejak sulfida |
+| **Jejak** | Ni | 0.001 – 0.05 | Asosiasi mineral mafik |
+| **Jejak** | Cr | 0.001 – 0.05 | Indikator mineral ultramafik |
+| **Jejak** | V | 0.001 – 0.05 | Logam transisi pada mineral mafik |
+| **Jejak** | Rb | 0.001 – 0.05 | Elemen alkali dalam feldspar |
+| **Jejak** | Pb | 0.001 – 0.02 | Logam jejak berat |
+| **Jejak** | Co | 0.001 – 0.02 | Berasosiasi dengan mineral Fe |
+| **Jejak** | Mo | 0.0005 – 0.01 | Logam jejak minor |
+| **Jejak** | Y | 0.0005 – 0.01 | Berasosiasi dengan *rare earth element* (REE) |
+| **Jejak** | Zr | 0.001 – 0.02 | Mineral penyerta zirkon |
+2. **Penghitungan populasi** tiap tingkat ionisasi menggunakan Persamaan Saha dan distribusi keadaan tereksitasi menggunakan Distribusi Boltzmann (Fujimoto, 2004). Parameter plasma di-sampling secara acak seragam: T_e ∈ [6.000–15.000] K, n_e ∈ [10^16 – 10^17] cm^{-3}. Rentang ini dipilih berdasarkan kondisi tipikal plasma LIBS pada tekanan atmosfer (Cristoforetti et al., 2010), dengan mempertimbangkan variasi yang mungkin terjadi pada berbagai jenis matriks sampel.
+3. **Pembangkitan spektrum monoatomik** S_mono^(z)(λ) per elemen dengan menjumlahkan koefisien emisi spektral menggunakan profil Voigt — konvolusi pelebaran Doppler dan Stark broadening (Griem, 1974). Profil Voigt dipilih karena merepresentasikan mekanisme pelebaran garis spektral dominan pada plasma LIBS, yaitu pelebaran termal (Doppler) dan pelebaran akibat interaksi elektron (Stark).
+4. **Konstruksi spektrum poliatomik** S_poly(λ) = Σ_z c_z · S_mono^(z)(λ) — superposisi terbobot konsentrasi fraksional. Tahap ini secara eksplisit mengimplementasikan hipotesis dekomposisi mono–poliatomik yang menjadi dasar arsitektur encoder–decoder.
+5. **Konvolusi instrumental** dengan fungsi Gaussian (FWHM = 0,02 nm) untuk mencocokkan resolusi spektrometer Echelle yang digunakan dalam eksperimen.
+6. Total dataset yang dibangkitkan: **10.000 pasangan spektrum sintetis** (monoatomik + poliatomik beserta label konsentrasi dan parameter plasma), dibagi menjadi 80% untuk *training* dan 20% untuk *test*.
+
+#### Akuisisi Data Eksperimental dan Pemodelan
+
+**2a. Sampel Penelitian**
+
+Penelitian ini memanfaatkan **24 sampel tanah vulkanik** yang telah dikumpulkan dan dipreparasi dalam rangka program riset kolaboratif grup Laboratorium Optika dan Aplikasi Laser, FMIPA USK. Sampel berasal dari lereng **Gunung Seulawah Agam, Kabupaten Aceh Besar, Provinsi Aceh**, yang diambil pada **4 arah mata angin** (Utara, Barat, Selatan, Timur) dan **3 kedalaman** (0–20 cm, 20–40 cm, 40–60 cm) di setiap titik, sehingga merepresentasikan variasi spasial komposisi geokimia secara sistematis. Strategi pengambilan sampel ini konsisten dengan pendekatan yang digunakan oleh Khumaeni et al. (2025) pada studi tanah vulkanik Merapi.
+
+Sampel telah dipreparasi menjadi bentuk pelet pada studi sebelumnya melalui prosedur standar:
+- Pengeringan pada suhu ruang untuk menghilangkan kelembaban berlebih.
+- Penggerusan hingga halus menggunakan mortar dan pestel.
+- Penyaringan menggunakan ayakan 40 mesh (420 µm) untuk menyeragamkan ukuran partikel.
+- Penimbangan sebanyak kurang lebih 3 gram bubuk per sampel.
+- Pengepresan menggunakan mesin *hydraulic press* dengan tekanan 7 ton selama 5 menit hingga terbentuk pelet dengan ketebalan sekitar 4 mm.
+
+Ketersediaan sampel pelet yang telah terpreparasi memungkinkan penelitian ini untuk langsung berfokus pada tahap akuisisi spektrum LIBS baru dan pengembangan model *deep learning*.
+
+**2b. Akuisisi Data Spektrum LIBS Baru**
+
+Meskipun estimasi komposisi dan data baseline awal bersumber dari observasi XRF dan CF-LIBS studi terdahulu, standar kualitas data spektral eksperimental masa lalu belum optimal untuk skenario pelatihan komputasi modern. Oleh karena itu, akuisisi spektrum LIBS **dilakukan secara baru dan independen** terhadap 24 sampel pelet tersebut. Fokus pembaruan eksperimen terletak pada peningkatan agregasi pengukuran: **jumlah tembakan laser (*shots*)** akan diperbanyak secara masif. Penambahan akumulasi tembakan ini sangat esensial untuk mengatasi fluktuasi ketidakstabilan plasma dan menekan profil *noise* temporal. Hasilnya, *Signal-to-Noise Ratio* (SNR) akan meningkat drastis, sehingga jaringan *deep learning* kelak dapat mendeteksi intensitas emisi lemah secara akurat tanpa tertukar dengan *noise*.
+
+Pengukuran dilaksanakan menggunakan sistem LIBS di Laboratorium Optika dan Aplikasi Laser, FMIPA USK. Prosedur pengambilan datanya adalah sebagai berikut:
+- Berkas laser Nd:YAG (λ = 1064 nm, energi pulsa 114 mJ) difokuskan pada permukaan sampel pelet menggunakan lensa bikonveks (f = 155 mm) untuk membangkitkan plasma.
+- Serat optik dihubungkan ke sistem spektrograf dan diarahkan ke bilik sampel untuk menangkap emisi plasma.
+- Sampel pelet diposisikan di dalam bilik sampel dan jarak fokus disesuaikan untuk memperoleh intensitas plasma yang ideal.
+- Emisi plasma tertangkap akan direkam menggunakan *Optical Multichannel Analyzer* (OMA) berbasis spektrometer Echelle (rentang 200–900 nm).
+- Setiap sampel diablasi dengan **kuantitas tembakan (*multiple shots*) tinggi** pada *crater* / permukaan titik yang berbeda, lalu semua tangkapan spektral dirata-ratakan secara presisi guna memperoleh stabilitas *continuum background* dan ketajaman puncak.
+- Data spektrum yang terekam ditampilkan dan disimpan menggunakan komputer untuk analisis lebih lanjut.
+- Garis-garis emisi diidentifikasi menggunakan database NIST Atomic Spectra Database (Kramida et al., 2024).
+
+**2c. Data Ground-Truth Konsentrasi (XRF)**
+
+Data konsentrasi elemen untuk seluruh 24 sampel telah tersedia dari pengukuran **X-Ray Fluorescence (XRF)** yang dilakukan pada studi sebelumnya dalam program riset grup. Data XRF ini digunakan dalam penelitian ini sebagai *ground-truth* konsentrasi unsur untuk supervisi pada tahap *fine-tuning* model. Penggunaan data XRF yang sudah ada memastikan konsistensi referensi antara studi terdahulu dan penelitian ini, serta menghindari pengulangan pengukuran yang tidak diperlukan. XRF dipilih sebagai referensi karena kemampuannya memberikan analisis kuantitatif multi-elemen yang akurat secara non-destruktif.
+
+**2d. Arsitektur Model CNN–Transformer Encoder–Decoder**
+
+Arsitektur model yang diusulkan dalam penelitian ini dirancang berdasarkan prinsip dekomposisi spektral mono–poliatomik eksplisit, di mana spektrum campuran poliatomik dimodelkan sebagai superposisi terbobot dari spektrum monoatomik penyusunnya. Secara teknis, rancangan jaringan ini ditunjukkan secara menyeluruh pada Gambar di bawah. Arsitektur encoder–decoder dipilih karena secara natural mampu memodelkan hubungan antara komponen individu (monoatomik via encoder) dan campurannya (poliatomik via decoder) melalui mekanisme *cross-attention* (Vaswani et al., 2017; Liu et al., 2026). 
+
+**Gambar Arsitektur Model**
+
+![Arsitektur CNN-Transformer Encoder-Decoder](Arsitektur-CNN-Trans.png)
+
+Komponen utamanya adalah sebagai berikut:
+
+1. **1D-CNN Feature Extractor** (*shared* encoder–decoder): Dieksekusi secara berulang sebanyak 3 kali blok tumpukan (terdiri dari Conv1D → Batch Normalization → GELU → Max Pooling 1D). Blok ini secara krusial menangkap fitur lokal profil emisi/bentuk garis dan mereduksi resolusi spasial sekuens panjang gelombang.
+2. **Transformer Encoder** (4 layer, 8 attention heads): menerima fitur CNN dari **seluruh** spektrum monoatomik (concatenated) + positional & element-type embedding → menghasilkan representasi laten spesifik-elemen via self-attention. Encoder mempelajari bagaimana setiap elemen berkontribusi terhadap sinyal spektral secara individual.
+3. **Transformer Decoder** (4 layer, 8 heads): menerima fitur CNN spektrum campuran poliatomik → **masked self-attention** → **cross-attention** terhadap output encoder → mempelajari aturan komposisi spektral. Mekanisme *cross-attention* memungkinkan decoder untuk meng-query representasi elemen dari encoder dan menentukan kontribusi masing-masing elemen terhadap spektrum campuran yang diamati.
 4. **Regression Head**: Global Average Pooling → Linear projection → vektor konsentrasi ĉ ∈ ℝ^Z.
-5. **Tiga output head**: (i) konsentrasi elemen (aktivasi Softplus), (ii) rekonstruksi spektrum (Sigmoid), (iii) parameter plasma T_e, n_e (Softplus).
+5. **Tiga output head**: (i) konsentrasi elemen (aktivasi Softplus), (ii) rekonstruksi spektrum (Sigmoid), (iii) parameter plasma T_e, n_e (Softplus). Desain *multi-task* ini mendorong model untuk tidak hanya memprediksi konsentrasi, tetapi juga mempertahankan konsistensi dengan fisika plasma yang mendasarinya.
 
-**2c. Strategi Pelatihan**
-1. **Pre-training** pada data sintetis: 200 epoch, learning rate 10^{-4}, optimizer Adam + cosine annealing. Loss = MSE konsentrasi + α × MSE rekonstruksi spektral (α = 0,1).
-2. **Fine-tuning** pada data eksperimental LIBS: 50 epoch, learning rate 10^{-5}, dengan target ground-truth XRF.
-3. **Domain adaptation**: Gradient Reversal Layer (GRL) + domain classifier (sintetis vs eksperimental) → mendorong encoder menghasilkan representasi domain-invariant.
+**2e. Strategi Pelatihan**
 
-**2d. Protokol Evaluasi**
-- **3 metrik per elemen**: RMSE, R², MAPE.
-- **4 model baseline**: PLS (Partial Least Squares), CNN-only, Transformer-only, Informer (Walidain et al., 2026).
-- **Validasi**: stratified 5-fold cross-validation pada dataset eksperimental.
-- **Interpretabilitas**: analisis bobot cross-attention → identifikasi apakah model menemukan region spektral spesifik elemen yang konsisten dengan garis emisi NIST yang diketahui.
+Strategi pelatihan model dirancang dalam tiga fase berurutan untuk memaksimalkan transfer pengetahuan dari domain sintetis ke domain eksperimental. Skema komplit dari alur adaptasi domain ini dapat dilihat pada Gambar di bawah.
+
+**Gambar Skema Domain Adaptation**
+
+![Skema Domain Adaptation Menggunakan GRL](Domain-Adapt.png)
+
+Pelatihan dilakukan dalam tahapan:
+
+1. **Pre-training** pada data sintetis: 200 epoch, learning rate 10^{-4}, optimizer Adam (Kingma & Ba, 2015) dengan *cosine annealing schedule* (Loshchilov & Hutter, 2017). Fungsi loss gabungan digunakan: Loss = MSE konsentrasi + α × MSE rekonstruksi spektral (α = 0,1). Komponen rekonstruksi spektral berfungsi sebagai regularisasi fisika, memastikan model memetakan fitur spektral yang bermakna secara fisik.
+2. **Fine-tuning** pada data eksperimental LIBS: 50 epoch, learning rate 10^{-5} (lebih rendah untuk mencegah *catastrophic forgetting*), dengan target *ground-truth* konsentrasi dari pengukuran XRF.
+3. **Domain adaptation**: Gradient Reversal Layer (GRL) (Ganin et al., 2016) + domain classifier (sintetis vs eksperimental) diintegrasikan selama pelatihan untuk mendorong encoder menghasilkan representasi yang *domain-invariant*. Pendekatan ini mengatasi *domain gap* antara spektrum sintetis (yang mengasumsikan LTE ideal) dan spektrum eksperimental (yang mengandung noise, fluktuasi tembakan-ke-tembakan, dan deviasi dari LTE).
+
+**2f. Pengolahan dan Analisis Data**
+
+Hasil eksperimen dianalisis melalui beberapa tahap:
+- **Pra-pemrosesan spektrum**: normalisasi intensitas, koreksi *baseline*, dan segmentasi rentang panjang gelombang yang relevan.
+- **Identifikasi garis emisi**: pencocokan puncak emisi dengan database NIST ASD untuk verifikasi keberadaan elemen target.
+- **Inferensi model**: spektrum eksperimental yang telah di-pra-proses dimasukkan ke model CNN–Transformer yang telah dilatih untuk memprediksi konsentrasi elemen.
+- **Analisis komparatif**: perbandingan prediksi konsentrasi dari model dengan hasil pengukuran XRF (ground-truth).
+
+**2g. Protokol Evaluasi**
+
+Evaluasi performa model dilakukan secara komprehensif dengan protokol sebagai berikut:
+- **3 metrik kuantitatif per elemen**: Root Mean Square Error (RMSE) untuk mengukur deviasi prediksi, koefisien determinasi (R²) untuk mengukur proporsi variansi yang dijelaskan model, dan Mean Absolute Percentage Error (MAPE) untuk mengukur akurasi relatif.
+- **4 model baseline** sebagai pembanding: PLS — Partial Least Squares (Wold et al., 2001) sebagai representasi metode kemometrik klasik, CNN-only dan Transformer-only sebagai komponen ablasi arsitektur, serta Informer (Zhou et al., 2021; Walidain et al., 2026) sebagai representasi model *sequence-to-sequence* terkini.
+- **Validasi**: stratified 5-fold cross-validation pada dataset eksperimental untuk memastikan robustness estimasi performa.
+- **Interpretabilitas**: analisis bobot *cross-attention* antara decoder dan encoder → identifikasi apakah model secara otomatis menemukan region spektral spesifik elemen yang konsisten dengan garis emisi NIST yang diketahui. Analisis ini menjadi validasi bahwa model benar-benar mempelajari dekomposisi mono–poliatomik yang bermakna secara fisik, bukan sekadar korelasi statistik.
+
+### Hasil yang Diharapkan
+
+Dari pelaksanaan penelitian ini, diharapkan diperoleh hasil sebagai berikut:
+1. **Model CNN–Transformer encoder–decoder** yang terlatih dan mampu melakukan kuantifikasi multi-elemen pada spektrum LIBS tanah vulkanik dengan akurasi yang superior dibandingkan model baseline (PLS, CNN-only, Transformer-only, Informer).
+2. **Validasi konsep dekomposisi spektral mono–poliatomik** melalui analisis bobot *cross-attention*, yang menunjukkan bahwa model secara eksplisit mempelajari kontribusi spektral masing-masing elemen dalam spektrum campuran.
+3. **Profil konsentrasi 7 elemen mayor** (Si, Al, Fe, Ca, Mg, Na, K) dari 24 sampel tanah vulkanik lereng Gunung Seulawah Agam, Aceh, yang divalidasi terhadap pengukuran XRF.
+4. **Metode kuantifikasi LIBS baru** yang mengintegrasikan pengetahuan fisika plasma (*physics-informed*) ke dalam arsitektur *deep learning*, membuka peluang analisis geokimia cepat tanpa kalibrasi standar.
+5. **Manuskrip jurnal ilmiah** yang siap disubmit ke jurnal internasional bereputasi.
+
+### Indikator Capaian yang Ditargetkan
+
+- Minimal **satu publikasi ilmiah** di jurnal internasional bereputasi. Jurnal yang ditargetkan: **IOP Machine Learning: Science and Technology** (Q1, terindeks Scopus). Sebagai alternatif: *Spectrochimica Acta Part B* atau *Journal of Analytical Atomic Spectrometry*.
+- **Penyelesaian tesis** mahasiswa magister dalam rentang waktu yang direncanakan (10 bulan).
+- **Peningkatan kapasitas laboratorium** dalam pengembangan dan penerapan metode *deep learning* untuk analisis spektroskopi LIBS, yang dapat digunakan untuk penelitian lanjutan di lingkungan Laboratorium Optika dan Aplikasi Laser, FMIPA USK.
+
+### Pembagian Kerja Tim Peneliti dan Keterlibatan Mahasiswa
+
+| No | Nama / NIP / Status | Instansi / Bidang Ilmu | Uraian Tugas |
+|----|---------------------|----------------------|--------------|
+| 1 | [Nama Pembimbing 1] / [NIP] / Ketua | FMIPA USK / Optika & Laser Spektroskopi | Bertanggung jawab mengkoordinasi pelaksanaan penelitian, mensupervisi pengukuran dengan instrumen LIBS dan analisis data, serta mereview manuskrip publikasi |
+| 2 | [Nama Pembimbing 2] / [NIP] / Anggota | FMIPA USK / [Bidang Ilmu] | Bertanggung jawab untuk supervisi metode komputasi dan pengembangan model *deep learning* |
+| 3 | Birrul Walidain / 250820201100015 / Anggota | FMIPA Fisika USK / Fisika Komputasi & Spektroskopi | Bertanggung jawab untuk implementasi arsitektur CNN–Transformer, pembangkitan data sintetis, preparasi sampel, pengambilan data eksperimental LIBS, serta penulisan draf tesis dan manuskrip publikasi |
 
 ---
 
@@ -195,10 +308,45 @@ Prosedur mengikuti two-stage workflow:
 
 ## DAFTAR PUSTAKA UTAMA
 
+**A. Fondasi Riset Grup**
+
 1. Mitaphonna, R., Ramli, M., Ismail, N., Hartadi, B.S., & Idris, N. (2023). Identification of possible preserved 2004 Indian Ocean tsunami deposits collected from Pulot Village in Aceh Besar Regency, Indonesia. *J. Phys.: Conf. Ser.*, 2582(1), 012033.
 2. Mitaphonna, R., Ramli, M., Ismail, N., & Idris, N. (2024). Qualitative Geochemical Analysis of the 2004 Indian Ocean Giant Tsunami Deposits Excavated at Seungko Mulat Located in Aceh Besar of Indonesia Using Laser-Induced Breakdown Spectroscopy. *Indonesian Journal of Chemistry*, 24(3).
 3. Khumaeni, A., Indriana, R.D., Jonathan, F., Fiantis, D., Ginting, F.I., Idris, N., & Kurniawan, H. (2025). Analysis of geochemical and mineral compositions of volcanic soil affected by Merapi eruption in Central Java Indonesia using laser-induced breakdown spectroscopy with calibration-free. *Talanta*, 295, 128376.
-4. Walidain, B. et al. (2026). Informer-based classification of LIBS spectra. *(Published)*.
-5. Liu, Y. et al. (2026). Remote LIBS quantitative analysis using hybrid CNN–Transformer. *(Published)*.
-6. Favre, Y. et al. (2025). MERLIN: Adaptive radiative-transfer model for CF-LIBS. *(Published)*.
-7. Wang, S. et al. (2024). Simulation-assisted deep learning for LIBS spectral analysis. *(Published)*.
+4. Walidain, B., Idris, N., Yuzza, N., & Mitaphonna, R. (2026). Informer-Based LIBS for Qualitative Multi-Element Analysis of an Aceh Traditional Women's Medicine. *IOP Conf. Ser.: Earth Environ. Sci.*, in press.
+
+**B. LIBS & Fisika Plasma**
+
+5. Legnaioli, S. et al. (2025). Laser-Induced Breakdown Spectroscopy Analysis of Lithium: A Comprehensive Review. *Sensors*, 25(24), 7689.
+6. Sawyers, E.R. et al. (2025). Database development and LIBS calibration for the LIBS-Raman Sensor for planetary exploration. *Icarus*, 442, 116742.
+7. Zhang, Y., Yang, G., Wang, B.-X., & Zhang, X. (2025). Improving the accuracy of laser-induced breakdown spectroscopy using the single-element standard curve calibration. *Instrumentation Science & Technology*, 1–20.
+8. Babos, D.V. et al. (2024). Laser-induced breakdown spectroscopy as an analytical tool for total carbon quantification in tropical and subtropical soils. *Frontiers in Soil Science*, 3, 1242647.
+9. Manzoor, M. et al. (2025). A machine learning assisted approach to classify rose species and varieties with laser induced breakdown spectroscopy. *Analytica Chimica Acta*, 1373, 344489.
+10. Cristoforetti, G. et al. (2010). Local Thermodynamic Equilibrium in Laser-Induced Breakdown Spectroscopy: Beyond the McWhirter criterion. *Spectrochimica Acta Part B*, 65(1), 86–95.
+11. Zaitsev, S.M. et al. (2024). Two-Zone Model of Laser-Induced Plasma. *Journal of Applied Spectroscopy*, 90(6), 1183–1189.
+12. Bultel, A., Morel, V., & Favre, A. (2025). The McWhirter Criterion Revisited for Laser-Induced Plasmas. *ICPIG International Conference*.
+13. Tang, Y. & Zhao, N. (2024). A Review of Development in the Research of Self-Absorption on Laser-Induced Breakdown Spectroscopy. *Atomic Spectroscopy*, 45(04), 336–357.
+14. Hansen, P.B. et al. (2021). Modeling of time-resolved LIBS spectra obtained in Martian atmospheric conditions with a stationary plasma approach. *Spectrochimica Acta Part B*, 178, 106115.
+15. Manelski, H.T. et al. (2024). LIBS plasma diagnostics with SuperCam on Mars: Implications for quantification of elemental abundances. *Spectrochimica Acta Part B*, 222, 107061.
+16. Favre, A. et al. (2025a). MERLIN, an adaptative LTE radiative transfer model for any mixture. *J. Quant. Spectrosc. Radiat. Transfer*, 330, 109222.
+17. Favre, A. et al. (2025b). Towards real-time calibration-free LIBS supported by machine learning. *Spectrochimica Acta Part B*, 224, 107082.
+18. Fujimoto, T. (2004). *Plasma Spectroscopy*. Oxford: Clarendon Press.
+19. Griem, H.R. (1974). *Spectral Line Broadening by Plasmas*. New York: Academic Press.
+20. Kramida, A., Ralchenko, Yu., Reader, J., & NIST ASD Team (2024). NIST Atomic Spectra Database (ver. 5.12). https://physics.nist.gov/asd.
+
+**C. Machine Learning & Deep Learning untuk LIBS**
+
+21. Liu, D., Chu, X., & Liu, H. (2026). Remote LIBS based on transformer-CNN method for quantitative analysis of trace elements in steel. *AIP Advances*, 16(4), 045110.
+22. Wang, Y. et al. (2024). Simulation of laser-induced plasma temperature based on machine learning.
+23. Hao, Z. et al. (2024). Machine learning in laser-induced breakdown spectroscopy: A review. *Frontiers of Physics*, 19(6), 62501.
+
+**D. Arsitektur & Teknik Deep Learning**
+
+24. Vaswani, A. et al. (2017). Attention is All You Need. *Advances in Neural Information Processing Systems*, 30.
+25. He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep Residual Learning for Image Recognition. *Proc. IEEE CVPR*, 770–778.
+26. Ioffe, S. & Szegedy, C. (2015). Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift. *Proc. ICML*, 37, 448–456.
+27. Zhou, H. et al. (2021). Informer: Beyond Efficient Transformer for Long Sequence Time-Series Forecasting. *Proc. AAAI*, 35(12), 11106–11115.
+28. Kingma, D.P. & Ba, J. (2015). Adam: A Method for Stochastic Optimization. *Proc. ICLR 2015*.
+29. Loshchilov, I. & Hutter, F. (2017). SGDR: Stochastic Gradient Descent with Warm Restarts. *Proc. ICLR 2017*.
+30. Wold, S., Sjöström, M., & Eriksson, L. (2001). PLS-regression: a basic tool of chemometrics. *Chemometrics and Intelligent Laboratory Systems*, 58(2), 109–130.
+31. Ganin, Y. et al. (2016). Domain-Adversarial Training of Neural Networks. *JMLR*, 17(59), 1–35.
