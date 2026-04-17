@@ -16,12 +16,13 @@
 \setlength{\parindent}{1.25cm}
 \setlength{\parskip}{0pt}
 
-% --- Remove numbering from sections for proposal style ---
-\renewcommand{\thesection}{}
-\renewcommand{\thesubsection}{}
-\renewcommand{\thesubsubsection}{}
+% Penomoran seksi diaktifkan standar
 
 \begin{document}
+
+\renewcommand{\contentsname}{DAFTAR ISI}
+\tableofcontents
+\newpage
 
 % ================================================================
 %  METODE PENELITIAN
@@ -37,37 +38,61 @@ Tahap komputasional---yang mencakup pembangkitan data sintetis, pengembangan ars
 
 \subsection{Alat dan Bahan Penelitian}
 
-Peralatan dan bahan yang digunakan dalam penelitian ini disajikan pada Tabel~\ref{tab:alat-bahan}.
+Penelitian ini memadukan pendekatan fisika eksperimental optik dan komputasi \textit{machine learning}. Oleh karena itu, instrumen yang digunakan dikategorikan menjadi instrumen perangkat keras eksperimental, infrastruktur komputasi, perangkat lunak penunjang, serta sumber data.
+
+\subsubsection{Instrumen Eksperimental dan Preparasi Sampel}
+Peralatan eksperimen utama yang digunakan untuk pengadaan sampel tanah vulkanik dan penembakan spektral LIBS disajikan pada Tabel~\ref{tab:alat-bahan}.
 
 \begin{table}[htbp]
 \centering
-\caption{Alat dan Bahan Penelitian}
+\caption{Instrumen Eksperimental Material dan Optik}
 \label{tab:alat-bahan}
 \small
-\begin{tabular}{clll}
+\begin{tabular}{clp{5.5cm}l}
 \toprule
 \textbf{No} & \textbf{Alat/Bahan} & \textbf{Spesifikasi} & \textbf{Jumlah} \\
 \midrule
 1  & Laser Nd:YAG              & Q-switched, $\lambda$ = 1064 nm, 114 mJ   & 1 unit \\
 2  & Lensa bikonveks           & $f$ = 155 mm (pemfokusan laser)            & 1 unit \\
 3  & Spektrometer Echelle + OMA& Rentang spektral 200--900 nm               & 1 unit \\
-4  & Kabel serat optik         & Penghantar sinyal emisi plasma             & 1 unit \\
-5  & Mesin \textit{hydraulic press} & Tekanan hingga 7 ton                  & 1 unit \\
-6  & Mortar dan pestel         & Penggerusan sampel tanah                   & 1 set  \\
-7  & Ayakan 40 mesh            & 420 $\mu$m                                 & 1 unit \\
-8  & Cetakan sampel            & Pembuatan pelet ($\sim$4 mm)               & 1 unit \\
-9  & Masker pelindung          & Keselamatan kerja                          & Secukupnya \\
-10 & GPU Compute Server        & Pelatihan CNN--Transformer                 & 1 unit \\
-11 & Instrumen XRF             & \textit{Ground-truth} konsentrasi elemen   & 1 unit \\
-12 & Sampel tanah vulkanik     & G. Seulawah Agam (4 arah $\times$ 3 kedalaman) & \textbf{24 sampel} \\
+4  & Mesin \textit{hydraulic press} & Tekanan hingga 7 ton                  & 1 unit \\
+5  & Mortar, Pestel, dan Ayakan& Penggerusan dan ayakan 40 mesh (420 $\mu$m) & 1 set  \\
+6  & Instrumen XRF             & \textit{Ground-truth} kuantifikasi elemen  & 1 unit \\
+7  & Sampel tanah vulkanik     & G. Seulawah Agam (4 arah $\times$ 3 kedalaman) & 24 sampel \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+\subsubsection{Perangkat Keras Komputasi}
+Untuk mengakomodasi kalkulasi dari pembuatan arsitektur \textit{deep learning} (CNN--Transformer) dan \textit{forward modeling} data sintetis, penelitian ini memerlukan kapabilitas komputasi berkinerja tinggi yang disokong oleh:
+\begin{enumerate}
+    \item \textbf{Laptop Apple MacBook Air M1 2020}: Dilengkapi dengan prosesor \textit{Apple M1}, memori (RAM) sebesar 8 GB, dan penyimpanan \textit{SSD}. Perangkat ini secara utama digunakan untuk pengembangan skrip kode lokal, eksplorasi matematis awal, dan penyusunan laporan akademis.
+    \item \textbf{Infrastruktur \textit{High Performance Computing} (HPC) Mahameru 4 BRIN}: Infrastruktur ini digunakan secara masif untuk simulasi spektroskopi emisi sintetis berskala besar dan pelatihan model CNN--Transformer yang intensif secara komputasi. Spesifikasi komputasinya meliputi:
+    \begin{itemize}
+        \item \textbf{Klaster CPU}: 92 \textit{compute node} dengan dual prosesor Xeon Gold (sekitar 32 core per \textit{node}) dan 256 GB RAM per \textit{node}. Terdapat 1 \textit{high memory node} dengan kapasitas memori hingga 1.5 TB.
+        \item \textbf{Klaster GPU}: Terkonsolidasi dari berbagai akselerator \textit{Graphics Processing Unit} kelas berat (di antaranya varian NVIDIA DGX A100, V100, dan P100).
+        \item \textbf{Sistem Penyimpanan}: Kapasitas masif total 4.5 PB, didukung arsitektur \textit{High Performance SSD} untuk menampung matriks HDF5 berjuta-baris dengan efisien.
+        \item \textbf{Jaringan Interkoneksi}: \textit{InfiniBand HDR} (dengan laju transfer 100 Gbps antar sistem server).
+        \item \textbf{Sistem Penjadwalan \textit{Job}}: Dikelola melalui antrian basis SLURM (\textit{Simple Linux Utility for Resource Management}).
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Perangkat Lunak}
+Siklus komputasional dan eksekusi jaringan model difasilitasi melalui perangkat lunak berikut:
+\begin{enumerate}
+    \item \textbf{Sistem Operasi \& Lingkungan}: \textit{macOS Ventura 13.6} pada perangkat lokal, dan mesin berbasis \textit{Ubuntu} Linux pada arsitektur server \textit{High Performance Computing}.
+    \item \textbf{Bahasa Pemrograman}: \textit{Python 3.10} ditetapkan sebagai ekosistem operasional primer yang disokong oleh antarmuka \textit{Jupyter Notebook} interaktif untuk validasi prototipe.
+    \item \textbf{Pustaka Algoritma \textit{Deep Learning}}: \textbf{\textit{PyTorch}} dipilih secara esensial sebagai kerangka kerja tulang punggung arsitektur neural (sub-rutin \textit{Convolution} dan \textit{Cross-Attention}). Digabungkan spesifik dengan modul \textbf{\textit{TensorBoard}} untuk pemantauan kurva iteratif metrik regresi per-\textit{epoch} \cite{paszke2019}.
+    \item \textbf{Pustaka Sains Data (\textit{Data Science})}: \textit{NumPy} dan \textit{Pandas} dimanfaatkan khusus merekayasa kompilasi baris numerik dimensi tinggi; modul \textit{h5py} murni sebagai pengelola \textit{file} ekspor set data spektral HDF5; \textit{scikit-learn} mengeksekusi rotasi grup \textit{5-fold cross validation} \& skor akurasi; serta \textit{Matplotlib}/\textit{Seaborn} yang memperindah render komparasi \textit{ground-truth} versus grafik regresi. Modul standar bawaan \textit{itertools} juga digunakan secara masif di belakang layar untuk menjembatani manipulasi agregasi komputasi yang iteratif.
+\end{enumerate}
+
+\subsubsection{Sumber Data Spektroskopik}
+\textbf{NIST Atomic Spectra Database (ASD)}: Merupakan basis kompilasi standar yang diakses langsung pada server \textit{National Institute of Standards and Technology} \cite{kramida2024}. Ekstraksi dari tabel spektra ini menyupli pondasi variabel kuantum seperti batas energi ionisasi ($E_{\infty,i}$), eksitasi energi status ($E_k, E_i$), degenerasi probabilitas ($g_k, g_i$), hingga peluruhan transisi foton ($A_{ki}$) yang menentukan keberhasilan dari algoritma fisika plasma termodinamika buatan kita.
+
 
 \subsection{Prosedur Penelitian}
 
-Prosedur pelaksanaan penelitian ini terdiri dari beberapa tahapan utama sebagaimana diilustrasikan dalam diagram alir pada Gambar~\ref{fig:diagram-alir}. Penelitian mengikuti alur kerja yang mengintegrasikan pendekatan berbasis simulasi fisika plasma dengan teknik \textit{deep learning}, di mana keterbatasan jumlah data eksperimental (24 sampel) diatasi dengan memanfaatkan pengetahuan fisika plasma melalui data sintetis \cite{wang2024, favre2025b} sebelum mentransfer representasi yang telah dipelajari ke domain eksperimental.
+Prosedur pelaksanaan penelitian ini terdiri dari 4 (empat) tahapan utama sebagaimana diilustrasikan dalam diagram alir pada Gambar~\ref{fig:diagram-alir}. Penelitian mengikuti alur kerja yang mengintegrasikan pendekatan berbasis simulasi fisika plasma dengan teknik \textit{deep learning}, di mana keterbatasan jumlah data eksperimental (24 sampel) diatasi dengan memanfaatkan pengetahuan fisika plasma melalui data sintetis \cite{wang2024, favre2025b} sebelum mentransfer representasi yang telah dipelajari ke domain eksperimental.
 
 \begin{figure}[htbp]
     \centering
@@ -77,7 +102,7 @@ Prosedur pelaksanaan penelitian ini terdiri dari beberapa tahapan utama sebagaim
 \end{figure}
 
 % ----------------------------------------------------------------
-\subsubsection{Pembangkitan Data Sintetis}
+\subsubsection{Tahap 1: Pembangkitan Data Sintetis}
 
 Keterbatasan utama dalam pengembangan model \textit{deep learning} untuk analisis LIBS adalah minimnya ketersediaan data eksperimental berlabel yang memadai untuk pelatihan. Untuk mengatasi hal ini, penelitian ini memanfaatkan \textit{forward model} berbasis fisika plasma untuk membangkitkan dataset sintetis berskala besar. Pendekatan ini telah terbukti efektif dalam meningkatkan kemampuan generalisasi model melalui \textit{pre-training} pada data sintetis sebelum \textit{fine-tuning} pada data eksperimental \cite{wang2024, favre2025b}. Tahapan pembangkitan data sintetis adalah sebagai berikut:
 
@@ -123,7 +148,17 @@ Jejak & Zr & 0.001 -- 0.02 & Mineral penyerta zirkon \\
 \end{tabular}
 \end{table}
 
-    \item \textbf{Penghitungan populasi} tiap tingkat ionisasi menggunakan Persamaan Saha dan distribusi keadaan tereksitasi menggunakan Distribusi Boltzmann \cite{fujimoto2004}. Parameter plasma di-sampling secara acak seragam: $T_e \in [6.000\text{--}15.000]$ K, $n_e \in [10^{16}\text{--}10^{17}]$ cm$^{-3}$. Rentang ini dipilih berdasarkan kondisi tipikal plasma LIBS pada tekanan atmosfer \cite{cristoforetti2010}, dengan mempertimbangkan variasi yang mungkin terjadi pada berbagai jenis matriks sampel.
+    \item \textbf{Penghitungan populasi analit} memanfaatkan fondasi kesetimbangan termodinamika lokal (\textit{Local Thermodynamic Equilibrium} / LTE). Distribusi probabilitas elektron menempati keadaan tereksitasi dihitung berdasarkan Distribusi Boltzmann \cite{fujimoto2004}:
+    \begin{equation}
+        n_{k,z} = n_z \frac{g_{k,z}}{U_z(T_e)} \exp\left(-\frac{E_{k,z}}{k_B T_e}\right)
+        \label{eq:boltzmann}
+    \end{equation}
+    di mana $n_{k,z}$ adalah populasi spesies pada tingkat energi $k$ dan status ionisasi $z$, $g_{k,z}$ adalah degenerasi statistik dari tingkat energi eksitasi $E_{k,z}$, $U_z(T_e)$ merupakan fungsi partisi, dan $k_B$ melambangkan konstanta Boltzmann. Adapun keseimbangan jumlah partikel antar tingkat ionisasi yang berurutan (netral vs ion) diseimbangkan melalui Persamaan Saha:
+    \begin{equation}
+        \frac{n_{z+1} n_e}{n_z} = 2 \frac{U_{z+1}(T_e)}{U_z(T_e)} \left(\frac{m_e k_B T_e}{2\pi \hbar^2}\right)^{3/2} \exp\left(-\frac{E_{\infty,z}-\Delta E_{\infty,z}}{k_B T_e}\right)
+        \label{eq:saha}
+    \end{equation}
+    dengan $n_e$ merepresentasikan densitas elektron, $m_e$ massa elektron, $E_{\infty,z}$ energi ionisasi, dan $\Delta E_{\infty,z}$ koreksi penurunan batas ionisasi akibat rapatnya interaksi plasma. Parameter plasma dominan pada persamaan di atas selanjutnya di-sampling secara acak seragam untuk menghasilkan variasi dataset: $T_e \in [6.000\text{--}15.000]$ K, $n_e \in [10^{16}\text{--}10^{17}]$ cm$^{-3}$. Rentang ini dipilih berdasarkan kondisi tipikal fluktuasi plasma LIBS pada tekanan atmosfer \cite{cristoforetti2010}.
 
     \item \textbf{Pembangkitan spektrum monoatomik} $S_\mathrm{mono}^{(z)}(\lambda)$ per elemen dengan menjumlahkan koefisien emisi spektral menggunakan profil Voigt---konvolusi pelebaran Doppler dan Stark broadening \cite{griem1974}. Profil Voigt dipilih karena merepresentasikan mekanisme pelebaran garis spektral dominan pada plasma LIBS, yaitu pelebaran termal (Doppler) dan pelebaran akibat interaksi elektron (Stark).
 
@@ -136,13 +171,33 @@ Jejak & Zr & 0.001 -- 0.02 & Mineral penyerta zirkon \\
     \item \textbf{Konvolusi instrumental} dengan fungsi Gaussian (FWHM = 0{,}02 nm) untuk mencocokkan resolusi spektrometer Echelle yang digunakan dalam eksperimen.
 
     \item Total dataset yang dibangkitkan: \textbf{10.000 pasangan spektrum sintetis} (monoatomik + poliatomik beserta label konsentrasi dan parameter plasma), dibagi menjadi 80\% untuk \textit{training} dan 20\% untuk \textit{test}.
+    \item Ringkasan seluruh parameter fisis dan komputasional yang dilibatkan dalam simulasi \textit{forward model} spektral sintetis ini dirangkum pada Tabel~\ref{tab:parameter-simulasi}.
 \end{enumerate}
 
+\begin{table}[htbp]
+\centering
+\caption{Parameter fisis dan instrumental dalam algoritma pembangkitan data spektrum LIBS sintetis.}
+\label{tab:parameter-simulasi}
+\small
+\begin{tabular}{llp{5.5cm}}
+\toprule
+\textbf{Kategori / Parameter} & \textbf{Nilai / Rentang} & \textbf{Keterangan} \\
+\midrule
+Rentang Suhu Elektron ($T_e$) & $6.000 - 15.000$ K & Memodelkan fluktuasi pendinginan plasma \cite{cristoforetti2010} \\
+Rentang Densitas Elektron ($n_e$) & $10^{16} - 10^{17}$ cm$^{-3}$ & Menjamin terpenuhinya kriteria \textit{McWhirter} untuk LTE \\
+Rentang Spektral ($\lambda$) & $200 - 900$ nm & Penyesuaian batas rentang deteksi \textit{Echelle spectrometer} \\
+Resolusi Instrumental (FWHM) & $0{,}02$ nm & Mereplika batasan resolusi optik nyata dari sistem eksperimen \\
+Profil Bentuk Garis Emisi & Kurva Voigt & Transisi termal gabungan pelebaran \textit{Doppler} dan \textit{Stark} \\
+Fungsi Pelebaran Spektrograf & Distribusi Gaussian & Mendistribusikan piksel menyesuaikan difraksi \textit{grating} alat \\
+Total Spektrum Sintetis & $10.000$ pasangan set & Varians komprehensif matriks untuk proses \textit{Deep Learning} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ----------------------------------------------------------------
-\subsubsection{Akuisisi Data Eksperimental dan Pemodelan}
+\subsubsection{Tahap 2: Akuisisi Data Eksperimental}
 
-\paragraph{2a. Sampel Penelitian.}
+\paragraph{Sampel Penelitian.}
 Penelitian ini memanfaatkan \textbf{24 sampel tanah vulkanik} yang telah dikumpulkan dan dipreparasi dalam rangka program riset kolaboratif grup Laboratorium Optika dan Aplikasi Laser, FMIPA USK. Sampel berasal dari lereng \textbf{Gunung Seulawah Agam, Kabupaten Aceh Besar, Provinsi Aceh}, yang diambil pada \textbf{4 arah mata angin} (Utara, Barat, Selatan, Timur) dan \textbf{3 kedalaman} (0--20 cm, 20--40 cm, 40--60 cm) di setiap titik, sehingga merepresentasikan variasi spasial komposisi geokimia secara sistematis. Strategi pengambilan sampel ini konsisten dengan pendekatan yang digunakan oleh Khumaeni et al. \cite{khumaeni2025} pada studi tanah vulkanik Merapi.
 
 Sampel telah dipreparasi menjadi bentuk pelet pada studi sebelumnya melalui prosedur standar:
@@ -157,7 +212,7 @@ Sampel telah dipreparasi menjadi bentuk pelet pada studi sebelumnya melalui pros
 Ketersediaan sampel pelet yang telah terpreparasi memungkinkan penelitian ini untuk langsung berfokus pada tahap akuisisi spektrum LIBS baru dan pengembangan model \textit{deep learning}.
 
 
-\paragraph{2b. Akuisisi Data Spektrum LIBS Baru.}
+\paragraph{Akuisisi Data Spektrum LIBS Baru.}
 Meskipun estimasi komposisi (Tabel~\ref{tab:komposisi-tanah}) dan data baseline awal bersumber dari observasi XRF dan CF-LIBS studi terdahulu, standar kualitas data spektral eksperimental masa lalu belum optimal untuk skenario pelatihan komputasi modern. Oleh karena itu, akuisisi spektrum LIBS \textbf{dilakukan secara baru dan independen} terhadap 24 sampel pelet tersebut. Fokus pembaruan eksperimen terletak pada peningkatan agregasi pengukuran: \textbf{jumlah tembakan laser (\textit{shots})} akan diperbanyak secara masif. Penambahan akumulasi tembakan ini sangat esensial untuk mengatasi fluktuasi ketidakstabilan plasma dan menekan profil \textit{noise} temporal. Hasilnya, \textit{Signal-to-Noise Ratio} (SNR) akan meningkat drastis, sehingga jaringan \textit{deep learning} kelak dapat mendeteksi intensitas emisi lemah secara akurat tanpa tertukar dengan \textit{noise}.
 
 Pengukuran dilaksanakan menggunakan sistem LIBS di Laboratorium Optika dan Aplikasi Laser, FMIPA USK. Prosedur pengambilan datanya adalah sebagai berikut:
@@ -172,11 +227,14 @@ Pengukuran dilaksanakan menggunakan sistem LIBS di Laboratorium Optika dan Aplik
 \end{itemize}
 
 
-\paragraph{2c. Data Ground-Truth Konsentrasi (XRF).}
+\paragraph{Data Ground-Truth Konsentrasi (XRF).}
 Data konsentrasi elemen untuk seluruh 24 sampel telah tersedia dari pengukuran \textbf{X-Ray Fluorescence (XRF)} yang dilakukan pada studi sebelumnya dalam program riset grup. Data XRF ini digunakan dalam penelitian ini sebagai \textit{ground-truth} konsentrasi unsur untuk supervisi pada tahap \textit{fine-tuning} model. Penggunaan data XRF yang sudah ada memastikan konsistensi referensi antara studi terdahulu dan penelitian ini, serta menghindari pengulangan pengukuran yang tidak diperlukan. XRF dipilih sebagai referensi karena kemampuannya memberikan analisis kuantitatif multi-elemen yang akurat secara non-destruktif.
 
 
-\paragraph{2d. Arsitektur Model CNN--Transformer Encoder--Decoder.}
+% ----------------------------------------------------------------
+\subsubsection{Tahap 3: Pemodelan \textit{Deep Learning}}
+
+\paragraph{Arsitektur Model CNN--Transformer Encoder--Decoder.}
 Arsitektur model yang diusulkan dalam penelitian ini dirancang berdasarkan prinsip dekomposisi spektral mono--poliatomik eksplisit, di mana spektrum campuran poliatomik dimodelkan sebagai superposisi terbobot dari spektrum monoatomik penyusunnya. Secara teknis, rancangan jaringan ini ditunjukkan secara menyeluruh pada Gambar~\ref{fig:arsitektur-cnn-trans}. Arsitektur encoder--decoder dipilih karena secara natural mampu memodelkan hubungan antara komponen individu (monoatomik via encoder) dan campurannya (poliatomik via decoder) melalui mekanisme \textit{cross-attention} \cite{vaswani2017, liu2026}. 
 
 \begin{figure}[htbp]
@@ -201,7 +259,7 @@ Komponen utamanya adalah sebagai berikut:
 \end{enumerate}
 
 
-\paragraph{2e. Strategi Pelatihan.}
+\paragraph{Strategi Pelatihan.}
 Strategi pelatihan model dirancang dalam tiga fase berurutan untuk memaksimalkan transfer pengetahuan dari domain sintetis ke domain eksperimental. Skema komplit dari alur adaptasi domain ini dapat dilihat pada Gambar~\ref{fig:domain-adapt}.
 
 \begin{figure}[htbp]
@@ -224,23 +282,24 @@ Strategi pelatihan model dirancang dalam tiga fase berurutan untuk memaksimalkan
 \end{enumerate}
 
 
-\paragraph{2f. Pengolahan dan Analisis Data.}
-Hasil eksperimen dianalisis melalui beberapa tahap:
+% ----------------------------------------------------------------
+\subsubsection{Tahap 4: Analisa Sampel dan Pengolahan Data}
+
+Hasil akuisisi eksperimental dianalisis lebih lanjut melalui serangkaian tahapan komputasional. Pemrosesan data mentah dan analisis luaran model mencakup:
 \begin{itemize}[leftmargin=2cm]
-    \item \textbf{Pra-pemrosesan spektrum}: normalisasi intensitas, koreksi \textit{baseline}, dan segmentasi rentang panjang gelombang yang relevan.
-    \item \textbf{Identifikasi garis emisi}: pencocokan puncak emisi dengan database NIST ASD untuk verifikasi keberadaan elemen target.
-    \item \textbf{Inferensi model}: spektrum eksperimental yang telah di-pra-proses dimasukkan ke model CNN--Transformer yang telah dilatih untuk memprediksi konsentrasi elemen.
-    \item \textbf{Analisis komparatif}: perbandingan prediksi konsentrasi dari model dengan hasil pengukuran XRF (\textit{ground-truth}).
+    \item \textbf{Pra-pemrosesan spektrum}: normalisasi intensitas terhadap kurva respons sistem (*instrumental response*), koreksi kontinum \textit{baseline} melalui algoritma polynomial fitting, dan segmentasi rentang panjang gelombang fokus untuk membuang \textit{background noise}.
+    \item \textbf{Identifikasi garis emisi}: pencocokan otomatis antar puncak profil spektrum yang terukur dengan \textit{database} referensi NIST ASD guna memvalidasi keberadaan matriks elemen target.
+    \item \textbf{Inferensi model}: spektrum eksperimental yang telah bersih diumpankan ke model prediksi \textit{deep learning} (CNN--Transformer) yang telah terbiasa dengan spektrum sintetis untuk mengekstrak vektor konsentrasi elemen (\textit{end-to-end mapping}).
+    \item \textbf{Analisis komparatif}: penyelarasan keluaran prediksi konsentrasi dari pemodelan AI terhadap perolehan data eksak XRF sebagai landasan validasi metrik (*ground-truth*).
 \end{itemize}
 
-
-\paragraph{2g. Protokol Evaluasi.}
-Evaluasi performa model dilakukan secara komprehensif dengan protokol sebagai berikut:
+\textbf{Protokol Evaluasi Metrik} \\
+Evaluasi kapabilitas analitik model dihimpun secara komprehensif menggunakan protokol:
 \begin{itemize}[leftmargin=2cm]
-    \item \textbf{3 metrik kuantitatif per elemen}: Root Mean Square Error (RMSE) untuk mengukur deviasi prediksi, koefisien determinasi ($R^2$) untuk mengukur proporsi variansi yang dijelaskan model, dan Mean Absolute Percentage Error (MAPE) untuk mengukur akurasi relatif.
-    \item \textbf{4 model baseline} sebagai pembanding: PLS---Partial Least Squares \cite{wold2001} sebagai representasi metode kemometrik klasik, CNN-only dan Transformer-only sebagai komponen ablasi arsitektur, serta Informer \cite{zhou2021, walidain2026} sebagai representasi model \textit{sequence-to-sequence} terkini.
-    \item \textbf{Validasi}: stratified 5-fold cross-validation pada dataset eksperimental untuk memastikan robustness estimasi performa.
-    \item \textbf{Interpretabilitas}: analisis bobot \textit{cross-attention} antara decoder dan encoder $\rightarrow$ identifikasi apakah model secara otomatis menemukan region spektral spesifik elemen yang konsisten dengan garis emisi NIST yang diketahui. Analisis ini menjadi validasi bahwa model benar-benar mempelajari dekomposisi mono--poliatomik yang bermakna secara fisik, bukan sekadar korelasi statistik.
+    \item \textbf{3 metrik kuantitatif per elemen}: \textit{Root Mean Square Error} (RMSE) untuk melacak rata-rata deviasi kuadratik, \textit{Koefisien Determinasi} ($R^2$) memonitor proporsi korelasi linier prediksi absolut, dan \textit{Mean Absolute Percentage Error} (MAPE) sebagai parameter akurasi relatif spasial.
+    \item \textbf{4 model baseline} sebagai komparasi ketangguhan: PLS—\textit{Partial Least Squares} \cite{wold2001} sebagai representasi perbandingan regresi kemometrik klasik, model spasial diskrit (CNN-only), penyesuai sekuens independen (Transformer-only), dan arsitektur canggih \textit{Informer} \cite{zhou2021, walidain2026}.
+    \item \textbf{Keterandalan Lintas-Validasi}: \textit{stratified 5-fold cross-validation} diimplementasikan pada dataset eksperimental untuk menihilkan anomali uji (mencegah *overfitting*) serta menyajikan jaminan *robustness* validasi di situasi jumlah sampel yang terbatas.
+    \item \textbf{Interpretabilitas Fisik}: penelusuran balik bobot koneksi \textit{cross-attention} dari matriks \textit{decoder} ke \textit{encoder}. Pendekatan ini melegitimasi apakah mesin neural secara mandiri menemukan hubungan spasi-waktu transisi kuantum elemen, menegaskan bahwa simulasi benar-benar mempelajari dekomposisi mono--poliatomik sesuai hukum fisika, bukan sekadar intuisi korelasi statistik "kotak hitam" semata.
 \end{itemize}
 
 

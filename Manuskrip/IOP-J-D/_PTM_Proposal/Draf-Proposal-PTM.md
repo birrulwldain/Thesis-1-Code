@@ -123,22 +123,46 @@ Tahap komputasional — yang mencakup pembangkitan data sintetis, pengembangan a
 
 ### Alat dan Bahan Penelitian
 
-Peralatan dan bahan yang digunakan dalam penelitian ini disajikan pada Tabel berikut:
+Penelitian ini memadukan pendekatan fisika eksperimental optik dan komputasi *machine learning*. Oleh karena itu, instrumen yang digunakan dikategorikan menjadi instrumen perangkat keras eksperimental, infrastruktur komputasi, perangkat lunak penunjang, serta sumber data.
+
+#### Instrumen Eksperimental dan Preparasi Sampel
+
+Peralatan eksperimen utama yang digunakan untuk pengadaan sampel tanah vulkanik dan penembakan spektral LIBS disajikan pada Tabel berikut:
 
 | No | Alat/Bahan | Spesifikasi | Jumlah |
 |----|-----------|-------------|--------|
-| 1 | Laser Nd:YAG | Q-switched, λ = 1064 nm, pulse energy 114 mJ | 1 unit |
+| 1 | Laser Nd:YAG | Q-switched, λ = 1064 nm, 114 mJ | 1 unit |
 | 2 | Lensa bikonveks | f = 155 mm (pemfokusan laser) | 1 unit |
 | 3 | Spektrometer Echelle + detektor OMA | Rentang spektral 200–900 nm | 1 unit |
-| 4 | Kabel serat optik | Penghantar sinyal emisi plasma | 1 unit |
-| 5 | Mesin Hydraulic Press | Tekanan hingga 7 ton | 1 unit |
-| 6 | Mortar dan pestel | Penggerusan sampel tanah | 1 set |
-| 7 | Ayakan 40 mesh (420 µm) | Penyeragaman ukuran partikel | 1 unit |
-| 8 | Cetakan sampel | Pembuatan pelet (ketebalan ~4 mm) | 1 unit |
-| 9 | Masker pelindung | Keselamatan kerja | Secukupnya |
-| 10 | GPU Compute Server | Pelatihan deep learning (CNN–Transformer) | 1 unit |
-| 11 | Instrumen XRF | Ground-truth konsentrasi elemen | 1 unit |
-| 12 | Sampel tanah vulkanik | Gunung Seulawah Agam, Aceh (4 arah × 3 kedalaman) | **24 sampel** |
+| 4 | Mesin *Hydraulic Press* | Tekanan hingga 7 ton | 1 unit |
+| 5 | Mortar, Pestel, dan Ayakan | Penggerusan dan ayakan 40 mesh (420 µm) | 1 set |
+| 6 | Instrumen XRF | Ground-truth kuantifikasi elemen | 1 unit |
+| 7 | Sampel tanah vulkanik | G. Seulawah Agam (4 arah × 3 kedalaman) | **24 sampel** |
+
+#### Perangkat Keras Komputasi
+
+Untuk mengakomodasi kalkulasi dari pembuatan arsitektur *deep learning* (CNN–Transformer) dan *forward modeling* data sintetis, penelitian ini memerlukan kapabilitas komputasi berkinerja tinggi yang disokong oleh:
+
+1. **Laptop Apple MacBook Air M1 2020**: Dilengkapi dengan prosesor *Apple M1*, memori (RAM) sebesar 8 GB, dan penyimpanan *SSD*. Perangkat ini secara utama digunakan untuk pengembangan skrip kode lokal, eksplorasi matematis awal, dan penyusunan laporan akademis.
+2. **Infrastruktur *High Performance Computing* (HPC) Mahameru 4 BRIN**: Infrastruktur ini digunakan secara masif untuk simulasi spektroskopi emisi sintetis berskala besar dan pelatihan model CNN--Transformer yang intensif secara komputasi. Spesifikasi komputasinya meliputi:
+   - **Klaster CPU**: 92 *compute node* dengan dual prosesor Xeon Gold (sekitar 32 core per *node*) dan 256 GB RAM per *node*. Terdapat 1 *high memory node* dengan kapasitas memori hingga 1.5 TB.
+   - **Klaster GPU**: Terkonsolidasi dari berbagai akselerator *Graphics Processing Unit* kelas berat (di antaranya varian NVIDIA DGX A100, V100, dan P100).
+   - **Sistem Penyimpanan**: Kapasitas masif total 4.5 PB, didukung arsitektur *High Performance SSD* untuk menampung matriks HDF5 berjuta-baris dengan efisien.
+   - **Jaringan Interkoneksi**: *InfiniBand HDR* (dengan laju transfer 100 Gbps antar sistem server).
+   - **Sistem Penjadwalan *Job***: Dikelola melalui antrian basis SLURM (*Simple Linux Utility for Resource Management*).
+
+#### Perangkat Lunak
+
+Siklus komputasional dan eksekusi jaringan model difasilitasi melalui perangkat lunak berikut:
+
+1. **Sistem Operasi & Lingkungan**: *macOS Ventura 13.6* pada perangkat lokal, dan mesin berbasis *Ubuntu* Linux pada arsitektur server *High Performance Computing*.
+2. **Bahasa Pemrograman**: *Python 3.10* ditetapkan sebagai ekosistem operasional primer yang disokong oleh antarmuka *Jupyter Notebook* interaktif untuk validasi prototipe.
+3. **Pustaka Algoritma *Deep Learning***: ***PyTorch*** dipilih secara esensial sebagai kerangka kerja tulang punggung arsitektur neural (sub-rutin *Convolution* dan *Cross-Attention*). Digabungkan spesifik dengan modul ***TensorBoard*** untuk pemantauan kurva iteratif metrik regresi per-*epoch* (Paszke et al., 2019).
+4. **Pustaka Sains Data (*Data Science*)**: *NumPy* dan *Pandas* dimanfaatkan khusus merekayasa kompilasi baris numerik dimensi tinggi; modul *h5py* murni sebagai pengelola *file* ekspor set data spektral HDF5; *scikit-learn* mengeksekusi rotasi grup *5-fold cross validation* & skor akurasi; serta *Matplotlib* / *Seaborn* yang memperindah render visual. Modul standar Python *itertools* juga dilibatkan dalam iterasi logik kompleks.
+
+#### Sumber Data Spektroskopik
+
+1. **NIST Atomic Spectra Database (ASD)**: Merupakan basis kompilasi standar yang diakses langsung pada server *National Institute of Standards and Technology* (Kramida et al., 2024). Ekstraksi dari tabel spektra ini menyuplai pondasi variabel kuantum seperti batas energi ionisasi ($E_{\infty,i}$), eksitasi energi status ($E_k, E_i$), degenerasi probabilitas ($g_k, g_i$), hingga peluruhan transisi foton ($A_{ki}$) yang menentukan keberhasilan dari algoritma fisika plasma termodinamika buatan kita.
 
 ### Prosedur Penelitian
 
@@ -186,11 +210,24 @@ Keterbatasan utama dalam pengembangan model *deep learning* untuk analisis LIBS 
 | **Jejak** | Mo | 0.0005 – 0.01 | Logam jejak minor |
 | **Jejak** | Y | 0.0005 – 0.01 | Berasosiasi dengan *rare earth element* (REE) |
 | **Jejak** | Zr | 0.001 – 0.02 | Mineral penyerta zirkon |
-2. **Penghitungan populasi** tiap tingkat ionisasi menggunakan Persamaan Saha dan distribusi keadaan tereksitasi menggunakan Distribusi Boltzmann (Fujimoto, 2004). Parameter plasma di-sampling secara acak seragam: T_e ∈ [6.000–15.000] K, n_e ∈ [10^16 – 10^17] cm^{-3}. Rentang ini dipilih berdasarkan kondisi tipikal plasma LIBS pada tekanan atmosfer (Cristoforetti et al., 2010), dengan mempertimbangkan variasi yang mungkin terjadi pada berbagai jenis matriks sampel.
+2. **Penghitungan populasi analit** memanfaatkan fondasi kesetimbangan termodinamika lokal (*Local Thermodynamic Equilibrium* / LTE). Distribusi elektron tereksitasi pada tingkat energi spesifik dikalkulasi berdasarkan *Distribusi Boltzmann*, dan keseimbangan densitas antar tingkat ionisasi saling berurutan dihitung menggunakan *Persamaan Saha* (Fujimoto, 2004). Parameter plasma dominan (Suhu elektron, *T_e* dan densitas elektron, *n_e*) pada kalkulasi fundamental ini kemudian di-sampling secara acak seragam: T_e ∈ [6.000–15.000] K, n_e ∈ [10^16 – 10^17] cm^{-3}. Pemilihan rentang ini secara sengaja disusun menyerupai kondisi tipikal transien plasma spektrum LIBS pada tekanan udara terbuka (Cristoforetti et al., 2010).
 3. **Pembangkitan spektrum monoatomik** S_mono^(z)(λ) per elemen dengan menjumlahkan koefisien emisi spektral menggunakan profil Voigt — konvolusi pelebaran Doppler dan Stark broadening (Griem, 1974). Profil Voigt dipilih karena merepresentasikan mekanisme pelebaran garis spektral dominan pada plasma LIBS, yaitu pelebaran termal (Doppler) dan pelebaran akibat interaksi elektron (Stark).
 4. **Konstruksi spektrum poliatomik** S_poly(λ) = Σ_z c_z · S_mono^(z)(λ) — superposisi terbobot konsentrasi fraksional. Tahap ini secara eksplisit mengimplementasikan hipotesis dekomposisi mono–poliatomik yang menjadi dasar arsitektur encoder–decoder.
 5. **Konvolusi instrumental** dengan fungsi Gaussian (FWHM = 0,02 nm) untuk mencocokkan resolusi spektrometer Echelle yang digunakan dalam eksperimen.
 6. Total dataset yang dibangkitkan: **10.000 pasangan spektrum sintetis** (monoatomik + poliatomik beserta label konsentrasi dan parameter plasma), dibagi menjadi 80% untuk *training* dan 20% untuk *test*.
+7. Ringkasan seluruh parameter fisis dan komputasional yang dilibatkan dalam simulasi *forward model* spektral sintetis ini dirangkum pada Tabel berikut.
+
+**Tabel Parameter Fisis dan Instrumental Simulasi Data Sintetis**
+
+| Kategori / Parameter | Nilai / Rentang | Keterangan |
+|---|---|---|
+| Rentang Suhu Elektron ($T_e$) | 6.000 – 15.000 K | Memodelkan fluktuasi pendinginan plasma |
+| Rentang Densitas Elektron ($n_e$) | $10^{16}$ – $10^{17}$ $\text{cm}^{-3}$ | Memenuhi kriteria McWhirter untuk LTE |
+| Rentang Spektral ($\lambda$) | 200 – 900 nm | Kesesuaian rentang Echelle spectrometer |
+| Resolusi Sistem (FWHM) | 0.02 nm | Resolusi optik instrumental |
+| Profil Bentuk Garis Emisi | Kurva Voigt | Transisi termal pelebaran Doppler & Stark |
+| Fungsi Pelebaran Optik | Gaussian | Karakterisasi difraksi grating |
+| Total Data | 10.000 pasang | Varians komprehensif untuk *Deep Learning* |
 
 #### Akuisisi Data Eksperimental dan Pemodelan
 
@@ -254,21 +291,21 @@ Pelatihan dilakukan dalam tahapan:
 2. **Fine-tuning** pada data eksperimental LIBS: 50 epoch, learning rate 10^{-5} (lebih rendah untuk mencegah *catastrophic forgetting*), dengan target *ground-truth* konsentrasi dari pengukuran XRF.
 3. **Domain adaptation**: Gradient Reversal Layer (GRL) (Ganin et al., 2016) + domain classifier (sintetis vs eksperimental) diintegrasikan selama pelatihan untuk mendorong encoder menghasilkan representasi yang *domain-invariant*. Pendekatan ini mengatasi *domain gap* antara spektrum sintetis (yang mengasumsikan LTE ideal) dan spektrum eksperimental (yang mengandung noise, fluktuasi tembakan-ke-tembakan, dan deviasi dari LTE).
 
-**2f. Pengolahan dan Analisis Data**
+### Analisa Sampel dan Pengolahan Data
 
-Hasil eksperimen dianalisis melalui beberapa tahap:
-- **Pra-pemrosesan spektrum**: normalisasi intensitas, koreksi *baseline*, dan segmentasi rentang panjang gelombang yang relevan.
-- **Identifikasi garis emisi**: pencocokan puncak emisi dengan database NIST ASD untuk verifikasi keberadaan elemen target.
-- **Inferensi model**: spektrum eksperimental yang telah di-pra-proses dimasukkan ke model CNN–Transformer yang telah dilatih untuk memprediksi konsentrasi elemen.
-- **Analisis komparatif**: perbandingan prediksi konsentrasi dari model dengan hasil pengukuran XRF (ground-truth).
+Hasil akuisisi eksperimental dianalisis lebih lanjut melalui serangkaian tahapan komputasional. Pemrosesan data mentah dan analisis luaran model mencakup:
+- **Pra-pemrosesan spektrum**: normalisasi intensitas terhadap kurva respons sistem (*instrumental response*), koreksi kontinum *baseline* melalui algoritma polynomial fitting, dan segmentasi rentang panjang gelombang fokus untuk membuang *background noise*.
+- **Identifikasi garis emisi**: pencocokan otomatis antar puncak profil spektrum yang terukur dengan *database* referensi NIST ASD guna memvalidasi keberadaan matriks elemen target.
+- **Inferensi model**: spektrum eksperimental yang telah bersih diumpankan ke model prediksi *deep learning* (CNN–Transformer) yang telah terbiasa dengan spektrum sintetis untuk mengekstrak vektor konsentrasi elemen (*end-to-end mapping*).
+- **Analisis komparatif**: penyelarasan keluaran prediksi konsentrasi dari pemodelan AI terhadap perolehan data eksak XRF sebagai landasan validasi metrik (*ground-truth*).
 
-**2g. Protokol Evaluasi**
+**Protokol Evaluasi Metrik**
 
-Evaluasi performa model dilakukan secara komprehensif dengan protokol sebagai berikut:
-- **3 metrik kuantitatif per elemen**: Root Mean Square Error (RMSE) untuk mengukur deviasi prediksi, koefisien determinasi (R²) untuk mengukur proporsi variansi yang dijelaskan model, dan Mean Absolute Percentage Error (MAPE) untuk mengukur akurasi relatif.
-- **4 model baseline** sebagai pembanding: PLS — Partial Least Squares (Wold et al., 2001) sebagai representasi metode kemometrik klasik, CNN-only dan Transformer-only sebagai komponen ablasi arsitektur, serta Informer (Zhou et al., 2021; Walidain et al., 2026) sebagai representasi model *sequence-to-sequence* terkini.
-- **Validasi**: stratified 5-fold cross-validation pada dataset eksperimental untuk memastikan robustness estimasi performa.
-- **Interpretabilitas**: analisis bobot *cross-attention* antara decoder dan encoder → identifikasi apakah model secara otomatis menemukan region spektral spesifik elemen yang konsisten dengan garis emisi NIST yang diketahui. Analisis ini menjadi validasi bahwa model benar-benar mempelajari dekomposisi mono–poliatomik yang bermakna secara fisik, bukan sekadar korelasi statistik.
+Evaluasi kapabilitas analitik model dihimpun secara komprehensif menggunakan protokol:
+- **3 metrik kuantitatif per elemen**: *Root Mean Square Error* (RMSE) untuk melacak rata-rata deviasi kuadratik, *Koefisien Determinasi* (R²) memonitor proporsi korelasi linier prediksi absolut, dan *Mean Absolute Percentage Error* (MAPE) sebagai parameter akurasi relatif spasial.
+- **4 model baseline** sebagai komparasi ketangguhan: PLS — *Partial Least Squares* (Wold et al., 2001) sebagai representasi perbandingan regresi kemometrik klasik, model spasial diskrit (CNN-only), penyesuai sekuens independen (Transformer-only), dan arsitektur canggih *Informer* (Zhou et al., 2021).
+- **Keterandalan Lintas-Validasi**: *stratified 5-fold cross-validation* diimplementasikan pada dataset eksperimental untuk menihilkan anomali uji (mencegah *overfitting*) serta menyajikan jaminan *robustness* validasi.
+- **Interpretabilitas Fisik**: penelusuran balik bobot koneksi *cross-attention* dari matriks *decoder* ke *encoder*. Pendekatan ini melegitimasi apakah mesin neural secara mandiri menemukan hubungan spasi-waktu transisi kuantum elemen, menegaskan bahwa simulasi benar-benar mempelajari dekomposisi mono–poliatomik sesuai hukum fisika yang presisi.
 
 ### Hasil yang Diharapkan
 
