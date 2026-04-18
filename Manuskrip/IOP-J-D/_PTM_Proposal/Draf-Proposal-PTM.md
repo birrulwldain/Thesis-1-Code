@@ -164,24 +164,28 @@ Siklus komputasional dan eksekusi jaringan model difasilitasi melalui perangkat 
 
 1. **NIST Atomic Spectra Database (ASD)**: Merupakan basis kompilasi standar yang diakses langsung pada server *National Institute of Standards and Technology* (Kramida et al., 2024). Ekstraksi dari tabel spektra ini menyuplai pondasi variabel kuantum seperti batas energi ionisasi ($E_{\infty,i}$), eksitasi energi status ($E_k, E_i$), degenerasi probabilitas ($g_k, g_i$), hingga peluruhan transisi foton ($A_{ki}$) yang menentukan keberhasilan dari algoritma fisika plasma termodinamika buatan kita.
 
-### Prosedur Penelitian
+### Diagram Alir Penelitian
 
-Prosedur pelaksanaan penelitian ini terdiri dari beberapa tahapan utama sebagaimana diilustrasikan dalam diagram alir pada Gambar 1. Secara garis besar, penelitian mengikuti *two-stage workflow* yang mengintegrasikan pendekatan berbasis simulasi fisika plasma dengan teknik *deep learning*:
-
-1. **Tahap Offline** — Pembangkitan dataset sintetis menggunakan *forward model* Saha–Boltzmann berdasarkan data transisi atomik NIST, yang digunakan untuk *pre-training* model.
-2. **Tahap Online** — Akuisisi data eksperimental LIBS dari sampel tanah vulkanik, diikuti dengan *fine-tuning* dan evaluasi model pada data riil.
-
-Kombinasi dua tahap ini dirancang untuk mengatasi keterbatasan jumlah data eksperimental yang tersedia (24 sampel) dengan cara memanfaatkan pengetahuan fisika plasma terlebih dahulu melalui data sintetis (Wang et al., 2024; Favre et al., 2025b), kemudian mentransfer representasi yang telah dipelajari ke domain eksperimental.
+Secara komprehensif, kerangka kerja eksperimental dan komputasional dalam penelitian ini divisualisasikan melalui diagram alir pada Gambar 1.
 
 **Gambar 1. Diagram Alir Penelitian**
 
 ![Diagram Alir Penelitian](diagram-alir-M.png)
 
-#### Pembangkitan Data Sintetis
+### Prosedur Penelitian
 
-Keterbatasan utama dalam pengembangan model *deep learning* untuk analisis LIBS adalah minimnya ketersediaan data eksperimental berlabel yang memadai untuk pelatihan. Untuk mengatasi hal ini, penelitian ini memanfaatkan *forward model* berbasis fisika plasma untuk membangkitkan dataset sintetis berskala besar. Pendekatan ini telah terbukti efektif dalam meningkatkan kemampuan generalisasi model melalui *pre-training* pada data sintetis sebelum *fine-tuning* pada data eksperimental (Wang et al., 2024; Favre et al., 2025b). Tahapan pembangkitan data sintetis adalah sebagai berikut:
+Prosedur pelaksanaan penelitian ini terdiri dari 4 (empat) tahapan utama yang mendukung rancangan pada diagram alir di atas. Secara garis besar, penelitian mengikuti alur kerja yang mengintegrasikan pendekatan fisika eksperimental optik dan teknik *deep learning*:
 
-1. **Pengumpulan data transisi atomik** dari NIST Atomic Spectra Database (Kramida et al., 2024): panjang gelombang transisi (λ_ki), koefisien Einstein (A_ki), degenerasi (g_i), dan energi level (E_i). Agar rentang simulasi bersifat representatif, parameter elemen dikompilasi secara spesifik untuk **8 elemen mayor** dan **15 elemen jejak (*trace elements*)** khas tanah vulkanik, dengan batasan rentang konsentrasi sesuai Tabel berikut:
+1. **Tahap Offline** — Pembangkitan dataset sintetis menggunakan *forward model* Saha–Boltzmann berdasarkan data transisi atomik NIST, yang digunakan untuk *pre-training* model.
+2. **Tahap Online** — Akuisisi data eksperimental LIBS dari sampel tanah vulkanik, diikuti dengan *fine-tuning* dan evaluasi model pada data riil.
+
+Kombinasi tahapan ini dirancang untuk mengatasi keterbatasan jumlah data eksperimental yang tersedia (24 sampel) dengan cara memanfaatkan pengetahuan fisika plasma terlebih dahulu melalui data sintetis (Wang et al., 2024; Favre et al., 2025b), kemudian mentransfer representasi yang telah dipelajari ke domain eksperimental.
+
+#### Tahap 1: Pembangkitan Data Sintetis
+
+Keterbatasan utama dalam pengembangan model *deep learning* untuk analisis LIBS adalah minimnya ketersediaan data eksperimental berlabel yang memadai untuk pelatihan. Untuk mengatasi hal ini, penelitian ini memanfaatkan *forward model* berbasis fisika plasma untuk membangkitkan dataset sintetis berskala besar. Pendekatan ini telah terbukti efektif dalam meningkatkan kemampuan generalisasi model melalui *pre-training* pada data sintetis sebelum *fine-tuning* pada data eksperimental (Wang et al., 2024; Favre et al., 2025b).
+
+Sebelum algoritma numerik dieksekusi, parameter input yang mencakup rentang konsentrasi (*ground-truth* sintetis) dan karakteristik instrumen fisis didefinisikan secara konstan terlebih dahulu. Rentang referensi kelompok elemen penyusun matriks disajikan secara komprehensif pada **Tabel Rentang Referensi Komposisi Elemen**. Sementara batas variabel simulasi hukum fisikanya dipaparkan secara eksplisit di awal melalui **Tabel Parameter Fisis dan Instrumental**.
 
 **Tabel Rentang Referensi Komposisi Elemen Tanah Vulkanik**
 
@@ -210,13 +214,6 @@ Keterbatasan utama dalam pengembangan model *deep learning* untuk analisis LIBS 
 | **Jejak** | Mo | 0.0005 – 0.01 | Logam jejak minor |
 | **Jejak** | Y | 0.0005 – 0.01 | Berasosiasi dengan *rare earth element* (REE) |
 | **Jejak** | Zr | 0.001 – 0.02 | Mineral penyerta zirkon |
-2. **Penghitungan populasi analit** memanfaatkan fondasi kesetimbangan termodinamika lokal (*Local Thermodynamic Equilibrium* / LTE). Distribusi elektron tereksitasi pada tingkat energi spesifik dikalkulasi berdasarkan *Distribusi Boltzmann*, dan keseimbangan densitas antar tingkat ionisasi saling berurutan dihitung menggunakan *Persamaan Saha* (Fujimoto, 2004). Parameter plasma dominan (Suhu elektron, *T_e* dan densitas elektron, *n_e*) pada kalkulasi fundamental ini kemudian di-sampling secara acak seragam: T_e ∈ [6.000–15.000] K, n_e ∈ [10^16 – 10^17] cm^{-3}. Pemilihan rentang ini secara sengaja disusun menyerupai kondisi tipikal transien plasma spektrum LIBS pada tekanan udara terbuka (Cristoforetti et al., 2010).
-3. **Pembangkitan spektrum monoatomik** S_mono^(z)(λ) per elemen dengan menjumlahkan koefisien emisi spektral menggunakan profil Voigt — konvolusi pelebaran Doppler dan Stark broadening (Griem, 1974). Profil Voigt dipilih karena merepresentasikan mekanisme pelebaran garis spektral dominan pada plasma LIBS, yaitu pelebaran termal (Doppler) dan pelebaran akibat interaksi elektron (Stark).
-4. **Konstruksi spektrum poliatomik** S_poly(λ) = Σ_z c_z · S_mono^(z)(λ) — superposisi terbobot konsentrasi fraksional. Tahap ini secara eksplisit mengimplementasikan hipotesis dekomposisi mono–poliatomik yang menjadi dasar arsitektur encoder–decoder.
-5. **Konvolusi instrumental** dengan fungsi Gaussian (FWHM = 0,02 nm) untuk mencocokkan resolusi spektrometer Echelle yang digunakan dalam eksperimen.
-6. Total dataset yang dibangkitkan: **10.000 pasangan spektrum sintetis** (monoatomik + poliatomik beserta label konsentrasi dan parameter plasma), dibagi menjadi 80% untuk *training* dan 20% untuk *test*.
-7. Ringkasan seluruh parameter fisis dan komputasional yang dilibatkan dalam simulasi *forward model* spektral sintetis ini dirangkum pada Tabel berikut.
-
 **Tabel Parameter Fisis dan Instrumental Simulasi Data Sintetis**
 
 | Kategori / Parameter | Nilai / Rentang | Keterangan |
@@ -228,6 +225,15 @@ Keterbatasan utama dalam pengembangan model *deep learning* untuk analisis LIBS 
 | Profil Bentuk Garis Emisi | Kurva Voigt | Transisi termal pelebaran Doppler & Stark |
 | Fungsi Pelebaran Optik | Gaussian | Karakterisasi difraksi grating |
 | Total Data | 10.000 pasang | Varians komprehensif untuk *Deep Learning* |
+
+Setelah pondasi input di atas dipastikan secara ketat, tahapan operasional eksekusi logika pembangkitan data otomatis dikonstruksi secara programatik meliputi langkah berikut:
+
+1. **Pengumpulan data transisi atomik** diunduh secara algoritmik dari *database* referensi (Kramida et al., 2024). Parameter konstan panjang gelombang ($\lambda_{ki}$), Einstein ($A_{ki}$), dan termal nukleus ($E_i$, $g_i$) diseleksi khusus menurut Tabel Rentang Referensi Komposisi Elemen.
+2. **Penghitungan populasi analit** bersandar penuh pada kesetimbangan termodinamika lokal (*Local Thermodynamic Equilibrium* / LTE). Fraksi atom netral dan fraksi ion direkonsiliasi matematis berdasarkan *Distribusi Boltzmann* dan *Persamaan Ionisasi Saha* (Fujimoto, 2004). Parameter plasma dominan pendukung persamaan (Suhu elektron, *T_e* dan densitas elektron, *n_e*) pada kalkulasi fundamental ini kemudian di-sampling secara acak seragam: $T_e \in [6.000–15.000] K$, $n_e \in [10^{16} – 10^{17}] cm^{-3}$. Pemilihan rentang ini secara sengaja disusun menyerupai kondisi tipikal transien plasma spektrum LIBS pada tekanan atmosfer  (Cristoforetti et al., 2010).
+3. **Pembangkitan spektrum monoatomik** ($S_\mathrm{mono}^{(z)}$) diformulasikan spesifik tiap elemen. Profil kurva Voigt dipilih untuk mensintesis intensitas (pelebaran termal Doppler diputar dengan turbulensi elektron Stark) meniru optika asli difraksi fisik plasma (Griem, 1974).
+4. **Konstruksi spektrum poliatomik** campuran: memproyeksikan fraksi superposisi di seluruh sumbu spektrometer: $S_\mathrm{poly}(\lambda) = \sum_{z} c_z \cdot S_\mathrm{mono}^{(z)}(\lambda)$. Pada fase ini diatur konfigurasi dari koefisien variabel bebas $c_z$ diacak independen sebatas porsi tabel referensi komposisi.
+5. **Validasi final resolusi** dieksekusi via kernel fungsi Gaussian setara (FWHM 0,02 nm) agar mencocokkan resolusi nyata spektrometer Echelle yang digerakkan pada fase eksperimen alat.
+6. Total dataset yang dibangkitkan memformulasikan **10.000 pasangan spektrum sintetis** (korelasi monoatomik + superposisi poliatomik dengan label parameter). Kumpulan data sintetis raksasa ini dibagi statis secara acak, mengecualikan 20\% sebagai tes untuk model dan 80\% mutlak untuk fondasi pramu-latih (*pre-training*) *Deep Learning*.
 
 #### Akuisisi Data Eksperimental dan Pemodelan
 
