@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1776508681.94043 "/Users/birrulwldain/Projects/Thesis-1-Code/Manuskrip/IOP-J-D/_PTM_Proposal/peta-jalan.tex" "peta-jalan.pdf" "peta-jalan" 1776508682.63341 0
-  "/Users/birrulwldain/Projects/Thesis-1-Code/Manuskrip/IOP-J-D/_PTM_Proposal/peta-jalan.tex" 1776508681.60877 6474 a2759719993060b07d5965d14c897b12 ""
+["pdflatex"] 1776518384.20394 "/Users/birrulwldain/Projects/Thesis-1-Code/Manuskrip/IOP-J-D/_PTM_Proposal/peta-jalan.tex" "peta-jalan.pdf" "peta-jalan" 1776518384.95014 0
+  "/Users/birrulwldain/Projects/Thesis-1-Code/Manuskrip/IOP-J-D/_PTM_Proposal/peta-jalan.tex" 1776518383.94396 6787 9b3437888722eaff5968cb5997449660 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/adobe/helvetic/phvb8r.tfm" 1136768653 4484 b828043cbd581d289d955903c1339981 ""
@@ -143,8 +143,8 @@
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1759593401 5528139 daf1353d2d3d7fed9df2ebbf1b26218e ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1759593442 3628858 a076895f4b70d7745e06fc4161256e5b ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "peta-jalan.aux" 1776508682.58171 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
-  "peta-jalan.tex" 1776508681.60877 6474 a2759719993060b07d5965d14c897b12 ""
+  "peta-jalan.aux" 1776518384.89451 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "peta-jalan.tex" 1776518383.94396 6787 9b3437888722eaff5968cb5997449660 ""
   (generated)
   "peta-jalan.aux"
   "peta-jalan.log"
