@@ -1,0 +1,53 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: proposal-lengkap.aux
+The style file: apalike.bst
+Database file #1: Roadmap/Roadmap.bib
+Database file #2: Roadmap/referensi.bib
+Warning--empty booktitle in mitaphonna_preliminary_2024
+Warning--empty booktitle in mitaphonna_x-ray_2023
+Warning--empty booktitle in mitaphonna_characteristics_2023
+Warning--empty booktitle in ramli_elemental_2023-1
+Warning--can't use both volume and number fields in zhou2021
+You've used 48 entries,
+            1935 wiz_defined-function locations,
+            743 strings with 14985 characters,
+and the built_in function-call counts, 22354 in all, are:
+= -- 2085
+> -- 1267
+< -- 29
++ -- 463
+- -- 450
+* -- 1985
+:= -- 3902
+add.period$ -- 144
+call.type$ -- 48
+change.case$ -- 448
+chr.to.int$ -- 43
+cite$ -- 53
+duplicate$ -- 791
+empty$ -- 1377
+format.name$ -- 518
+if$ -- 4340
+int.to.chr$ -- 6
+int.to.str$ -- 0
+missing$ -- 49
+newline$ -- 243
+num.names$ -- 144
+pop$ -- 424
+preamble$ -- 1
+purify$ -- 450
+quote$ -- 0
+skip$ -- 609
+stack$ -- 0
+substring$ -- 1288
+swap$ -- 134
+text.length$ -- 10
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 284
+warning$ -- 5
+while$ -- 144
+width$ -- 0
+write$ -- 620
+(There were 5 warnings)
